@@ -13,7 +13,7 @@ To getting it used, simply clone and build the solution:
  
  - *ConsolaCore5/ConsolaCore5.sln* builds a .Net(Core) 5.0 dll
  
-In a Project to make usage of *Consola*, add a reference to the Console.dll file that was built and add *Consola.StdStream.Init();* as first line inside the programs Main() function. (makes it initializing by default parameters). So any code in the Project should be able now using the *Consola.StdStream* api in quite a similar way as like also the  *System.Console* api would be used:
+In a Project to make usage of *Consola*, add a reference to the *Consola.dll* file that was built and add *Consola.StdStream.Init();* as first line inside the programs Main() function. (makes it initializing by default parameters). So any code in the Project should be able now using the *Consola.StdStream* api in quite a similar way as like also the  *System.Console* api would be used:
 
 ## Writing Output:
 ```
