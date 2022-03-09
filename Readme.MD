@@ -18,22 +18,27 @@ In a Project to make usage of *Consola*, add a reference to the Console.dll file
 ## Writing Output:
 ```
 // writing a strng to stdout
+
 Consola.StdStream.Out.WriteLine("Hello {0}!",worldObj);
 
 // writing a string to stderr
+
 Consola.StdStream.Err.WriteLine("Bad Error");
 
 // reading a line from stdin
+
 string userinp = Consola.StdStream.Inp.ReadLine();
 ```
 
 ## Redirecting Streams: 
 
-```
-// these can be simply assigned to each other like this:   
+Streams can be simply assigned to each other:
 
+```  
 // example: this would redirect stderr to stdout
+
 Consola.StdStream.Out = Consola.StdStream.Err;
+
 ```
 
 ## Starting Log Sessions: 
@@ -42,16 +47,23 @@ Streams can simply be redirected to log files:
 
 ```
 // anthing that goes through stderr shall get logget:
+
 Consola.StdStream.Err.Log = Consola.StdStream.Err
+
 ```
 
-Stream Loggers can be redirectd individually:
+Log files can be redirectd individually:
 
 ```
 // this enables logging for stdout
+
 Consola.StdStream.Out.Log = Consola.StdStream.Out;
+
+
 // this redirects Error-Log to the Output-Log. 
+
 Consola.StdStream.Err.Log = Consola.StdStream.Out.Log
+
 ```
 (* e.g.: in the above example, stderr and stdout are not redirected so. these still will stay a separate stream each. but both will produce log within a single log file so) 
 
@@ -59,9 +71,12 @@ Consola.StdStream.Err.Log = Consola.StdStream.Out.Log
 
 ```
 // gets a locked output stream object: 
+
 Locked output = Consola.StdStream.Out.Stream();
 
+
 // which can be used from within current scope: 
+
 output.Put("Hallo").Put(" ");
 WorldClass worldObj = GetWorldInfo();
 output.Put(" ...").Put(worldObj).Put(" how are you?");
@@ -69,7 +84,9 @@ output.Put(" ...").Put(worldObj).Put(" how are you?");
 // to enable other threads being able again writing to
 // StdOut, the locked stream when done with writing,
 // must release that lock it holds via calling End()
-output.Put(" ...by by").End()
+
+output.Put(" ...by by").End();
+
 ```
 
 
