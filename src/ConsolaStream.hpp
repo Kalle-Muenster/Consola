@@ -22,6 +22,8 @@ namespace Consola
     ref class AuxXml;
     ref class Locked;
     ref class AuxilaryStream;
+    value struct StreamLocker;
+    ref class OutStream;
 
     [FlagsAttribute()]
     public enum class CreationFlags : uint { None = 0,
@@ -137,8 +139,11 @@ namespace Consola
         virtual bool   lockup(uint) abstract;
         virtual bool   unlock(uint) abstract;
         virtual bool   locked(void) abstract;
+        static  bool   strmlockup(StdStream^ strm, uint);
+        static  bool   strmunlock(StdStream^ strm, uint);
 
     private:
+
         static CreationFlags   consolestate = CreationFlags(-1);
         static CreationFlags   loggingstate = CreationFlags(-1);
         static unsigned        instanzencounter = 0;
@@ -202,29 +207,29 @@ namespace Consola
         }
     };
 
-    private value struct LockerVomHocker {
-    private:
-        static Reflection::MethodInfo^ lockInfo;
-        static Reflection::MethodInfo^ freeInfo;
-        Object^                        hocker;
-        array<Object^>^                locker;
+    private value struct StreamLocker {
+    private: 
+        static Func<StdStream^, UInt32, bool>^ lockInfo;
+        static Func<StdStream^, UInt32, bool>^ freeInfo;
+        StdStream^                             hocker;
+        uint                                   locker;
 
     public:
         uint direct;
-        static LockerVomHocker(void) {
-            lockInfo = StdStream::typeid->GetMethod("lock");
-            freeInfo = StdStream::typeid->GetMethod("unlock");
+        static StreamLocker(void) {
+            lockInfo = gcnew Func< StdStream^, UInt32, bool>(StdStream::strmlockup);
+            freeInfo = gcnew Func< StdStream^, UInt32, bool>(StdStream::strmunlock);
         }
-        LockerVomHocker( StdStream^ stream, uint keyid )
-            : direct((uint)stream->StreamDirection)
-            , hocker(stream) {
-            locker = gcnew array<Object^> {keyid};
+        StreamLocker( StdStream^ stream, uint keyid )
+            : direct( (uint)stream->StreamDirection )
+            , hocker( stream ) {
+            locker = keyid;
         }
         bool up(void) {
-            return (bool)lockInfo->Invoke(hocker, locker);
+            return lockInfo(hocker,locker);
         }
         bool un(void) {
-            return (bool)freeInfo->Invoke(hocker, locker);
+            return freeInfo(hocker,locker);
         }
     };
 
@@ -345,22 +350,24 @@ namespace Consola
     {
     internal: Locked( Direction streamdirection ) : OutStream( streamdirection ) {}
     public:
-        void End() {
-            if (dir == 1) {
-                if ( reinterpret_cast<StdOut^>(this)->unlock( streamlocked ))
+        virtual void End() {
+            switch ( Direction(dir) ) {
+            case Direction::Out: {
+                if ( this->lockup(streamlocked) ) // reinterpret_cast<StdOut^>(this)->unlock(streamlocked))
                     streamlocked = EMPTY;
-                else throw gcnew System::Exception("volle kanne error");
-            } else {
-                if (reinterpret_cast<StdErr^>(this)->unlock( streamlocked ))
+                else throw gcnew System::Exception("thread lock invalid");
+            } break;
+            case Direction::Err: {
+                if ( this->unlock(streamlocked) )
                     streamlocked = EMPTY;
-                else throw gcnew System::Exception("volle kanne error");
-            }
+                else throw gcnew System::Exception("thread lock invalid");
+            } break; }
         }
         Locked^ Put( Object^ data ) {
             if( dir == 1 ) {
-                return reinterpret_cast<Locked^>( reinterpret_cast<StdOut^>(this)->operator << (data) );
+                return reinterpret_cast<Locked^>( this->operator << (data) );
             } else {
-                return reinterpret_cast<Locked^>( reinterpret_cast<StdErr^>(this)->operator << (data) );
+                return reinterpret_cast<Locked^>( this->operator << (data) );
             }
         }
     };

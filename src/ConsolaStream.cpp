@@ -212,7 +212,7 @@ void
 Consola::StdStream::asynchronStreamWrite( Object^ taskData )
 {
     array<Object^>^ dataArray = safe_cast<array<Object^>^>( taskData );
-    LockerVomHocker lock = safe_cast<LockerVomHocker>( dataArray[0] );
+    StreamLocker lock = safe_cast<StreamLocker>( dataArray[0] );
     String^ data = safe_cast<String^>( dataArray[1] );
     LogWriter^ logger = safe_cast<LogWriter^>( dataArray[2] );
     while (true) if ( lock.up() ) {
@@ -231,7 +231,7 @@ void
 Consola::StdStream::asynchronDataWrite( Object^ taskData )
 {
     array<Object^>^ dataArray = safe_cast<array<Object^>^>(taskData);
-    LockerVomHocker lock = safe_cast<LockerVomHocker>(dataArray[0]);
+    StreamLocker lock = safe_cast<StreamLocker>(dataArray[0]);
     array<byte>^ byteData = safe_cast<array<byte>^>(dataArray[1]);
     while (true) if ( lock.up() ) {
         _writeByteArrayToStdtStream( lock.direct, byteData, 0, byteData->Length );
@@ -247,7 +247,7 @@ Consola::StdStream::asynchronRawDataWrite( Object^ taskData )
 {
     ulong size; int oset;
     array<Object^>^ taskDataObjects = safe_cast<array<Object^>^>(taskData);
-    LockerVomHocker lock = safe_cast<LockerVomHocker>(taskDataObjects[0]);
+    StreamLocker lock = safe_cast<StreamLocker>(taskDataObjects[0]);
     IntPtr rawData = safe_cast<IntPtr>(taskDataObjects[1]);
     size = safe_cast<ulong>(taskDataObjects[2]);
     oset = (int)(size & 0x00000000ffffffff);
@@ -269,7 +269,7 @@ Consola::StdStream::asynchronArrayWrite( Object^ taskData )
     int oset;
     ulong size;
     array<Object^>^ taskDataObjects = safe_cast<array<Object^>^>(taskData);
-    LockerVomHocker lock = safe_cast<LockerVomHocker>(taskDataObjects[0]);
+    StreamLocker lock = safe_cast<StreamLocker>(taskDataObjects[0]);
     array<T>^ dataArray = safe_cast<array<T>^>(taskDataObjects[1]);
     if (taskDataObjects->Length > 2) {
         size = safe_cast<ulong>(taskDataObjects[2]);
@@ -289,7 +289,7 @@ void
 Consola::StdStream::asynchronStreamGetLocked( Object^ taskData )
 {
     array<Object^>^ dataArray = safe_cast<array<Object^>^>( taskData );
-    LockerVomHocker lock = safe_cast<LockerVomHocker>( dataArray[0] );
+    StreamLocker lock = safe_cast<StreamLocker>( dataArray[0] );
     String^ data = safe_cast<String^>( dataArray[1] );
     LogWriter^ logger = safe_cast<LogWriter^>( dataArray[2] );
     while (true) if ( lock.up() ) {
@@ -306,7 +306,7 @@ Consola::StdStream::asynchronStreamGetLocked( Object^ taskData )
 
 String^ Consola::StdStream::asynchronStreamRead( Object^ taskData )
 {
-    LockerVomHocker lock = safe_cast<LockerVomHocker>( safe_cast<array<Object^>^>(taskData)[0] );
+    StreamLocker lock = safe_cast<StreamLocker>( safe_cast<array<Object^>^>(taskData)[0] );
     uint condition = safe_cast<uint>( safe_cast<array<Object^>^>( taskData )[1] );
     while( true ) if ( lock.up() ) {
         return _readStringFromStdIn( condition );
@@ -318,7 +318,7 @@ String^ Consola::StdStream::asynchronStreamRead( Object^ taskData )
 generic<class T> where T : ValueType
 array<T>^ Consola::StdStream::asynchronArrayRead( Object^ taskData )
 {
-    LockerVomHocker lock = safe_cast<LockerVomHocker>( safe_cast<array<Object^>^>(taskData)[0] );
+    StreamLocker lock = safe_cast<StreamLocker>( safe_cast<array<Object^>^>(taskData)[0] );
     uint condition = safe_cast<uint>( safe_cast<array<Object^>^>(taskData)[1] );
     while( true ) if ( lock.up() ) {
         return _readArrayFromStdIn<T>( condition );
@@ -331,7 +331,7 @@ generic<class T> where T : ValueType
 uint Consola::StdStream::asynchronDataRead( Object^ taskData )
 {
     array<Object^>^ dataArray = safe_cast<array<Object^>^>( taskData );
-    LockerVomHocker lock = safe_cast<LockerVomHocker>( dataArray[0] );
+    StreamLocker lock = safe_cast<StreamLocker>( dataArray[0] );
     array<T>^ dst = safe_cast<array<T>^>( dataArray[1] );
     uint offset = safe_cast<uint>( dataArray[2] );
     uint Tcount = safe_cast<uint>( dataArray[3] );
@@ -345,7 +345,7 @@ uint Consola::StdStream::asynchronDataRead( Object^ taskData )
 uint Consola::StdStream::asynchronRawDataRead( Object^ taskData )
 {
     array<Object^>^ dataArray = safe_cast<array<Object^>^>(taskData);
-    LockerVomHocker lock = safe_cast<LockerVomHocker>(dataArray[0]);
+    StreamLocker lock = safe_cast<StreamLocker>(dataArray[0]);
     IntPtr dst = safe_cast<IntPtr>(dataArray[1]);
     uint offset = safe_cast<uint>(dataArray[2]);
     uint Tcount = safe_cast<uint>(dataArray[3]);
@@ -484,6 +484,17 @@ Consola::StdStream::Init( CreationFlags creationflags )
 }
 
 
+bool
+Consola::StdStream::strmlockup(StdStream^ strm, uint key)
+{
+    return strm->lockup(key);
+}
+bool
+Consola::StdStream::strmunlock(StdStream^ strm, uint key)
+{
+    return strm->unlock(key);
+}
+
 String^
 Consola::StdStream::Cwd::get()
 {
@@ -579,7 +590,7 @@ Consola::StdStream::systemStringToStdOut( String^ string )
         unlock( key );
     } else {
         Action<Object^> ^fu = gcnew Action<Object^>(this->asynchronStreamWrite);
-        ( gcnew Task( fu, gcnew array<Object^>{ LockerVomHocker( this, key ), string, log })
+        ( gcnew Task( fu, gcnew array<Object^>{ StreamLocker( this, key ), string, log })
          )->Start();
     } 
 }
@@ -594,7 +605,7 @@ Consola::StdStream::dataArrayToStdOut( array<byte>^ data )
     } else {
         Task^ task;
         Action<Object^>^ fu = gcnew Action<Object^>( this->asynchronDataWrite );
-        task = gcnew Task( fu, gcnew array<Object^>{ LockerVomHocker(this,key), data } );
+        task = gcnew Task( fu, gcnew array<Object^>{ StreamLocker(this,key), data } );
         task->Start();
     }
 }
@@ -609,7 +620,7 @@ Consola::StdStream::systemArrayToStdOut( array<T>^ data, int oset, int size )
     } else { Task^ task;
         ulong sizeinfo = ulong(oset | (size << 32));
         Action<Object^>^ fu = gcnew Action<Object^>( this->asynchronArrayWrite<T> );
-        task = gcnew Task( fu, gcnew array<Object^>{ LockerVomHocker(this,key), data, sizeinfo } );
+        task = gcnew Task( fu, gcnew array<Object^>{ StreamLocker(this,key), data, sizeinfo } );
         task->Start();
     }
 }
@@ -625,7 +636,7 @@ Consola::StdStream::rawDataToStdOut( IntPtr data, int oset, int size )
         Task^ task;
         ulong sizeinfo = ulong(oset | (size << 32));
         Action<Object^>^ fu = gcnew Action<Object^>( this->asynchronRawDataWrite );
-        task = gcnew Task(fu, gcnew array<Object^>{ LockerVomHocker(this, key), data, sizeinfo });
+        task = gcnew Task(fu, gcnew array<Object^>{ StreamLocker(this, key), data, sizeinfo });
         task->Start();
     }
 }
@@ -667,7 +678,7 @@ Consola::StdStream::systemStringFromStdIn( uint condition )
         returnvalue = _readStringFromStdIn( condition );
     else { Task<String^>^ task;
         Func<Object^,String^> ^fu = gcnew Func<Object^,String^>( this->asynchronStreamRead );
-        task = Task<String^>::Factory->StartNew( fu, gcnew array<Object^>{ LockerVomHocker( this, key ), condition } );
+        task = Task<String^>::Factory->StartNew( fu, gcnew array<Object^>{ StreamLocker( this, key ), condition } );
         returnvalue = task->GetAwaiter().GetResult();
     } unlock( key );
     if( log != nullptr ) {
@@ -687,7 +698,7 @@ Consola::StdStream::rawDataFromStdIn( IntPtr dst, int offset, int length )
         Task<uint>^ task;
         ulong sizeinfo = ulong(offset | (length << 32));
         Func<Object^,uint>^ fu = gcnew Func<Object^,uint>( this->asynchronRawDataRead );
-        task = Task<uint>::Factory->StartNew(fu, gcnew array<Object^>{ LockerVomHocker(this, key), sizeinfo });
+        task = Task<uint>::Factory->StartNew(fu, gcnew array<Object^>{ StreamLocker(this, key), sizeinfo });
         returnvalue = task->GetAwaiter().GetResult();
     } unlock(key);
     return returnvalue;
@@ -702,7 +713,7 @@ Consola::StdStream::systemArrayFromStdIn( uint condition )
         returnvalue = _readArrayFromStdIn<T>(condition);
     else { Task<array<T>^>^ task;
         Func<Object^,array<T>^>^ fu = gcnew Func<Object^,array<T>^>( this->asynchronArrayRead<T> );
-        task = Task<array<T>^>::Factory->StartNew( fu, gcnew array<Object^>{ LockerVomHocker( this, key ), condition } );
+        task = Task<array<T>^>::Factory->StartNew( fu, gcnew array<Object^>{ StreamLocker( this, key ), condition } );
         returnvalue = (array<T>^)task->GetAwaiter().GetResult();
     } unlock( key );
     if (log != nullptr) {
@@ -721,7 +732,7 @@ Consola::StdStream::readDataFromStdIn( array<T>^ dst,uint offset,uint length )
         returnvalue = _readDataFromStdIn<T>( dst, offset, length );
     else { Task<uint>^ task;
         Func<Object^,uint>^ fu = gcnew Func<Object^,uint>( this->asynchronDataRead<T> );
-        array<Object^>^ taskdata = gcnew array<Object^>{ LockerVomHocker( this, key ), dst, offset, length };
+        array<Object^>^ taskdata = gcnew array<Object^>{ StreamLocker( this, key ), dst, offset, length };
         task = Task<uint>::Factory->StartNew( fu, taskdata );
         returnvalue = task->GetAwaiter().GetResult();
     } unlock( key );

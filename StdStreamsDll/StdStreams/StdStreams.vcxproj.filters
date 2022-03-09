@@ -24,7 +24,10 @@
     <ClCompile Include="..\..\src\ConsolaAuxilary.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="C:\CMD\CCommands\.stringPool.cc">
+    <ClCompile Include="..\..\src\stringpool\.byteOrder.cc">
+      <Filter>Headerdateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\stringpool\.stringPool.cc">
       <Filter>Headerdateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +44,10 @@
     <ClInclude Include="..\..\src\ConsolaAuxilary.hpp">
       <Filter>Quelldateien</Filter>
     </ClInclude>
-    <ClInclude Include="C:\CMD\CCommands\.stringPool.h">
+    <ClInclude Include="..\..\src\stringpool\.byteOrder.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\stringpool\.stringPool.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
