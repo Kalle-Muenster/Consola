@@ -64,22 +64,4 @@ Consola.StdStream.Err.Log = Consola.StdStream.Out.Log
 
 (* e.g.: in the above example, stderr and stdout are not redirected so. these still will stay a separate stream each. but both will produce log within one single log file so) 
 
-## Using Stream Objects:
-
-Get a locked output stream object: 
-```
-Locked output = Consola.StdStream.Out.Stream;
-```
-
-Use it in the current scope: 
-```
-output.Put("Hallo").Put(" ");
-WorldClass worldObj = GetWorldInfo();
-output.Put(" ...").Put(worldObj).Put(" how are you?");
-```
-
-When done with writing, to reelease lock, *End()* must be called. So other threads can write to StdStream.Out again
-```
-output.Put(" ...by by").End();
-```
 
