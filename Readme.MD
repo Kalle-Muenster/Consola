@@ -17,29 +17,33 @@ In a Project to make usage of *Consola*, add a reference to the *Consola.dll* fi
 
 ## Writing Output:
 
-### writing a strng to stdout
+writing a strng to stdout
 ```
 Consola.StdStream.Out.WriteLine("Hello {0}!",worldObj);
 ```
 
-### writing a string to stderr
+writing a string to stderr
 ```
 Consola.StdStream.Err.WriteLine("Bad Error");
 ```
 
-### reading a line from stdin
+reading a line from stdin
 ```
 string userinp = Consola.StdStream.Inp.ReadLine();
 ```
 
 ## Redirecting Streams: 
 
-For redirecting streams, these can be simply assigned to each other:
- 
 redirect *stderr* to *stdout*
 ```
 Consola.StdStream.Out = Consola.StdStream.Err;
 ```
+
+---
+
+In addition some little bit more things can be done:
+
+---
 
 ## Starting Log Sessions: 
 
