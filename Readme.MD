@@ -41,7 +41,7 @@ Consola.StdStream.Out = Consola.StdStream.Err;
 
 ---
 
-In addition some little bit more things can be done:
+
 
 ---
 
