@@ -47,7 +47,7 @@ Streams can be not only redirected to other streams, but also to attached file l
 
 this enables *stderr* stream logging via a file logger, which gets attached as *Err.Log*:
 ```
-Consola.StdStream.Err.Log = Consola.StdStream.Err
+Consola.StdStream.Err.Log = Consola.StdStream.Err;
 ```
 
 ## Redirecting Log files: 
@@ -59,7 +59,7 @@ Consola.StdStream.Out.Log = Consola.StdStream.Out;
 
 this enables *stderr* stream logging via the *Out.Log* logger which gets attached as *Err.Log*:
 ```
-Consola.StdStream.Err.Log = Consola.StdStream.Out.Log
+Consola.StdStream.Err.Log = Consola.StdStream.Out.Log;
 ```
 
 (* e.g.: in the above example, stderr and stdout are not redirected so. these still will stay a separate stream each. but both will produce log within one single log file so) 
