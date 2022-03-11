@@ -20,10 +20,11 @@ namespace Consola
     ref class StdOut;
     ref class StdErr;
     ref class AuxXml;
-    ref class Locked;
-    ref class AuxilaryStream;
-    value struct StreamLocker;
     ref class OutStream;
+    ref class AuxilaryStream;
+
+    generic<class O> where O : OutStream 
+    ref class Locked;
 
     [FlagsAttribute()]
     public enum class CreationFlags : uint { None = 0,
@@ -53,6 +54,10 @@ namespace Consola
         static void    SetLogName( String^ logFile );
         static uint    VersionNumber();
         static String^ VersionName();
+        static Int32   ProgramProc();
+        static String^ ProgramName();
+        static String^ MachineName();
+        static String^ MachineArch();
         static bool    HasConsole( void );
         virtual       ~StdStream( void );
 
@@ -207,41 +212,51 @@ namespace Consola
         }
     };
 
+
+
     private value struct StreamLocker {
     private: 
-        static Func<StdStream^, UInt32, bool>^ lockInfo;
-        static Func<StdStream^, UInt32, bool>^ freeInfo;
-        StdStream^                             hocker;
-        uint                                   locker;
+        static System::Func<StdStream^,UInt32,bool>^   lockFunco;
+        static System::Func<StdStream^,UInt32,bool>^   freeFunco;
+        StdStream^                                     hocker;
+        uint                                           locker;
 
     public:
         uint direct;
         static StreamLocker(void) {
-            lockInfo = gcnew Func< StdStream^, UInt32, bool>(StdStream::strmlockup);
-            freeInfo = gcnew Func< StdStream^, UInt32, bool>(StdStream::strmunlock);
+            lockFunco = gcnew System::Func<StdStream^,UInt32,bool>(StdStream::strmlockup);
+            freeFunco = gcnew System::Func<StdStream^,UInt32,bool>(StdStream::strmunlock);
         }
         StreamLocker( StdStream^ stream, uint keyid )
-            : direct( (uint)stream->StreamDirection )
+            : direct( (uint)((StdStream^)stream)->StreamDirection )
             , hocker( stream ) {
             locker = keyid;
         }
         bool up(void) {
-            return lockInfo(hocker,locker);
+            return lockFunco( (StdStream^)hocker, locker );
         }
         bool un(void) {
-            return freeInfo(hocker,locker);
+            return freeFunco( (StdStream^)hocker, locker );
         }
     };
+
+    public interface class ILocked {
+    public:
+        ILocked^ Put( Object^ content );
+        void End();
+    };
+
+
 
     public ref class OutStream abstract : public StdStream
     {
     protected:
         static bool ErrAndOutSharedLock = true;
-        uint streamlocked = false;
-
+       
     internal:
+        uint streamlocked = false;
         static volatile uint lockvar = EMPTY;
-
+        virtual ILocked^ l() abstract;
         OutStream( Direction streamdirection )
             : StdStream( streamdirection ) {
         }
@@ -265,13 +280,11 @@ namespace Consola
             return hocker != EMPTY;
         }
         void LockedStreamWrite( String^ data );
-        OutStream^ operator << (Object^ object) {
+        ILocked^ operator << (Object^ object) {
             LockedStreamWrite( object->ToString() );
-            return this;
+            return this->l();
         }
-        static operator Locked ^ (OutStream^ cast) {
-            return reinterpret_cast<Locked^>(cast);
-        }
+
 
     public:
         void WriteLine( String^ line );
@@ -283,10 +296,53 @@ namespace Consola
         generic<class T> where T : ValueType
         void Write( array<T>^ data, int offsetTs, int countOnTs );
         void Write( IntPtr data, int cbOffset, int cbSize );
-        property Locked^ Stream {
-            Locked^ get(void);
+        property ILocked^ Stream {
+            ILocked^ get(void);
         };
     };
+
+    generic<class O> where O : OutStream
+        public ref class Locked : public OutStream, ILocked
+    {
+    internal:
+        O okopirer;
+        Locked(O kopierer) : OutStream(kopierer->StreamDirection) {
+            okopirer = kopierer;
+            streamlocked = okopirer->streamlocked;
+        }
+        operator O() {
+            return this->okopirer;
+        }
+        virtual ILocked^ l() override { return this; }
+
+    public:
+        virtual void End() {
+            switch (Direction(this->dir)) {
+            case Direction::Out: {
+                if (this->unlock(streamlocked))
+                    streamlocked = EMPTY;
+                else throw gcnew System::Exception("thread lock invalid");
+            } break;
+            case Direction::Err: {
+                if (this->unlock(streamlocked))
+                    streamlocked = EMPTY;
+                else throw gcnew System::Exception("thread lock invalid");
+            } break;
+            }
+        }
+        virtual ILocked^ Put(Object^ data) {
+            if (dir == 1) {
+                return okopirer->operator << (data);
+            }
+            else {
+                return okopirer->operator << (data);
+            }
+        }
+        virtual ~Locked(void) {
+            End();
+        }
+    };
+
 
     public ref class StdOut sealed : public OutStream
     {
@@ -315,60 +371,54 @@ namespace Consola
                 return OutStream::locked();
             } else return lockvar != EMPTY;
         }
+        virtual ILocked^ l() override {
+            if (this->GetType() == Locked<StdOut^>::typeid)
+                return this;
+            else return gcnew Locked<StdOut^>(this);
+        }
+        static operator ILocked^ (StdOut^ cast) {
+            return  cast->l();
+        }
     };
+
+
 
     public ref class StdErr sealed : public OutStream
     {
     internal:
         static volatile uint lockvar = EMPTY;
-
-        StdErr( void ) : OutStream( Direction::Err ) {
+        StdErr(void) : OutStream(Direction::Err) {
             if (err == nullptr) err = this;
         }
-        virtual bool     lockup( uint key ) override {
+        virtual bool     lockup(uint key) override {
             if (ErrAndOutSharedLock) {
-                return OutStream::lockup( key );
-            } else if ( lockvar == EMPTY ) {
+                return OutStream::lockup(key);
+            }
+            else if (lockvar == EMPTY) {
                 lockvar = key;
             } return lockvar == key;
         }
-        virtual bool     unlock( uint key ) override {
+        virtual bool     unlock(uint key) override {
             if (ErrAndOutSharedLock) {
-                return OutStream::unlock( key );
-            } else if ( lockvar == key ) {
+                return OutStream::unlock(key);
+            }
+            else if (lockvar == key) {
                 lockvar = EMPTY;
             } return lockvar == EMPTY;
         }
-        virtual bool     locked( void ) override {
+        virtual bool     locked(void) override {
             if (ErrAndOutSharedLock) {
                 return OutStream::locked();
-            } else return lockvar != EMPTY;
-        }
-    };
-
-    public ref class Locked abstract : public OutStream
-    {
-    internal: Locked( Direction streamdirection ) : OutStream( streamdirection ) {}
-    public:
-        virtual void End() {
-            switch ( Direction(dir) ) {
-            case Direction::Out: {
-                if ( this->lockup(streamlocked) ) // reinterpret_cast<StdOut^>(this)->unlock(streamlocked))
-                    streamlocked = EMPTY;
-                else throw gcnew System::Exception("thread lock invalid");
-            } break;
-            case Direction::Err: {
-                if ( this->unlock(streamlocked) )
-                    streamlocked = EMPTY;
-                else throw gcnew System::Exception("thread lock invalid");
-            } break; }
-        }
-        Locked^ Put( Object^ data ) {
-            if( dir == 1 ) {
-                return reinterpret_cast<Locked^>( this->operator << (data) );
-            } else {
-                return reinterpret_cast<Locked^>( this->operator << (data) );
             }
+            else return lockvar != EMPTY;
+        }
+        virtual ILocked^ l() override {
+            if (this->GetType() == Locked<StdErr^>::typeid)
+                return this;
+            else return gcnew Locked<StdErr^>(this);
+        }
+        static operator ILocked^ (StdErr^ cast) {
+            return cast->l();
         }
     };
 
@@ -377,7 +427,7 @@ namespace Consola
     public:
         StdStreams()
             : StdStream( Direction::Non ) {
-            nam = Reflection::Assembly::GetCallingAssembly()->GetName()->Name + "_{0}.log";
+            nam = ProgramName() + "_{0}.log";
             StdStream::Init();
         }
         StdStreams( String^ logfile )
@@ -386,7 +436,7 @@ namespace Consola
         }
         StdStreams( CreationFlags createConsole )
             : StdStream( Direction::Non ) {
-            nam = Reflection::Assembly::GetCallingAssembly()->GetName()->Name + "_{0}.log";
+            nam = ProgramName() + "_{0}.log";
             StdStream::Init( createConsole );
         }
         StdStreams( CreationFlags flags, String^ logfile )

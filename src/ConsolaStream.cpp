@@ -406,7 +406,7 @@ Consola::StdStream::VersionName()
 void
 Consola::StdStream::Init( void )
 {
-    nam = Reflection::Assembly::GetCallingAssembly()->GetName()->Name
+    nam = ProgramName() // Reflection::Assembly::GetCallingAssembly()->GetName()->Name
         + "_{0}.log";
     Init( CreationFlags::TryConsole );
 }
@@ -443,7 +443,7 @@ Consola::StdStream::Init( CreationFlags creationflags )
                                    | CreationFlags::CreateLog
                                    | CreationFlags::NoInputLog );
     if( nam == nullptr )
-        nam = Reflection::Assembly::GetCallingAssembly()->GetName()->Name
+        nam = ProgramName() //Reflection::Assembly::GetCallingAssembly()->GetName()->Name
             + "_{0}.log";
 
     creationflags = creationflags & ~( CreationFlags::AppendLog
@@ -505,6 +505,37 @@ void
 Consola::StdStream::Cwd::set( String^ cd )
 {
     Directory::SetCurrentDirectory( cd );
+}
+
+System::String^
+Consola::StdStream::ProgramName()
+{
+    return System::Diagnostics::Process::GetCurrentProcess()->ProcessName;
+}
+
+System::Int32
+Consola::StdStream::ProgramProc()
+{
+    return System::Diagnostics::Process::GetCurrentProcess()->Id;
+}
+
+System::String^
+Consola::StdStream::MachineName()
+{
+    return System::Diagnostics::Process::GetCurrentProcess()->MachineName;
+}
+
+System::String^
+Consola::StdStream::MachineArch()
+{
+#ifdef _WIN64
+    String^ bits = "64bit ";
+#elif _WIN32
+    String^ bits = "32bit ";
+#endif
+    return bits + IS_BIG_ENDIAN()
+         ? String::Format("x86 {0} (BigEndian)",bits)
+         : String::Format("CPU {0} (LittleEndian)",bits);
 }
 
 Consola::AuxilaryStream^
@@ -659,14 +690,18 @@ Consola::OutStream::LockedStreamWrite( String^ data )
     }
 }
 
-Consola::Locked^
+Consola::ILocked^
 Consola::OutStream::Stream::get( void )
 {
     uint hocker = keygenerator->Next(INT_MAX);
     while (!lockup(hocker)) {
         System::Threading::Thread::Sleep(THREAD_WAITSTATE_CYCLE_TIME);
     } streamlocked = hocker;
-    return reinterpret_cast<Locked^>(this);
+    if(GetType()==StdOut::typeid)
+    return gcnew Locked<StdOut^>((StdOut^)this);
+    else {
+        return gcnew Locked<StdErr^>((StdErr^)this);
+    }
 }
 
 String^

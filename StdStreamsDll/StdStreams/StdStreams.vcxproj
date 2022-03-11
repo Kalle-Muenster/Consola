@@ -29,14 +29,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -44,14 +44,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -76,14 +76,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>./;c:\CMD\CCommands;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./;c:\CMD\CCommands;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
@@ -92,14 +92,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./;c:\CMD\CCommands;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./;c:\CMD\CCommands;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
@@ -180,28 +180,43 @@
     <ClCompile Include="..\..\src\ConsolaAuxilary.cpp" />
     <ClCompile Include="..\..\src\ConsolaLogger.cpp" />
     <ClCompile Include="..\..\src\ConsolaStream.cpp" />
-    <ClCompile Include="C:\CMD\CCommands\.stringPool.cc">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+    <ClCompile Include="..\..\src\stringpool\.byteOrder.cc">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+    </ClCompile>
+    <ClCompile Include="..\..\src\stringpool\.stringPool.cc">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ConsolaAuxilary.hpp" />
     <ClInclude Include="..\..\src\ConsolaLogger.hpp" />
     <ClInclude Include="..\..\src\ConsolaStream.hpp" />
-    <ClInclude Include="C:\CMD\CCommands\.stringPool.h" />
+    <ClInclude Include="..\..\src\stringpool\.byteOrder.h" />
+    <ClInclude Include="..\..\src\stringpool\.CheckForProjectSettings.h" />
+    <ClInclude Include="..\..\src\stringpool\.poolBottom.h" />
+    <ClInclude Include="..\..\src\stringpool\.stringPool.h" />
     <ClInclude Include="settings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Build.cmd" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
     <Reference Include="System.Xml">
       <HintPath>..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.XML.dll</HintPath>
     </Reference>

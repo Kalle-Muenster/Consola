@@ -53,6 +53,7 @@ typedef double             float64;
  #define FLOAT64 double
  #endif
 
+
 #if defined( __x86_64__) || defined(_WIN64)
  #define WORD_BYTESIZE 8
  #define WORD_TYPENAME "QWORD"

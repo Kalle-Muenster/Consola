@@ -25,10 +25,10 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\stringpool\.byteOrder.cc">
-      <Filter>Headerdateien</Filter>
+      <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\stringpool\.stringPool.cc">
-      <Filter>Headerdateien</Filter>
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -45,10 +45,16 @@
       <Filter>Quelldateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\stringpool\.byteOrder.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\stringpool\.CheckForProjectSettings.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\stringpool\.poolBottom.h">
+      <Filter>Quelldateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\stringpool\.stringPool.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Quelldateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
