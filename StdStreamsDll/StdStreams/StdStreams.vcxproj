@@ -80,6 +80,7 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetName>Consola</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -89,6 +90,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>Consola</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -96,6 +98,7 @@
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetName>Consola</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -103,6 +106,7 @@
     <OutDir>$(ProjectDir)..\..\bin\$(TargetFrameworkVersion)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+    <TargetName>Consola</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
