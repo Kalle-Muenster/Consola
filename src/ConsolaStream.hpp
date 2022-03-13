@@ -280,11 +280,11 @@ namespace Consola
             return hocker != EMPTY;
         }
         void LockedStreamWrite( String^ data );
-        ILocked^ operator << (Object^ object) {
-            LockedStreamWrite( object->ToString() );
-            return this->l();
-        }
 
+    protected:
+        void okokpiereStreamLock( uint key ) {
+            streamlocked = key;
+        }
 
     public:
         void WriteLine( String^ line );
@@ -301,41 +301,42 @@ namespace Consola
         };
     };
 
-    generic<class O> where O : OutStream
-        public ref class Locked : public OutStream, ILocked
+    generic<class O>
+        where O : OutStream
+    public ref class Locked
+        : public ILocked, IDisposable
     {
     internal:
-        O okopirer;
-        Locked(O kopierer) : OutStream(kopierer->StreamDirection) {
-            okopirer = kopierer;
-            streamlocked = okopirer->streamlocked;
+        O okopierer;
+        Locked( O kopierer ) {
+            okopierer = kopierer;
         }
-        operator O() {
-            return this->okopirer;
-        }
+        operator O() { return this->okopierer; }
         virtual ILocked^ l() override { return this; }
 
     public:
         virtual void End() {
-            switch (Direction(this->dir)) {
-            case Direction::Out: {
-                if (this->unlock(streamlocked))
-                    streamlocked = EMPTY;
-                else throw gcnew System::Exception("thread lock invalid");
+            switch ( okopierer->StreamDirection ) {
+            case StdStream::Direction::Out: { if ( okopierer->unlock( okopierer->streamlocked ) )
+                    okopierer->streamlocked = EMPTY;
+                else throw gcnew System::Exception( "thread lock invalid" );
             } break;
-            case Direction::Err: {
-                if (this->unlock(streamlocked))
-                    streamlocked = EMPTY;
-                else throw gcnew System::Exception("thread lock invalid");
+            case StdStream::Direction::Err: { if ( okopierer->unlock( okopierer->streamlocked ) )
+                    okopierer->streamlocked = EMPTY;
+                else throw gcnew System::Exception( "thread lock invalid" );
             } break;
             }
         }
-        virtual ILocked^ Put(Object^ data) {
-            if (dir == 1) {
-                return okopirer->operator << (data);
-            }
-            else {
-                return okopirer->operator << (data);
+        Locked^ operator << ( Object^ object ) {
+            okopierer->LockedStreamWrite( object->ToString() );
+            return this;
+        }
+        virtual ILocked^ Put( Object^ data ) {
+            return this << data->ToString();
+        }
+        property StdStream::Direction StreamDirection {
+            StdStream::Direction get(void) {
+                return okopierer->StreamDirection;
             }
         }
         virtual ~Locked(void) {
@@ -372,9 +373,7 @@ namespace Consola
             } else return lockvar != EMPTY;
         }
         virtual ILocked^ l() override {
-            if (this->GetType() == Locked<StdOut^>::typeid)
-                return this;
-            else return gcnew Locked<StdOut^>(this);
+            return gcnew Locked<StdOut^>(this);
         }
         static operator ILocked^ (StdOut^ cast) {
             return  cast->l();
@@ -413,9 +412,7 @@ namespace Consola
             else return lockvar != EMPTY;
         }
         virtual ILocked^ l() override {
-            if (this->GetType() == Locked<StdErr^>::typeid)
-                return this;
-            else return gcnew Locked<StdErr^>(this);
+            return gcnew Locked<StdErr^>(this);
         }
         static operator ILocked^ (StdErr^ cast) {
             return cast->l();

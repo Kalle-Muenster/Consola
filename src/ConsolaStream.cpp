@@ -693,14 +693,14 @@ Consola::OutStream::LockedStreamWrite( String^ data )
 Consola::ILocked^
 Consola::OutStream::Stream::get( void )
 {
-    uint hocker = keygenerator->Next(INT_MAX);
-    while (!lockup(hocker)) {
-        System::Threading::Thread::Sleep(THREAD_WAITSTATE_CYCLE_TIME);
+    uint hocker = keygenerator->Next( INT_MAX );
+    while( !lockup( hocker ) ) {
+        System::Threading::Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME );
     } streamlocked = hocker;
-    if(GetType()==StdOut::typeid)
-    return gcnew Locked<StdOut^>((StdOut^)this);
-    else {
-        return gcnew Locked<StdErr^>((StdErr^)this);
+    switch( Direction(dir) ) {
+    case Direction::Out: return gcnew Locked<StdOut^>( (StdOut^)this );
+    case Direction::Err: return gcnew Locked<StdErr^>( (StdErr^)this );
+    default: return nullptr;
     }
 }
 
