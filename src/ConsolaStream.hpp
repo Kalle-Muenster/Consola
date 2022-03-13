@@ -212,9 +212,8 @@ namespace Consola
         }
     };
 
-
-
-    private value struct StreamLocker {
+    private value struct StreamLocker
+    {
     private: 
         static System::Func<StdStream^,UInt32,bool>^   lockFunco;
         static System::Func<StdStream^,UInt32,bool>^   freeFunco;
@@ -240,19 +239,19 @@ namespace Consola
         }
     };
 
-    public interface class ILocked {
+    public interface class ILocked
+    {
     public:
         ILocked^ Put( Object^ content );
         void End();
     };
 
-
-
-    public ref class OutStream abstract : public StdStream
+    public ref class OutStream abstract
+        : public StdStream
     {
     protected:
         static bool ErrAndOutSharedLock = true;
-       
+
     internal:
         uint streamlocked = false;
         static volatile uint lockvar = EMPTY;
@@ -288,17 +287,15 @@ namespace Consola
 
     public:
         void WriteLine( String^ line );
-        void WriteLine(String^ format, ...array<Object^>^ parameter);
+        void WriteLine(String^ format, ...array<Object^>^ parameter );
         void Write( String^ text );
-        void Write(String^ format, ...array<Object^>^ parameter);
+        void Write( String^ format, ...array<Object^>^ parameter );
         generic<class T> where T : ValueType
         void Write(array<T>^ data);
         generic<class T> where T : ValueType
         void Write( array<T>^ data, int offsetTs, int countOnTs );
         void Write( IntPtr data, int cbOffset, int cbSize );
-        property ILocked^ Stream {
-            ILocked^ get(void);
-        };
+        property ILocked^ Stream { ILocked^ get( void ); };
     };
 
     generic<class O>
@@ -339,19 +336,19 @@ namespace Consola
                 return okopierer->StreamDirection;
             }
         }
-        virtual ~Locked(void) {
+        virtual ~Locked( void ) {
             End();
         }
     };
 
-
-    public ref class StdOut sealed : public OutStream
+    public ref class StdOut sealed
+        : public OutStream
     {
     internal:
         static volatile uint lockvar = EMPTY; 
 
         StdOut(void) : OutStream( Direction::Out ) {
-            if (oup == nullptr) oup = this;
+            if ( oup == nullptr ) oup = this;
         }
         virtual bool     lockup( uint key ) override {
             if (ErrAndOutSharedLock) {
@@ -382,7 +379,8 @@ namespace Consola
 
 
 
-    public ref class StdErr sealed : public OutStream
+    public ref class StdErr sealed
+        : public OutStream
     {
     internal:
         static volatile uint lockvar = EMPTY;

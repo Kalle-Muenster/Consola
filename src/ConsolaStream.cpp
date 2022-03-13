@@ -680,7 +680,7 @@ Consola::OutStream::LockedStreamWrite( String^ data )
             lockvar = streamlocked;
             break;
         } else {
-            System::Threading::Thread::Sleep(THREAD_WAITSTATE_CYCLE_TIME);
+            System::Threading::Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME );
         }
     }
     _writeSystemStringToStdtStream( dir, data );
