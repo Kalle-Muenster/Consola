@@ -42,9 +42,6 @@ Consola.StdStream.Out = Consola.StdStream.Err;
 ---
 
 
-
----
-
 ## Starting Log Sessions: 
 
 Streams can be not only redirected to other streams, but also to attached file loggers
