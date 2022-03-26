@@ -8,6 +8,7 @@
 #ifndef _ConsolaStream_hpp_
 #define _ConsolaStream_hpp_
 
+#include "ConsolaUtils.hpp"
 #include "ConsolaLogger.hpp"
 
 using namespace System::Runtime;
@@ -22,6 +23,9 @@ namespace Consola
     ref class AuxXml;
     ref class OutStream;
     ref class AuxilaryStream;
+    
+    using WriterCallbackArgs = System::Diagnostics::DataReceivedEventArgs;
+    using WriterCallback  = System::Diagnostics::DataReceivedEventHandler;
 
     generic<class O> where O : OutStream 
     ref class Locked;
@@ -52,12 +56,6 @@ namespace Consola
             return gcnew DirectoryInfo(Cwd);
         }
         static void    SetLogName( String^ logFile );
-        static uint    VersionNumber();
-        static String^ VersionName();
-        static Int32   ProgramProc();
-        static String^ ProgramName();
-        static String^ MachineName();
-        static String^ MachineArch();
         static bool    HasConsole( void );
         virtual       ~StdStream( void );
 
@@ -101,51 +99,55 @@ namespace Consola
         LogWriter^      createLog();
         bool            existsLog();
 
-    protected:
-        static String^   asynchronStreamRead( Object^ );
-        generic<class T> where T : ValueType
-        static array<T>^ asynchronArrayRead( Object^ );
-        generic<class T> where T : ValueType
-        static uint      asynchronDataRead( Object^ );
-        static uint      asynchronRawDataRead( Object^ );
-        static void      asynchronStreamWrite( Object^ );
-        static void      asynchronDataWrite( Object^ );
-        static void      asynchronRawDataWrite( Object^ );
-        static void      asynchronStreamGetLocked( Object^ );
-        generic<class T> where T : ValueType
-        static void      asynchronArrayWrite( Object^ );
-
-        
-        static StdStream^  inp;
-        static StdStream^  oup;
-        static StdStream^  err;
-        static StdStream^  aux = nullptr;
-        static String^     nam = nullptr;
-        const  uint        dir;
-
-        String^          systemStringFromStdIn( uint );
-        generic<class T> where T : ValueType
-        array<T>^        systemArrayFromStdIn( uint );
-        generic<class T> where T : ValueType
-        uint             readDataFromStdIn( array<T>^, uint, uint );
-        uint             rawDataFromStdIn( IntPtr dst, int offset, int length );
-        void             systemStringToStdOut( String^ );
-        void             dataArrayToStdOut( array<byte>^ );
-        generic<class T> where T : ValueType
-        void             systemArrayToStdOut( array<T>^, int, int );
-        void             rawDataToStdOut( IntPtr dst, int offset, int length );
-
     internal:
-        static Random^ keygenerator;
-        static void    CreateConsole(void);
-        static void    RedirectStreams(void);
-        LogWriter^     log;
-                       StdStream( Direction );
-        virtual bool   lockup(uint) abstract;
-        virtual bool   unlock(uint) abstract;
-        virtual bool   locked(void) abstract;
-        static  bool   strmlockup(StdStream^ strm, uint);
-        static  bool   strmunlock(StdStream^ strm, uint);
+
+        static StdStream^ inp;
+        static StdStream^ oup;
+        static StdStream^ err;
+        static Random^    keygenerator;
+        static StdStream^ aux = nullptr;
+        static String^    nam = nullptr;
+
+        static String^    asynchronStreamRead( Object^ );
+        generic<class T> where T : ValueType
+        static array<T>^  asynchronArrayRead( Object^ );
+        generic<class T> where T : ValueType
+        static uint       asynchronDataRead( Object^ );
+        static uint       asynchronRawDataRead( Object^ );
+        static void       asynchronStreamWrite( Object^ );
+        static void       asynchronDataWrite( Object^ );
+        static void       asynchronRawDataWrite( Object^ );
+        static void       asynchronStreamGetLocked( Object^ );
+        generic<class T> where T : ValueType
+        static void       asynchronArrayWrite( Object^ );
+
+        static void       CreateConsole( void );
+        static void       RedirectStreams( void );
+
+
+        const uint    dir;
+        LogWriter^    log;
+
+                      StdStream( Direction );
+
+        String^       systemStringFromStdIn( uint );
+                      generic<class T> where T : ValueType
+        array<T>^     systemArrayFromStdIn( uint );
+                      generic<class T> where T : ValueType
+        uint          readDataFromStdIn( array<T>^, uint, uint );
+        uint          rawDataFromStdIn( IntPtr dst, int offset, int length );
+        void          systemStringToStdOut( String^ );
+        void          dataArrayToStdOut( array<byte>^ );
+                      generic<class T> where T : ValueType
+        void          systemArrayToStdOut( array<T>^, int, int );
+        void          rawDataToStdOut( IntPtr dst, int offset, int length );
+
+
+        virtual bool  lockup(uint) abstract;
+        virtual bool  unlock(uint) abstract;
+        virtual bool  locked(void) abstract;
+        static  bool  strmlockup(StdStream^ strm, uint);
+        static  bool  strmunlock(StdStream^ strm, uint);
 
     private:
 
@@ -212,32 +214,29 @@ namespace Consola
         }
     };
 
+
     private value struct StreamLocker
     {
     private: 
-        static System::Func<StdStream^,UInt32,bool>^   lockFunco;
-        static System::Func<StdStream^,UInt32,bool>^   freeFunco;
         StdStream^                                     hocker;
         uint                                           locker;
 
     public:
         uint direct;
-        static StreamLocker(void) {
-            lockFunco = gcnew System::Func<StdStream^,UInt32,bool>(StdStream::strmlockup);
-            freeFunco = gcnew System::Func<StdStream^,UInt32,bool>(StdStream::strmunlock);
-        }
+
         StreamLocker( StdStream^ stream, uint keyid )
             : direct( (uint)((StdStream^)stream)->StreamDirection )
             , hocker( stream ) {
             locker = keyid;
         }
         bool up(void) {
-            return lockFunco( (StdStream^)hocker, locker );
+            return StdStream::strmlockup( hocker, locker );
         }
         bool un(void) {
-            return freeFunco( (StdStream^)hocker, locker );
+            return StdStream::strmunlock( hocker, locker );
         }
     };
+
 
     public interface class ILocked
     {
@@ -245,6 +244,7 @@ namespace Consola
         ILocked^ Put( Object^ content );
         void End();
     };
+
 
     public ref class OutStream abstract
         : public StdStream
@@ -281,9 +281,8 @@ namespace Consola
         void LockedStreamWrite( String^ data );
 
     protected:
-        void okokpiereStreamLock( uint key ) {
-            streamlocked = key;
-        }
+        void okokpiereStreamLock( uint key ) { streamlocked = key; }
+        void WriteLineCallback( Object^ sender, WriterCallbackArgs^ e );
 
     public:
         void WriteLine( String^ line );
@@ -296,7 +295,9 @@ namespace Consola
         void Write( array<T>^ data, int offsetTs, int countOnTs );
         void Write( IntPtr data, int cbOffset, int cbSize );
         property ILocked^ Stream { ILocked^ get( void ); };
+        WriterCallback^ GetDelegate();
     };
+
 
     generic<class O>
         where O : OutStream
@@ -316,11 +317,11 @@ namespace Consola
             switch ( okopierer->StreamDirection ) {
             case StdStream::Direction::Out: { if ( okopierer->unlock( okopierer->streamlocked ) )
                     okopierer->streamlocked = EMPTY;
-                else throw gcnew System::Exception( "thread lock invalid" );
+                else throw gcnew System::Exception( "thread lock not valid" );
             } break;
             case StdStream::Direction::Err: { if ( okopierer->unlock( okopierer->streamlocked ) )
                     okopierer->streamlocked = EMPTY;
-                else throw gcnew System::Exception( "thread lock invalid" );
+                else throw gcnew System::Exception( "thread lock not valid" );
             } break;
             }
         }
@@ -340,6 +341,7 @@ namespace Consola
             End();
         }
     };
+
 
     public ref class StdOut sealed
         : public OutStream
@@ -376,7 +378,6 @@ namespace Consola
             return  cast->l();
         }
     };
-
 
 
     public ref class StdErr sealed
@@ -417,12 +418,13 @@ namespace Consola
         }
     };
 
+
     public ref class StdStreams sealed : public StdStream
     {
     public:
         StdStreams()
             : StdStream( Direction::Non ) {
-            nam = ProgramName() + "_{0}.log";
+            nam = Utility::ProgramName() + "_{0}.log";
             StdStream::Init();
         }
         StdStreams( String^ logfile )
@@ -431,7 +433,7 @@ namespace Consola
         }
         StdStreams( CreationFlags createConsole )
             : StdStream( Direction::Non ) {
-            nam = ProgramName() + "_{0}.log";
+            nam = Utility::ProgramName() + "_{0}.log";
             StdStream::Init( createConsole );
         }
         StdStreams( CreationFlags flags, String^ logfile )
@@ -480,7 +482,4 @@ namespace Consola
     };
 
 }//end of Consola
-
-//#include <.byteOrder.h>
-
 #endif

@@ -144,6 +144,7 @@ array<T>^ _readArrayFromStdIn( uint Tcount ) { pool_scope
 
 void _writeSystemStringToStdtStream( uint direction, String^ string )
 {
+    if ( string == nullptr ) string = String::Empty;
     char buffer[128];
     const int end = string->Length;
     const int lst = end - 1;
@@ -158,6 +159,7 @@ void _writeSystemStringToStdtStream( uint direction, String^ string )
 
 uint _writeByteArrayToStdtStream( uint direction, array<byte>^ data, int oset, int size )
 {
+    if ( data == nullptr ) { data = Array::Empty<byte>(); size = oset = 0; }
     byte buffer[128];
     const int end = Math::Min( data->Length - oset, size );
     const int lst = end - 1;
@@ -172,6 +174,7 @@ uint _writeByteArrayToStdtStream( uint direction, array<byte>^ data, int oset, i
 
 uint _writeByteDataToStdtStream( uint direction, IntPtr data, int oset, int size )
 {
+    if (data == IntPtr::Zero) { data = IntPtr(""); size = 0; }
     byte buffer[128];
     const int end = size;
     const int lst = end - 1;
@@ -188,6 +191,7 @@ uint _writeByteDataToStdtStream( uint direction, IntPtr data, int oset, int size
 generic<class T> where T : ValueType
 uint _writeSystemArrayToStdtStream( uint direction, array<T>^ data, int oset, ulong size )
 {
+    if (data == nullptr) { data = Array::Empty<T>(); size = oset = 0; }
     byte buffer[128];
     const int siz = sizeof(T);
     const int end = Math::Min( data->Length, (int)(oset + size) );
@@ -391,17 +395,7 @@ Consola::StdStream::RedirectStreams( void )
     freopen("conout$", "w", stderr);
 }
 
-uint
-Consola::StdStream::VersionNumber()
-{
-    return CONSOLA_VERSION_NUMBER;
-}
 
-String^
-Consola::StdStream::VersionName()
-{
-    return gcnew String( CONSOLA_VERSION_STRING );
-}
 
 void
 Consola::StdStream::Init( void )
@@ -485,14 +479,14 @@ Consola::StdStream::Init( CreationFlags creationflags )
 
 
 bool
-Consola::StdStream::strmlockup(StdStream^ strm, uint key)
+Consola::StdStream::strmlockup( StdStream^ strm, uint key )
 {
-    return strm->lockup(key);
+    return strm->lockup( key );
 }
 bool
 Consola::StdStream::strmunlock(StdStream^ strm, uint key)
 {
-    return strm->unlock(key);
+    return strm->unlock( key );
 }
 
 String^
@@ -507,36 +501,6 @@ Consola::StdStream::Cwd::set( String^ cd )
     Directory::SetCurrentDirectory( cd );
 }
 
-System::String^
-Consola::StdStream::ProgramName()
-{
-    return System::Diagnostics::Process::GetCurrentProcess()->ProcessName;
-}
-
-System::Int32
-Consola::StdStream::ProgramProc()
-{
-    return System::Diagnostics::Process::GetCurrentProcess()->Id;
-}
-
-System::String^
-Consola::StdStream::MachineName()
-{
-    return System::Diagnostics::Process::GetCurrentProcess()->MachineName;
-}
-
-System::String^
-Consola::StdStream::MachineArch()
-{
-#ifdef _WIN64
-    String^ bits = "64bit ";
-#elif _WIN32
-    String^ bits = "32bit ";
-#endif
-    return bits + IS_BIG_ENDIAN()
-         ? String::Format("x86 {0} (BigEndian)",bits)
-         : String::Format("CPU {0} (LittleEndian)",bits);
-}
 
 Consola::AuxilaryStream^
 Consola::StdStream::Aux::get(void)
@@ -688,6 +652,18 @@ Consola::OutStream::LockedStreamWrite( String^ data )
         log->Write( data );
         log->Flush();
     }
+}
+
+System::Diagnostics::DataReceivedEventHandler^ 
+Consola::OutStream::GetDelegate()
+{
+    return gcnew System::Diagnostics::DataReceivedEventHandler( this, &OutStream::WriteLineCallback );
+}
+
+void
+Consola::OutStream::WriteLineCallback( Object^ sender, System::Diagnostics::DataReceivedEventArgs^ e )
+{
+    Write( e->Data == nullptr ? L"\n" : e->Data );
 }
 
 Consola::ILocked^
