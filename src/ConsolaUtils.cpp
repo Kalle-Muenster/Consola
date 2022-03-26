@@ -81,6 +81,8 @@ Consola::Utility::CommandExec( String^ command, Flags flags, ...array<Object^>^ 
             while( !StdStream::Inp->lockup(val) ) {
                 Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 5 );
             } cmd = merge( wrk, cmd );
+        } else {
+            cmd = (const char*)cmdptr;
         } result = system( cmd );
     } else {
         Dictionary<String^,String^>^ environment = nullptr;
