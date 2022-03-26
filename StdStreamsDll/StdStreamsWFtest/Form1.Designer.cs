@@ -43,6 +43,7 @@
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.button6 = new System.Windows.Forms.Button();
             this.threadbox = new System.Windows.Forms.GroupBox();
+            this.button7 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.threadbox.SuspendLayout();
             this.SuspendLayout();
@@ -93,7 +94,7 @@
             this.button4.Location = new System.Drawing.Point(56, 368);
             this.button4.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(312, 55);
+            this.button4.Size = new System.Drawing.Size(184, 55);
             this.button4.TabIndex = 4;
             this.button4.Text = "Read Line";
             this.button4.UseVisualStyleBackColor = true;
@@ -150,10 +151,10 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(381, 368);
+            this.button5.Location = new System.Drawing.Point(253, 368);
             this.button5.Margin = new System.Windows.Forms.Padding(5);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(307, 55);
+            this.button5.Size = new System.Drawing.Size(204, 55);
             this.button5.TabIndex = 9;
             this.button5.Text = "Start Getching";
             this.button5.UseVisualStyleBackColor = true;
@@ -220,11 +221,22 @@
             this.threadbox.TabStop = false;
             this.threadbox.Text = "Two Threads";
             // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(465, 368);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(216, 55);
+            this.button7.TabIndex = 13;
+            this.button7.Text = "Execute";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(764, 469);
+            this.Controls.Add(this.button7);
             this.Controls.Add(this.threadbox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button5);
@@ -263,6 +275,7 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.GroupBox threadbox;
+        private System.Windows.Forms.Button button7;
     }
 }
 

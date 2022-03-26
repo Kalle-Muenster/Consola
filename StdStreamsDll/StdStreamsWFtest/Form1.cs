@@ -63,10 +63,10 @@ namespace StdStreamsWFtest
         public Form1()
         {
             InitializeComponent();
-            uint ver = Consola.StdStream.VersionNumber();
+            uint ver = Consola.Utility.VersionNumber();
             string vers = string.Format("{0}.{1}.{2}.{3}", ((ver & 0xff000000) >> 24),
                                ((ver & 0x00ff0000) >> 16), ((ver & 0x0000ff00) >> 8), (ver & 0x000000ff) );
-            if ( vers != Consola.StdStream.VersionName() ) {
+            if ( vers != Consola.Utility.VersionString() ) {
                 vers = "Unknown Version";
                 lbl_version.ForeColor = Color.Red;
             } lbl_version.Text = vers;
@@ -185,6 +185,25 @@ namespace StdStreamsWFtest
             textBox1.Text += inp;
         }
 
+        private void button7_Click( object sender, EventArgs e )
+        {
+            labeltext = "";
+            textBox1.Text = string.Format("processid: {0} - ", Consola.Utility.CommandExec( textBox1.Text, getResult ) );
+            Paint += Form1_Paint;
+        }
 
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            if( labeltext.Length > 0 ) {
+                textBox1.Text += labeltext;
+                labeltext = "";
+            } Paint -= Form1_Paint;
+        }
+
+        private void getResult(int result)
+        {
+            labeltext = string.Format("returncode: {0}", result);
+            Invalidate();
+        }
     }
 }

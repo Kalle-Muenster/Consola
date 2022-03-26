@@ -15,7 +15,7 @@
 
 #ifdef _DEBUG
 #undef  DEBUG
-#define DEBUG (1)
+#define DEBUG (0)
 #define CYCLE_COUNT (16)
 #else
 #define DEBUG (0)
@@ -23,6 +23,7 @@
 #endif
 
 #define NOT_USE_ENVIRONMENTOR
+#define COMMANDLINER_DISABLE_DEBUG (1)
 #define SET_NAMESPACE (-1)
 #define NO_CHECKPOINT_MODE
 #define COMMANDLINER_EXTERN_C extern "C" {

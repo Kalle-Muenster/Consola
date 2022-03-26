@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\src\stringpool\.stringPool.cc">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ConsolaUtils.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ConsolaStream.hpp">
@@ -54,6 +57,12 @@
       <Filter>Quelldateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\stringpool\.stringPool.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ConsolaUtils.hpp">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\stringpool\enumoperators.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
   </ItemGroup>
