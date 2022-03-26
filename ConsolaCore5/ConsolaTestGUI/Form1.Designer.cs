@@ -43,6 +43,7 @@ namespace Consola.TestApp
             this.button6 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.InputField = new System.Windows.Forms.TextBox();
+            this.button7 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -184,7 +185,7 @@ namespace Consola.TestApp
             this.button5.Location = new System.Drawing.Point(51, 671);
             this.button5.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(535, 63);
+            this.button5.Size = new System.Drawing.Size(341, 63);
             this.button5.TabIndex = 7;
             this.button5.Text = "Read Line";
             this.button5.UseVisualStyleBackColor = true;
@@ -193,10 +194,10 @@ namespace Consola.TestApp
             // button6
             // 
             this.button6.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button6.Location = new System.Drawing.Point(606, 671);
+            this.button6.Location = new System.Drawing.Point(402, 671);
             this.button6.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(522, 63);
+            this.button6.Size = new System.Drawing.Size(344, 63);
             this.button6.TabIndex = 8;
             this.button6.Text = "Get Char";
             this.button6.UseVisualStyleBackColor = true;
@@ -223,11 +224,23 @@ namespace Consola.TestApp
             this.InputField.Size = new System.Drawing.Size(1077, 84);
             this.InputField.TabIndex = 10;
             // 
+            // button7
+            // 
+            this.button7.Font = new System.Drawing.Font("Segoe UI", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.button7.Location = new System.Drawing.Point(765, 671);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(363, 63);
+            this.button7.TabIndex = 11;
+            this.button7.Text = "Execute";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1187, 765);
+            this.Controls.Add(this.button7);
             this.Controls.Add(this.InputField);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.button6);
@@ -264,6 +277,7 @@ namespace Consola.TestApp
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox InputField;
+        private System.Windows.Forms.Button button7;
     }
 }
 

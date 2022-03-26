@@ -82,10 +82,10 @@ namespace Consola.TestApp
         public Form1()
         {
             InitializeComponent();
-            uint ver = StdStream.VersionNumber();
+            uint ver = Utility.VersionNumber();
             string vers = string.Format("{0}.{1}.{2}.{3}", ((ver & 0xff000000) >> 24),
                                ((ver & 0x00ff0000) >> 16), ((ver & 0x0000ff00) >> 8), (ver & 0x000000ff) );
-            if ( vers != StdStream.VersionName() )
+            if ( vers != Utility.VersionString() )
             {
                 vers = "Unknown Version";
                 lbl_version.ForeColor = Color.Red;
@@ -234,6 +234,24 @@ namespace Consola.TestApp
             InputField.Text += inp;
         }
 
+        private void button7_Click( object sender, EventArgs e )
+        {
+            InputField.Text = string.Format( "processid: {0}", Utility.CommandExec( InputField.Text, getReturnCode ) );
+            Paint += Form1_Paint;
+        }
 
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            if (labeltext.Length > 0) {
+                InputField.Text += (" \n"+labeltext);
+                labeltext = "";
+            } 
+        }
+
+        private void getReturnCode(int returncode)
+        {
+            labeltext = string.Format( "returned: {0}", returncode );
+            Invalidate();
+        }
     }
 }

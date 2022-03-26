@@ -221,8 +221,10 @@
     <ClInclude Include="..\..\src\ConsolaAuxilary.hpp" />
     <ClInclude Include="..\..\src\ConsolaLogger.hpp" />
     <ClInclude Include="..\..\src\ConsolaStream.hpp" />
+    <ClInclude Include="..\..\src\ConsolaUtils.hpp" />
     <ClInclude Include="..\..\src\stringpool\.byteOrder.h" />
     <ClInclude Include="..\..\src\stringpool\.stringPool.h" />
+    <ClInclude Include="..\..\src\stringpool\enumoperators.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="settings.h" />
@@ -231,6 +233,7 @@
     <ClCompile Include="..\..\src\ConsolaAuxilary.cpp" />
     <ClCompile Include="..\..\src\ConsolaLogger.cpp" />
     <ClCompile Include="..\..\src\ConsolaStream.cpp" />
+    <ClCompile Include="..\..\src\ConsolaUtils.cpp" />
     <ClCompile Include="..\..\src\stringpool\.byteOrder.cc">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>

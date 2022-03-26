@@ -42,6 +42,12 @@
     <ClInclude Include="..\..\src\stringpool\.byteOrder.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\ConsolaUtils.hpp">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\stringpool\enumoperators.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -61,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\stringpool\.byteOrder.cc">
       <Filter>Headerdateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ConsolaUtils.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
