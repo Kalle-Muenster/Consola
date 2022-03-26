@@ -60,7 +60,7 @@ stream.Put("ByBy").End();
 (e.g. the above example code ensures that all elements of list *ObjectList* are progressed and will be written to StdStream.Out as one consectuitive text block - with no interruption other threads could cause when writing output at same time.)
 
 
-Any other thread will be able writing StdStream.Out again as soon either *stream.End()* is called, or at least with *stream* leaving actual scope. (it then would call *stream* automatically as soon catched by the collector, on disposal) 
+Any other thread will be able writing StdStream.Out again as soon either *stream.End()* is called, or at least with *stream* leaving actual scope. (it then would call *.End()* automatically as soon it's catched by the collector, on disposal) 
 
 
 ---
