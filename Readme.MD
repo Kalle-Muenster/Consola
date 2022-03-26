@@ -39,30 +39,6 @@ redirect *stderr* to *stdout*
 Consola.StdStream.Out = Consola.StdStream.Err;
 ```
 
----
-
-
-## Locking a Stream:
-
-Streams can be scope locked, so no simultanuous write operations of other threads are able to interferr a planed output operation:
-```
-Consola.Locked stream = Consola.StdStream.Out.Stream;
-```
-
-with getting *Out.Stream* and assigning it to a (here *stream*) variable, the StdStream.Out stream gets thread locked. No other thread will be able writing to *StdStream.Out* anymore and will be forced to wait until *stream* later releases the lock via calling *.End();*
-```
-stream.Put("Hello ").Put(worldObj).Put(",... how are you?\n");
-foreach(var obj in ObjectsList)
-    stream.Put("Hello").Put(obj).Put("How are you?\n");
-stream.Put("ByBy").End();
-```
-
-*this example ensures that all elements of list *ObjectList* are progressed and will be written to StdStream.Out as one consectuitive text block - with no interruption other threads could cause when writing output at same time.
-
-any other thread will be able writing StdStream.Out again as soon either *stream.End()* is called, or at least with *stream* leaving the actual scope. (it then, on disposal, calls *.End()* automatically as soon catched by the collector) 
-
-
----
 
 ## Starting Log Sessions: 
 
@@ -88,3 +64,21 @@ Consola.StdStream.Err.Log = Consola.StdStream.Out.Log;
 (* e.g.: in the above example, stderr and stdout are not redirected so. these still will stay a separate stream each. but both will produce log within one single log file so) 
 
 
+## Locking a Stream:
+
+Streams can be scope locked, so no simultanuous write operations of other threads are able to interferr a planed output operation:
+```
+Consola.Locked stream = Consola.StdStream.Out.Stream;
+```
+
+with getting *Out.Stream* and assigning it to a (here *stream*) variable, the StdStream.Out stream gets thread locked. No other thread will be able writing to *StdStream.Out* anymore and will be forced to wait until *stream* later releases the lock via calling *.End();*
+```
+stream.Put("Hello ").Put(worldObj).Put(",... how are you?\n");
+foreach(var obj in ObjectsList)
+    stream.Put("Hello").Put(obj).Put("How are you?\n");
+stream.Put("ByBy").End();
+```
+
+*this example ensures that all elements of list *ObjectList* are progressed and will be written to StdStream.Out as one consectuitive text block - with no interruption other threads could cause when writing output at same time.
+
+any other thread will be able writing StdStream.Out again as soon either *stream.End()* is called, or at least with *stream* leaving the actual scope. (it then, on disposal, calls *.End()* automatically as soon catched by the collector) 
