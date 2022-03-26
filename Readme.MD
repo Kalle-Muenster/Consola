@@ -49,7 +49,7 @@ Streams can be scope locked, so no simultanuous write operations of other thread
 Consola.Locked stream = Consola.StdStream.Out.Stream;
 ```
 
-with getting *Out.Stream* and assigning it to a (here *stream*) variable, the StdStream.Out stream gets thread locked. No other thread will be able writing to *StdStream.Out* anymore and will be forced to wait until *stream* releases the lock:
+with getting *Out.Stream* and assigning it to a (here *stream*) variable, the StdStream.Out stream gets thread locked. No other thread will be able writing to *StdStream.Out* anymore and will be forced to wait until *stream* later releases the lock via calling *.End();*
 ```
 stream.Put("Hello ").Put(worldObj).Put(",... how are you?\n");
 foreach(var obj in ObjectsList)
@@ -57,7 +57,7 @@ foreach(var obj in ObjectsList)
 stream.Put("ByBy").End();
 ```
 
-(e.g. in the above example code it's ensured that all elements of list *ObjectList* will be progressed and written to StdStream.Out as one consectuitive text block without any interruption which other threads could cause when writing output the same time.)
+(e.g. the above example code ensures that all elements of list *ObjectList* are progressed and will be written to StdStream.Out as one consectuitive text block - with no interruption other threads could cause when writing output at same time.)
 
 
 Any other thread will be able again writing to StdStream.Out as soon either calling *stream.End()* or at least as soon *stream* leaves actual scope (stream would automatically call *End()* on disposal as soon catched up by the collector) 
