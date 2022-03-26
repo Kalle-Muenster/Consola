@@ -56,7 +56,10 @@ foreach(var obj in ObjectsList)
     stream.Put("Hello").Put(obj).Put("How are you?\n");
 stream.Put("ByBy").End();
 ```
-(the above example code ensures that all elements of list *ObjectList* will be progressed and written to StdStream.Out without a risk that other threads could interrupt within output until the lock gets released again via *stream.End()* call 
+(e.g. in the above example code it's ensured that all elements of list *ObjectList* will be progressed and written to StdStream.Out as one consectuitive text block without any interruption which other threads could cause when writing output the same time.)
+
+Any other thread will be able again writing to StdStream.Out as soon either calling *stream.End()* or at least as soon *stream* leaves actual scope (stream would automatically call *End()* on disposal as soon catched up by the collector) 
+
 ---
 
 ## Starting Log Sessions: 
