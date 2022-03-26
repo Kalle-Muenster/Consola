@@ -63,7 +63,8 @@ Consola.StdStream.Err.Log = Consola.StdStream.Out.Log;
 
 (* e.g.: in the above example, stderr and stdout are not redirected so. these still will stay a separate stream each. but both will produce log within one single log file so) 
 
-
+```
+```
 
 ## Streams can be used Locked:
 
