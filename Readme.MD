@@ -40,7 +40,7 @@ Consola.StdStream.Out = Consola.StdStream.Err;
 ```
 
 ---
-## Locked Streams:
+## Locking Streams:
 
 Streams can be scope locked, so no simultanuous write operations of other threads are able to interferr a planed output operation:
 
