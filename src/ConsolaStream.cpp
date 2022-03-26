@@ -212,6 +212,16 @@ uint _writeSystemArrayToStdtStream( uint direction, array<T>^ data, int oset, ul
 ////////////////////////////////////////////////////////////////////////////
 // loose functions to be asynchronuosly executed
 
+const char*
+Consola::Utility::merge( const char* a, const char* b )
+{ pool_scope
+
+    pool_set(a);
+    pool_set(b);
+
+return pool_merge(2); }
+
+
 void
 Consola::StdStream::asynchronStreamWrite( Object^ taskData )
 {
@@ -400,7 +410,8 @@ Consola::StdStream::RedirectStreams( void )
 void
 Consola::StdStream::Init( void )
 {
-    nam = ProgramName() // Reflection::Assembly::GetCallingAssembly()->GetName()->Name
+    // Reflection::Assembly::GetCallingAssembly()->GetName()->Name
+    nam = Utility::ProgramName()
         + "_{0}.log";
     Init( CreationFlags::TryConsole );
 }
@@ -437,7 +448,7 @@ Consola::StdStream::Init( CreationFlags creationflags )
                                    | CreationFlags::CreateLog
                                    | CreationFlags::NoInputLog );
     if( nam == nullptr )
-        nam = ProgramName() //Reflection::Assembly::GetCallingAssembly()->GetName()->Name
+        nam = Utility::ProgramName()
             + "_{0}.log";
 
     creationflags = creationflags & ~( CreationFlags::AppendLog

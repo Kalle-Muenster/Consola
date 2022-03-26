@@ -37,6 +37,11 @@ typedef double             float64;
 #define COMMANDLINER_ESCENTIALS_DEFINED (1)
 #endif
 
+#ifndef  EMPTY
+#define  EMPTY (0xffffffff)
+#define  EMPTY_(UT) ((UT)-1)
+#endif
+
  #ifndef QWORD
  #define QWORD unsigned long long int
  #endif

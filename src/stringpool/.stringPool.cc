@@ -79,14 +79,14 @@ void pool_setBottom(StringPool* poolDingsbums)
 #endif
 #endif
 	defaultInstance = poolDingsbums;
-	#if DEBUG
+	#if DEBUG > 0
 	printf("%s(): %p\n",__FUNCTION__,poolDingsbums);
 	#endif
 }
 
 StringPool* POOL_VOIDCALL( InitializeCycle )
 {
-	#if DEBUG
+	#if DEBUG > 0
 	printf("%s(): bottom at the floor is: %p\n",__FUNCTION__,&PoolInstance);
 	#endif
     if( inst->Pls == EMPTY ) {
