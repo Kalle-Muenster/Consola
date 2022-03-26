@@ -48,7 +48,7 @@ Streams can be scope locked, so no simultanuous write operations of other thread
 Consola.Locked stream = Consola.StdStream.Out.Stream;
 ```
 
-with getting *Out.Stream* and assigning it to a variable (here *stream*) the StdStream.Out stream gets thread locked so no other threads can write to *StdStream.Out* and will be forced into wait state until *stream* releases the the lock:
+with getting *Out.Stream* and assigning it to a (here *stream*) variable, the StdStream.Out stream gets thread locked. No other thread will be able writing to *StdStream.Out* anymore and will be forced to wait until *stream* releases the lock:
 
 ```
 stream.Put("Hello ").Put(worldObj).Put(",... how are you?\n");
