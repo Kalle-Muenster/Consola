@@ -40,7 +40,24 @@ Consola.StdStream.Out = Consola.StdStream.Err;
 ```
 
 ---
+## Locked Streams:
 
+Streams can be scope locked, so no simultanuous write operations of other threads are able to interferr a planed output operation:
+
+```
+Consola.Locked stream = Consola.StdStream.Out.Stream;
+```
+
+with getting *Out.Stream* and assigning it to a variable (here *stream*) the StdStream.Out stream gets thread locked so no other threads can write to *StdStream.Out* and will be forced into wait state until *stream* releases the the lock:
+
+```
+stream.Put("Hello ").Put(worldObj).Put(",... how are you?\n");
+foreach(var obj in ObjectsList)
+    stream.Put("Hello").Put(obj).Put("How are you?\n");
+stream.Put("ByBy").End();
+```
+(the above example code ensures that all elements of list *ObjectList* will be progressed and written to StdStream.Out without a risk that other threads could interrupt within output until the lock gets released again via *stream.End()* call 
+---
 
 ## Starting Log Sessions: 
 
