@@ -8,7 +8,7 @@
 #ifndef _ConsolaAuxilary_hpp_
 #define _ConsolaAuxilary_hpp_
 
-// #include <.byteOrder.h>
+
 
 using namespace System::Xml;
 
@@ -18,15 +18,11 @@ namespace Consola {
     ref class AuxXml;
     ref class StdStream;
 
- //   ref class AuxOut;
- //   ref class AuxLog;
- //   ref class AuxInp;
-
     public ref class AuxilaryStream : public StdStream
     {
     private:
-        // eindimensionale, spheroide räume:
         static int extendRaum(unsigned des, Direction how);
+
     internal:
         static volatile uint lockvar = EMPTY;
        

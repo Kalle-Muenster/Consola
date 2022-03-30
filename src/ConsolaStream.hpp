@@ -10,10 +10,6 @@
 
 using namespace System::Runtime;
 
-//#include "ConsolaUtils.hpp"
-//#include "ConsolaLogger.hpp"
-//#include "ConsolaAuxilary.hpp"
-
 
 namespace Consola
 {

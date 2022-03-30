@@ -8,9 +8,9 @@
     ((mi&0xff)<<16) | ((ma&0xff)<<24) \
 )
 #define CONSOLA_VERSION_NUMBER \
-        CONSOLA_VERSION(0,0,1,5)
+        CONSOLA_VERSION(0,0,1,6)
 #define CONSOLA_VERSION_STRING \
-                       "0.0.1.5"
+                       "0.0.1.6"
 #endif
 
 #ifdef _DEBUG

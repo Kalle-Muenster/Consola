@@ -164,7 +164,7 @@ Consola::Utility::CommandExec( String^ command, Action<int>^ onexit )
         int split = command->IndexOf('\"', 1) + 1;
         parameters = command->Substring(split);
         command = command->Substring(0,split);
-    } else if (command->Contains(" ")) {
+    } else if ( command->Contains(" ") ) {
         int split = command->IndexOf(" ") + 1;
         parameters = command->Substring(split);
         command = command->Substring(0, split);

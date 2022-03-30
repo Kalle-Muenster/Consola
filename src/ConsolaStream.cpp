@@ -430,7 +430,6 @@ Consola::StdStream::RedirectStreams( void )
 void
 Consola::StdStream::Init( void )
 {
-    // Reflection::Assembly::GetCallingAssembly()->GetName()->Name
     nam = Utility::ProgramName()
         + "_{0}.log";
     Init( CreationFlags::TryConsole );
@@ -906,73 +905,4 @@ void
 Consola::OutStream::Write( IntPtr data, int cbOffset, int cbSize )
 {
     rawDataToStdOut( data, cbOffset, cbSize );
-}
-
-
-
-int
-Consola::AuxXml::Write(System::Object^ content)
-{
-    NewScope(State::Content);
-    Log->Write(content->ToString());
-    return depth;
-}
-
-int
-Consola::AuxXml::WriteElement(String^ tagname, ...array<Object^>^ attribute)
-{
-    if (scope >= State::Element) {
-        NewScope(State::Element);
-    }
-    ++depth;
-    state = tagname;
-    scope = State::Attribute;
-    log->Write(String::Format("<{0}", tagname));
-    for (int i = 0; i < attribute->Length; ++i) {
-        String^ a = attribute[i]->ToString();
-        if (a->Contains("=")) {
-            array<String^>^ kv = a->Split('=');
-            WriteAttribute(kv[0], kv[1]);
-        }
-        else {
-            WriteAttribute(a, nullptr);
-        }
-    } return depth;
-
-}
-
-int
-Consola::AuxXml::WriteAttribute(String^ name, Object^ value)
-{
-    if (scope == State::Element) scope == State::Attribute;
-    if (scope == State::Attribute) {
-        if (value != nullptr) log->Write(String::Format(" {0}=\"{1}\"", name, value->ToString()));
-        else log->Write(" " + name);
-        return depth;
-    } return -1;
-}
-
-generic<class T> int
-Consola::AuxXml::WriteData(array<T>^ data)
-{
-    return -1;
-}
-
-int
-Consola::AuxXml::WriteNode(System::Xml::XmlNode^ node)
-{
-    Log->WriteLine(node->OuterXml);
-    return depth;
-}
-
-Consola::AuxXml::State
-Consola::AuxXml::Scope::get(void)
-{
-    return scope;
-}
-
-bool
-Consola::AuxXml::IsInput::get(void)
-{
-    return false;
 }

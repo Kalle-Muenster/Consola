@@ -42,8 +42,8 @@ namespace Consola
     private:
         static const char*  merge( const char* a, const char* b );
         static void         ended( Object^ sender, EventArgs^ e );
-        static Dictionary<int,ProcessFinishedDelegate^>^ exits;
-        static Dictionary<int,Action<int>^>^             axits;
+        static Dictionary<int,ProcessFinishedDelegate^>^    exits;
+        static Dictionary<int,Action<int>^>^                axits;
     };
 
 

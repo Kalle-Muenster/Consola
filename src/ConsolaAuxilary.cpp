@@ -94,7 +94,7 @@ Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
     default: how = Direction::Err; break;
     }
 }
-/*
+
 int
 Consola::AuxXml::Write( System::Object^ content )
 {
@@ -122,7 +122,7 @@ Consola::AuxXml::WriteElement( String^ tagname, ...array<Object^>^ attribute )
             WriteAttribute(a,nullptr);
         }
     } return depth;
-    
+
 }
 
 int
@@ -160,5 +160,3 @@ Consola::AuxXml::IsInput::get(void)
 {
     return false;
 }
-
-*/

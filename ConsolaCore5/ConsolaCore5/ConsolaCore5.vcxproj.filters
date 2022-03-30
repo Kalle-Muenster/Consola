@@ -46,7 +46,7 @@
       <Filter>Quelldateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\stringpool\enumoperators.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Quelldateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

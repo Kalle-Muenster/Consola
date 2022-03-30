@@ -135,7 +135,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000105</Version>
+      <Version>00000106</Version>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -162,7 +162,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000105</Version>
+      <Version>00000106</Version>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -191,7 +191,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000105</Version>
+      <Version>00000106</Version>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -222,7 +222,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000105</Version>
+      <Version>00000106</Version>
       <SubSystem>
       </SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
