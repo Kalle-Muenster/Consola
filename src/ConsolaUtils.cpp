@@ -188,6 +188,7 @@ Consola::Utility::ended(Object^ sender, EventArgs^ e)
         exits[proc->Id]( proc->ExitCode, proc->StandardOutput->ReadToEnd(), proc->StandardError->ReadToEnd() );
         exits->Remove( proc->Id );
     } else if( axits->ContainsKey( proc->Id ) ) {
+        Thread::Sleep(THREAD_WAITSTATE_CYCLE_TIME * 100);
         proc->ErrorDataReceived -= StdStream::Err->GetDelegate();
         proc->OutputDataReceived -= StdStream::Out->GetDelegate();
         axits[proc->Id]( proc->ExitCode );

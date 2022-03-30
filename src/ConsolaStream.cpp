@@ -693,7 +693,7 @@ Consola::OutStream::GetDelegate()
 void
 Consola::OutStream::WriteLineCallback( Object^ sender, System::Diagnostics::DataReceivedEventArgs^ e )
 {
-    Write( e->Data == nullptr ? L"\n" : e->Data );
+    WriteLine( e->Data == nullptr ? L"\n" : e->Data );
 }
 
 Consola::ILocked^
