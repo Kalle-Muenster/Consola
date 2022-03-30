@@ -8,7 +8,7 @@
 #ifndef _ConsolaAuxilary_hpp_
 #define _ConsolaAuxilary_hpp_
 
-#include <.byteOrder.h>
+// #include <.byteOrder.h>
 
 using namespace System::Xml;
 
@@ -16,6 +16,8 @@ using namespace System::Xml;
 namespace Consola {
     
     ref class AuxXml;
+    ref class StdStream;
+
  //   ref class AuxOut;
  //   ref class AuxLog;
  //   ref class AuxInp;
@@ -24,58 +26,16 @@ namespace Consola {
     {
     private:
         // eindimensionale, spheroide räume:
-        static int extendRaum( fourCC des, Direction how ) {
-            switch ( how ) {
-            case Direction::Out: {
-                int size = auxeen->Length;
-                array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>(auxtrm->Length + 1);
-                array<fourCC>^ nameExtender = gcnew array<fourCC>(auxeen->Length + 1);
-                auxtrm->CopyTo(raumExtender, 0);
-                auxeen->CopyTo(nameExtender, 0);
-                auxtrm = raumExtender;
-                auxeen = nameExtender;
-                auxeen[size] = des;
-                return size;
-            } break;
-            case Direction::Inp: {
-                if (auxtrm->Length > 1) {
-                    int position = auxeen->Length-1;
-                    array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>(auxtrm->Length - 1);
-                    array<fourCC>^ nameExtender = gcnew array<fourCC>(auxeen->Length - 1);
-                    for (int i = position, n = position-1; i >= 0; --i, --n) {
-                        if (auxeen[i] != des) {
-                            raumExtender[n] = auxtrm[i];
-                            nameExtender[n] = auxeen[i];
-                        } else position = n++;
-                    }
-                    auxtrm = raumExtender;
-                    auxeen = nameExtender;
-                    return position;
-                } else {
-                    auxtrm = nullptr;
-                    auxeen = nullptr;
-                    return 0;
-                }
-            } break;
-            default: how = Direction::Err; break;
-            }
-        }
+        static int extendRaum(unsigned des, Direction how);
     internal:
         static volatile uint lockvar = EMPTY;
        
-        static array<fourCC>^          auxeen;
+        static array<unsigned>^          auxeen;
         static array<AuxilaryStream^>^ auxtrm;
 
-        AuxilaryStream( fourCC name )
-            : StdStream( Direction::Aux )
-            , typ( name ) {
-            if (auxeen == nullptr) {
-                auxeen = gcnew array<fourCC>(1) { name };
-                auxtrm = gcnew array<AuxilaryStream^>(1) { this };
-                aux = this;
-            } else auxtrm[ extendRaum( typ, Direction::Inp ) ] = this;
-        }
-        virtual ~AuxilaryStream() { extendRaum( typ, Direction::Out ); }
+        AuxilaryStream(unsigned name);
+        virtual ~AuxilaryStream();
+
         virtual bool lockup(uint key) override {
             if (lockvar == EMPTY) {
                 lockvar = key;
@@ -90,7 +50,7 @@ namespace Consola {
             return lockvar != EMPTY;
         }
     protected:
-        const fourCC typ;
+        const unsigned typ;
     public:
         property LogWriter^ Log {
             virtual LogWriter^ get(void) override {
@@ -108,18 +68,14 @@ namespace Consola {
         }
 
         property AuxXml^ Xml {
-            AuxXml^ get(void) { for (int idx = 0; idx < auxeen->Length; ++idx) if (auxeen[idx] == byteOrder_stringTOfourCC("Xml")) return (AuxXml^)auxtrm[idx]; return nullptr; }
+            AuxXml^ get(void);
         }
     };
 
     public ref class AuxXml : public AuxilaryStream
     {
     internal:
-        AuxXml(void) : AuxilaryStream( byteOrder_stringTOfourCC("Xml") ) {
-            scope = State::NoScope;
-            depth = -1;
-            state = nullptr;
-        }
+        AuxXml(void);
 
 
     public:
@@ -137,16 +93,15 @@ namespace Consola {
 
 
         virtual property LogWriter^ Log {
-        public: LogWriter^ get(void) override {
+            LogWriter^ get(void) override {
             return log == nullptr
-                ? createLog() : log;
-        }
-        public: void set(LogWriter^ logger) override {
+                 ? createLog() : log;
+            }
+            void set(LogWriter^ logger) override {
             if (logger == nullptr) {
                 closeLog();
+            } else { log = logger; }
             }
-            else { log = logger; }
-        }
         }
 
         property State Scope {

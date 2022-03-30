@@ -15,14 +15,20 @@
 #include <limits.h>
 
 #include <.stringPool.h>
-#include "ConsolaStream.hpp"
-#include "ConsolaAuxilary.hpp"
+
 
 using namespace   System;
 using namespace   System::IO;
 using namespace   System::Threading::Tasks;
 using namespace   System::Threading;
 const char*       EmptyString = "\0";
+
+
+#include "ConsolaLogger.hpp"
+#include "ConsolaStream.hpp"
+#include "ConsolaAuxilary.hpp"
+#include "ConsolaUtils.hpp"
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,6 +378,20 @@ uint Consola::StdStream::asynchronRawDataRead( Object^ taskData )
 }
 
 // --- class member definitions: ---------------------
+
+Consola::StdStreams::StdStreams(void)
+    : StdStream( Direction::Non )
+{
+    nam = Utility::ProgramName() + "_{0}.log";
+    StdStream::Init();
+}
+
+Consola::StdStreams::StdStreams(CreationFlags createConsole)
+    : StdStream(Direction::Non)
+{
+    nam = Utility::ProgramName() + "_{0}.log";
+    StdStream::Init(createConsole);
+}
 
 Consola::StdStream::StdStream( Direction dir )
     : dir((uint)dir)

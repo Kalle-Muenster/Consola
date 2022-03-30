@@ -29,7 +29,7 @@ class Program
                     return;
                 }
             }
-            uint version = StdStream.VersionNumber();
+            uint version = Utility.VersionNumber();
             uint minor = (version & 0x0000ff00)>>8;
             uint build = version & 0x000000ff;
             version = (version & 0xffff0000)>>16;

@@ -24,7 +24,7 @@
     <Keyword>NetCoreCProj</Keyword>
     <RootNamespace>ConsolaCore5</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <ProjectName>StdStreams</ProjectName>
     <TargetFrameworkVersion>.NET 6</TargetFrameworkVersion>
   </PropertyGroup>
@@ -112,6 +112,7 @@
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
+    <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>./;$(ProjectDir)../../src/stringpool;$(ProjectDir)../../src;$(IncludePath)</IncludePath>
@@ -140,7 +141,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <PreventDllBinding>false</PreventDllBinding>
     </Link>
+    <Manifest>
+      <UpdateFileHashes>true</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -163,7 +168,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <PreventDllBinding>false</PreventDllBinding>
     </Link>
+    <Manifest>
+      <UpdateFileHashes>true</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -187,9 +196,14 @@
       </SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <GenerateWindowsMetadata>true</GenerateWindowsMetadata>
+      <GenerateWindowsMetadata>
+      </GenerateWindowsMetadata>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <PreventDllBinding>false</PreventDllBinding>
     </Link>
+    <Manifest>
+      <UpdateFileHashes>true</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -215,7 +229,11 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <PreventDllBinding>false</PreventDllBinding>
     </Link>
+    <Manifest>
+      <UpdateFileHashes>true</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ConsolaAuxilary.hpp" />

@@ -22,6 +22,7 @@
 #define CYCLE_COUNT (32)
 #endif
 
+//#define USE_NAMESPACER (1)
 #define NOT_USE_ENVIRONMENTOR
 #define COMMANDLINER_DISABLE_DEBUG (1)
 #define SET_NAMESPACE (-1)

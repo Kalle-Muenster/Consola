@@ -16,7 +16,11 @@ using namespace   System::IO;
 using namespace   System::Threading::Tasks;
 using namespace   System::Threading;
 
+#include "ConsolaLogger.hpp"
 #include "ConsolaStream.hpp"
+#include "ConsolaAuxilary.hpp"
+#include "ConsolaUtils.hpp"
+
 #include <enumoperators.h>
 
 

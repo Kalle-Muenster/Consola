@@ -8,11 +8,11 @@
 #ifndef _ConsolaStream_hpp_
 #define _ConsolaStream_hpp_
 
-#include "ConsolaUtils.hpp"
-#include "ConsolaLogger.hpp"
-
 using namespace System::Runtime;
 
+//#include "ConsolaUtils.hpp"
+//#include "ConsolaLogger.hpp"
+//#include "ConsolaAuxilary.hpp"
 
 
 namespace Consola
@@ -422,20 +422,12 @@ namespace Consola
     public ref class StdStreams sealed : public StdStream
     {
     public:
-        StdStreams()
-            : StdStream( Direction::Non ) {
-            nam = Utility::ProgramName() + "_{0}.log";
-            StdStream::Init();
-        }
+        StdStreams();
         StdStreams( String^ logfile )
             : StdStream( Direction::Non ) {
             StdStream::Init( logfile );
         }
-        StdStreams( CreationFlags createConsole )
-            : StdStream( Direction::Non ) {
-            nam = Utility::ProgramName() + "_{0}.log";
-            StdStream::Init( createConsole );
-        }
+        StdStreams(CreationFlags createConsole);
         StdStreams( CreationFlags flags, String^ logfile )
             : StdStream( Direction::Non ) {
             StdStream::Init( flags, logfile );

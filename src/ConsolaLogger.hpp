@@ -8,6 +8,8 @@
 #ifndef _ConsolaLogger_hpp_
 #define _ConsolaLogger_hpp_
 
+#using <System.Runtime.dll>
+
 using namespace System;
 using namespace System::IO;
 
@@ -17,7 +19,7 @@ namespace Consola
     int sizeOfPoolInstance(void);
 
     public ref class LogWriter
-        : public StreamWriter
+        : public System::IO::StreamWriter
     {
     private:
         static array<FileInfo^>^  Infos = gcnew array<FileInfo^>(0);

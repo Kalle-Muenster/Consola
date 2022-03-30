@@ -5,19 +5,96 @@
 ||     Generated: 23.02.2022                                 ||
 ||                                                           ||
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
-/*
 #include <settings.h>
-#include "ConsolaStream.hpp"
-#include "ConsolaAuxilary.hpp"
+#include <.byteOrder.h>
+
 
 using namespace   System;
 using namespace   System::IO;
 using namespace   System::Threading::Tasks;
 using namespace   System::Threading;
-const char*       EmptyString = "\0";
 
 
+#include "ConsolaLogger.hpp"
+#include "ConsolaStream.hpp"
+#include "ConsolaAuxilary.hpp"
 
+
+Consola::AuxilaryStream::AuxilaryStream( fourCC name )
+    : StdStream( Direction::Aux )
+    , typ(name)
+{
+    if (auxeen == nullptr) {
+        auxeen = gcnew array<fourCC>(1) { name };
+        auxtrm = gcnew array<AuxilaryStream^>(1) { this };
+        aux = this;
+    }
+    else auxtrm[extendRaum(typ, Direction::Inp)] = this;
+}
+
+
+Consola::AuxilaryStream::~AuxilaryStream()
+{
+    extendRaum(typ, Direction::Out);
+}
+
+Consola::AuxXml::AuxXml(void)
+    : AuxilaryStream( byteOrder_stringTOfourCC("Xml") )
+{
+    scope = State::NoScope;
+    depth = -1;
+    state = nullptr;
+}
+
+Consola::AuxXml^
+Consola::AuxilaryStream::Xml::get(void)
+{
+    for (int idx = 0; idx < auxeen->Length; ++idx)
+        if (auxeen[idx] == byteOrder_stringTOfourCC("Xml"))
+            return (AuxXml^)auxtrm[idx];
+    return nullptr;
+}
+
+int
+Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
+    switch (how) {
+    case Direction::Out: {
+        int size = auxeen->Length;
+        array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>(auxtrm->Length + 1);
+        array<unsigned>^ nameExtender = gcnew array<unsigned>(auxeen->Length + 1);
+        auxtrm->CopyTo(raumExtender, 0);
+        auxeen->CopyTo(nameExtender, 0);
+        auxtrm = raumExtender;
+        auxeen = nameExtender;
+        auxeen[size] = des;
+        return size;
+    } break;
+    case Direction::Inp: {
+        if (auxtrm->Length > 1) {
+            int position = auxeen->Length - 1;
+            array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>(auxtrm->Length - 1);
+            array<unsigned>^ nameExtender = gcnew array<unsigned>(auxeen->Length - 1);
+            for (int i = position, n = position - 1; i >= 0; --i, --n) {
+                if (auxeen[i] != des) {
+                    raumExtender[n] = auxtrm[i];
+                    nameExtender[n] = auxeen[i];
+                }
+                else position = n++;
+            }
+            auxtrm = raumExtender;
+            auxeen = nameExtender;
+            return position;
+        }
+        else {
+            auxtrm = nullptr;
+            auxeen = nullptr;
+            return 0;
+        }
+    } break;
+    default: how = Direction::Err; break;
+    }
+}
+/*
 int
 Consola::AuxXml::Write( System::Object^ content )
 {
