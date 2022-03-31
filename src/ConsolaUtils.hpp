@@ -19,14 +19,14 @@ namespace Consola
     {
     public:
         enum class Flags : unsigned {
-            Simple, Asynch, Detach, Hidden = 4
+            Simple, Asynch, Detach, Hidden = 4, Shell = 8
         };
 
         delegate void ProcessFinishedDelegate(int result, String^ stdOut, String^ stdErr);
 
         static Utility() {
             exits = gcnew Dictionary<int,ProcessFinishedDelegate^>(0);
-            axits = gcnew Dictionary<int, Action<int>^>(0);
+            axits = gcnew Dictionary<int,Action<int>^>(0);
         }
         static unsigned VersionNumber();
         static String^  VersionString();

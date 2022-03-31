@@ -71,7 +71,7 @@ int
 Consola::Utility::CommandExec( String^ command, Flags flags, ...array<Object^>^ args )
 {
     int result = -1;
-    if (!enum_utils::anyFlag(flags, Flags::Asynch | Flags::Detach)) {
+    if ( !enum_utils::anyFlag( flags, Flags::Asynch | Flags::Detach ) ) {
         array<byte>^ Cmd = System::Text::Encoding::Default->GetBytes( command );
         pin_ptr<byte> cmdptr( &Cmd[0] );
         const char* cmd = (const char*)cmdptr;
@@ -81,10 +81,11 @@ Consola::Utility::CommandExec( String^ command, Flags flags, ...array<Object^>^ 
             array<byte>^ Wrk = System::Text::Encoding::Default->GetBytes( Directory::GetCurrentDirectory() );
             pin_ptr<byte> wrkptr( &Wrk[0] );
             const char* wrk = (const char*)wrkptr;
-            uint val = StdStream::keygenerator->Next(_CRT_INT_MAX);
-            while( !StdStream::Inp->lockup(val) ) {
+            uint val = StdStream::keygenerator->Next(_CRT_INT_MAX );
+            while( !StdStream::Inp->lockup( val ) ) {
                 Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 5 );
             } cmd = merge( wrk, cmd );
+            StdStream::Inp->unlock( val );
         } else {
             cmd = (const char*)cmdptr;
         } result = system( cmd );
@@ -121,14 +122,14 @@ Consola::Utility::CommandExec( String^ command, Flags flags, ...array<Object^>^ 
                 command
             );
         }
-        setuproc->RedirectStandardOutput = !enum_utils::hasFlag(flags, Flags::Detach);
-        setuproc->RedirectStandardError = !enum_utils::hasFlag(flags, Flags::Detach);
+        setuproc->RedirectStandardOutput = !enum_utils::hasFlag( flags, Flags::Detach );
+        setuproc->RedirectStandardError = !enum_utils::hasFlag( flags, Flags::Detach );
         setuproc->CreateNoWindow = enum_utils::hasFlag( flags, Flags::Hidden );
-        setuproc->UseShellExecute = false;
+        setuproc->UseShellExecute = enum_utils::hasFlag( flags, Flags::Shell );
         setuproc->WorkingDirectory = StdStream::Cwd;
         if( environment ) {
             IEnumerator<KeyValuePair<String^,String^>>^ it = environment->GetEnumerator();
-            while (it->MoveNext()) {
+            while ( it->MoveNext() ) {
                 setuproc->Environment->Add( it->Current.Key, it->Current.Value );
             } it->~IEnumerator<KeyValuePair<String^,String^>>();
         }
@@ -137,7 +138,7 @@ Consola::Utility::CommandExec( String^ command, Flags flags, ...array<Object^>^ 
         proc->StartInfo = setuproc;
         if ( !enum_utils::hasFlag( flags, Flags::Detach ) ) {
             proc->EnableRaisingEvents = true;
-            if ( !enum_utils::hasFlag(flags, Flags::Hidden) ) {
+            if ( !enum_utils::hasFlag( flags, Flags::Hidden ) ) {
                 proc->ErrorDataReceived += StdStream::Err->GetDelegate();
                 proc->OutputDataReceived += StdStream::Out->GetDelegate();
             } proc->Exited += gcnew EventHandler(ended);
@@ -184,17 +185,17 @@ void
 Consola::Utility::ended(Object^ sender, EventArgs^ e)
 {
     System::Diagnostics::Process^ proc = dynamic_cast<System::Diagnostics::Process^>( sender );
-    if (exits->ContainsKey(proc->Id)) {
+    if (exits->ContainsKey( proc->Id )) {
+        Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 100 );
         exits[proc->Id]( proc->ExitCode, proc->StandardOutput->ReadToEnd(), proc->StandardError->ReadToEnd() );
         exits->Remove( proc->Id );
     } else if( axits->ContainsKey( proc->Id ) ) {
-        Thread::Sleep(THREAD_WAITSTATE_CYCLE_TIME * 100);
+        Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 100 );
         proc->ErrorDataReceived -= StdStream::Err->GetDelegate();
         proc->OutputDataReceived -= StdStream::Out->GetDelegate();
         axits[proc->Id]( proc->ExitCode );
         axits->Remove( proc->Id );
-    }
-    proc->Exited -= gcnew EventHandler(ended);
+    } proc->Exited -= gcnew EventHandler( ended );
     proc->~Process();
 }
 
