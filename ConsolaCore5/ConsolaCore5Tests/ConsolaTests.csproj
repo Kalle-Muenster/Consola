@@ -5,14 +5,14 @@
     <TargetFramework>net5.0</TargetFramework>
     <ApplicationIcon>WARN.ico</ApplicationIcon>
     <Platforms>x64;x86</Platforms>
-    <Version>0.0.1.5</Version>
+    <Version>0.0.1.6</Version>
     <Nullable>enable</Nullable>
     <NeutralLanguage></NeutralLanguage>
     <StartupObject></StartupObject>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>ConsolaStreams</PackageId>
-    <Authors>ConsolaStreams</Authors>
-    <Product>ConsolaStreams</Product>
+    <PackageId>Consola</PackageId>
+    <Authors>Consola</Authors>
+    <Product>Consola</Product>
     <BaseOutputPath>..\..\bin</BaseOutputPath>
     <DebugType>full</DebugType>
   </PropertyGroup>

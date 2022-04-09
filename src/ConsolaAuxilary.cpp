@@ -170,7 +170,7 @@ Consola::AuxXml::NewScope( State newScope )
 {
     if( scope == State::NoScope ) {
         scope = State::Document;
-        log->WriteLine( "<!xml version=\"1.0\" encoding=\"utf8\">" );
+        log->Write( "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" );
     } switch( scope ) {
     case State::Attribute:
         if( !( (newScope & (State::Element|State::Content)) != State::NoScope ) ) {
