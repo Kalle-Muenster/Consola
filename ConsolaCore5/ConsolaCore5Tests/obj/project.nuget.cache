@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8T06q3OfxN/03MAB9v5G4TkZ/BKb/HC3feBD+hv+rvCMEJBzFHfrZQEzxlspnSsSDkb71liBupgtTSmqEC+jZQ==",
+  "dgSpecHash": "HeBDioHYXoWYwDiWNkh9szIa6zB8+oAhZIO4sLz0Pl2IyEte1p2O3Z6Xq5kySLaie9FJrIKzwn+vieV8GykrDg==",
   "success": true,
-  "projectFilePath": "C:\\WORKSPACE\\PROJECTS\\ConsolaStreams\\ConsolaCore5\\ConsolaCore5Tests\\ConsolaCore5Tests.csproj",
+  "projectFilePath": "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\ConsolaTests.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

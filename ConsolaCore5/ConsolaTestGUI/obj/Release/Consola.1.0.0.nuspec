@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Consola</id>
+    <version>1.0.0</version>
+    <authors>ConsolaTestGUI</authors>
+    <icon>karen.png</icon>
+    <description>Package Description</description>
+    <tags>Console StdStreams</tags>
+    <dependencies>
+      <group targetFramework="net5.0-windows7.0">
+        <dependency id="StdStreams" version="1.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework="net5.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WindowsForms" />
+      </group>
+    </frameworkReferences>
+  </metadata>
+  <files>
+    <file src="C:\WORKSPACE\PROJECTS\Consola\bin\core5\Test\x64\Release\net5.0-windows\ConsolaTestGUI.runtimeconfig.json" target="lib\net5.0-windows7.0\ConsolaTestGUI.runtimeconfig.json" />
+    <file src="C:\WORKSPACE\PROJECTS\Consola\bin\core5\Test\x64\Release\net5.0-windows\ConsolaTestGUI.dll" target="lib\net5.0-windows7.0\ConsolaTestGUI.dll" />
+    <file src="C:\WORKSPACE\PROJECTS\Consola\ConsolaCore5\ConsolaTestGUI\karen.png" target="\karen.png" />
+  </files>
+</package>

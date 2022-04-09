@@ -463,16 +463,12 @@ Consola::StdStream::Init( CreationFlags flags, String^ logfile )
 void
 Consola::StdStream::Init( CreationFlags creationflags )
 {
-    loggingstate = creationflags & ( CreationFlags::AppendLog
-                                   | CreationFlags::CreateLog
-                                   | CreationFlags::NoInputLog );
+    loggingstate = creationflags & CreationFlags::LoggingFlagsMask;
     if( nam == nullptr )
         nam = Utility::ProgramName()
             + "_{0}.log";
 
-    creationflags = creationflags & ~( CreationFlags::AppendLog
-                                     | CreationFlags::CreateLog
-                                     | CreationFlags::NoInputLog );
+    creationflags = creationflags & ~CreationFlags::LoggingFlagsMask;
 
     if( creationflags == CreationFlags::None ) {
         creationflags = CreationFlags::TryConsole;
@@ -500,10 +496,12 @@ Consola::StdStream::Init( CreationFlags creationflags )
         gcnew StdErr();
     }
     if( loggingstate != CreationFlags::None ) {
+        oup->createLog();
         if( !loggingstate.HasFlag( CreationFlags::NoInputLog ) )
             inp->createLog();
-        oup->createLog();
-        err->createLog();
+        if( !loggingstate.HasFlag( CreationFlags::SharedLogs ) )
+             err->createLog();
+        else err->Log = oup->log;
     }
 }
 

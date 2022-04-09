@@ -31,6 +31,8 @@ namespace Consola
         UseConsole = 0x00000010, NewConsole = 0x00000020,
         TryConsole = 0x00000030, AppendLog = 0x00000001,
         NoInputLog = 0x00000004, CreateLog = 0x00000002,
+        SharedLogs = 0x00000008, OutputLog = 0x0000000e,
+        LoggingFlagsMask = 0x0000000f
     };
 
     public ref class StdStream
@@ -90,10 +92,10 @@ namespace Consola
             return cast->Log;
         }
 
-        void            closeLog();
-        void            removeLog();
-        LogWriter^      createLog();
-        bool            existsLog();
+        virtual void       closeLog();
+        virtual void       removeLog();
+        virtual LogWriter^ createLog();
+        virtual bool       existsLog();
 
     internal:
 
@@ -429,8 +431,8 @@ namespace Consola
             StdStream::Init( flags, logfile );
         }
 
-        void closeLog(void) new;
-        void removeLog(void) new;
+        virtual void closeLog(void) override;
+        virtual void removeLog(void) override;
 
         property StdInp^ Inp {
             StdInp^ get( void ) { return StdStream::Inp; }

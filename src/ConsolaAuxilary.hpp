@@ -9,35 +9,38 @@
 #define _ConsolaAuxilary_hpp_
 
 
-
 using namespace System::Xml;
 
 
-namespace Consola {
-    
+namespace Consola
+{
     ref class AuxXml;
     ref class StdStream;
 
-    public ref class AuxilaryStream : public StdStream
+    public ref class AuxilaryStream
+        : public StdStream
     {
     private:
-        static int extendRaum(unsigned des, Direction how);
+        static int extendRaum( unsigned des, Direction how );
+    
+    protected:
+        const unsigned typ;
 
     internal:
         static volatile uint lockvar = EMPTY;
        
-        static array<unsigned>^          auxeen;
+        static array<unsigned>^        auxeen;
         static array<AuxilaryStream^>^ auxtrm;
 
-        AuxilaryStream(unsigned name);
+        AuxilaryStream( unsigned name );
         virtual ~AuxilaryStream();
 
-        virtual bool lockup(uint key) override {
+        virtual bool lockup( uint key ) override {
             if (lockvar == EMPTY) {
                 lockvar = key;
             } return lockvar == key;
         }
-        virtual bool unlock(uint key) override {
+        virtual bool unlock( uint key ) override {
             if (lockvar == key) {
                 lockvar = EMPTY;
             } return lockvar == EMPTY;
@@ -45,22 +48,15 @@ namespace Consola {
         virtual bool locked(void) override {
             return lockvar != EMPTY;
         }
-    protected:
-        const unsigned typ;
+
     public:
         property LogWriter^ Log {
-            virtual LogWriter^ get(void) override {
-                return log == nullptr
-                     ? createLog() : log;
-            }
-            virtual void set( LogWriter^ value ) override {
-                if (((log != nullptr) && (log != value)) || (value == nullptr)) {
-                    closeLog();
-                } log = value;
-            }
+            virtual LogWriter^ get( void ) override;
+            virtual void set( LogWriter^ value ) override;
         }
-        virtual String^ ToString(void) override {
-            return String::Format("{0}_{1}.log", this->nam, typ );
+
+        virtual String^ ToString( void ) override {
+            return String::Format( "{0}_{1}.log", this->nam, typ );
         }
 
         property AuxXml^ Xml {
@@ -68,78 +64,55 @@ namespace Consola {
         }
     };
 
-    public ref class AuxXml : public AuxilaryStream
+    public ref class AuxXml
+        : public AuxilaryStream
     {
     internal:
-        AuxXml(void);
-
+        AuxXml( void );
 
     public:
-        enum class State { NoScope, Document, Element, Attribute, Content, CData, Comment };
+        enum class State { 
+            NoScope, Document, Element,
+            Attribute, Content, CData,
+            Comment
+        };
 
-        property bool IsInput { bool get(void); }
-        
-        int     WriteNode( System::Xml::XmlNode^ node );
-        int     Write(System::Object^ content);
-        int     WriteElement(String^ tagname, ...array<Object^>^ attribute);
-        int     WriteAttribute(String^ name, Object^ value);
-        generic<class T> where T : ValueType
-        int     WriteData(array<T>^ data);
-        
+        void    CloseScope( void );
+        void    WriteNode( XmlNode^ node );
+        void    WriteContent( String^ format, ...array<Object^>^ objects );
+        void    WriteElement( String^ tagname, ...array<String^>^ attributes );
+        void    WriteAttribute( String^ name, Object^ value );
+        void    NewScope( State newScope );
 
+        void closeLog(void) override {
+            while( depth >= 0 && scope > State::NoScope ) {
+                CloseScope();
+            }
+        }
 
         virtual property LogWriter^ Log {
-            LogWriter^ get(void) override {
-            return log == nullptr
-                 ? createLog() : log;
-            }
-            void set(LogWriter^ logger) override {
-            if (logger == nullptr) {
-                closeLog();
-            } else { log = logger; }
-            }
+            LogWriter^ get(void) override;
+            void set(LogWriter^ logger) override;
+        }
+
+        property bool IsInput {
+            bool get(void) { return false; }
         }
 
         property State Scope {
-            State get(void);
+            State get(void) { return scope; }
         }
 
-        void NewScope(State newScope) {
-            switch (scope) {
-            case State::Attribute:
-                if ( (newScope & (State::Element | State::Content)) != State::NoScope ) log->Write('>');
-                else { --depth; log->WriteLine("/>"); }
-                scope = newScope;
-                break;
-            case State::Element:
-                if (state != nullptr && !(newScope == State::Content))
-                    log->WriteLine(String::Format("</{0}>", state));
-                else log->WriteLine("/>");
-                --depth;
-                break;
-            case State::Comment:
-                log->WriteLine(" -->");
-                --depth;
-                break;
-            case State::Content:
-                if (newScope != State::Content) {
-                    log->WriteLine(String::Format("</{0}>", state));
-                    --depth;
-                }
-                break;
-            case State::CData:
-                log->WriteLine("\"]>");
-                --depth;
-            } scope = newScope;
+        property int Depth { 
+            int get(void) { return depth; }
         }
-
-        property int Depth { int get(void) { return depth; } }
 
     private:
+
         int depth;
         State scope;
+        System::Collections::Generic::List<String^>^ states;
         String^ state;
-
     };
 
 } //end of Consola
