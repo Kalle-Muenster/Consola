@@ -19,7 +19,7 @@ using namespace   System::Threading;
 #include "ConsolaAuxilary.hpp"
 
 
-#define TABS for (int i = 0; i < depth; ++i) log->Write( "    " )
+#define TABS if(notabs) notabs = false; else for (int i = 0; i < Depth; ++i) log->Write( "    " )
 
 
 Consola::AuxilaryStream::AuxilaryStream( fourCC name )
@@ -43,9 +43,9 @@ Consola::AuxXml::AuxXml(void)
     : AuxilaryStream( byteOrder_stringTOfourCC("Xml") )
 {
     scope = State::NoScope;
-    depth = -1;
     state = nullptr;
     states = gcnew System::Collections::Generic::List<String^>();
+    nocontent = notabs = false;
 }
 
 Consola::AuxXml^
@@ -96,39 +96,38 @@ Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
     }
 }
 
-void
+Consola::AuxXml^
 Consola::AuxXml::WriteContent( System::String^ format, ...array<Object^>^ content )
 {
-    if( scope != State::Content )
-        NewScope( State::Content );
+    if (scope != State::Content) {
+        NewScope(State::Content);
+    }
     Log->Write( format, content );
     Log->Flush();
+    notabs = true;
+    return this;
 }
 
-void
+Consola::AuxXml^
 Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
 {
-    if (scope >= State::Element) {
-        NewScope(State::Element);
-    }
-    ++depth;
+    NewScope( State::Element, false );
     states->Add( state = tagname );
+    TABS; log->Write( String::Format( "<{0}", tagname ) );
     scope = State::Attribute;
-    TABS;
-    log->Write( String::Format( "<{0}", tagname ) );
     if( attribute->Length == 0 ) log->Flush();
-    for ( int i = 0; i < attribute->Length; ++i ) {
+    for (int i = 0; i < attribute->Length; ++i) {
         String^ a = attribute[i]->ToString();
         if (a->Contains("=")) {
             array<String^>^ kv = a->Split('=');
-            WriteAttribute( kv[0], kv[1] );
+            WriteAttribute(kv[0], kv[1]);
         } else {
-            WriteAttribute( a, nullptr );
+            WriteAttribute(a, nullptr);
         }
-    }
+    } return this;
 }
 
-void
+Consola::AuxXml^
 Consola::AuxXml::WriteAttribute( String^ name, Object^ value )
 {
     if (scope == State::Element) scope == State::Attribute;
@@ -136,7 +135,7 @@ Consola::AuxXml::WriteAttribute( String^ name, Object^ value )
         if( value != nullptr ) log->Write( String::Format(" {0}=\"{1}\"", name, value->ToString() ) );
         else log->Write(" " + name);
         log->Flush();
-    }
+    } return this;
 }
 
 void
@@ -144,71 +143,92 @@ Consola::AuxXml::WriteNode( System::Xml::XmlNode^ node )
 {
     if( scope == State::Content || scope == State::Element || scope == State::Attribute ) {
         NewScope(State::Content);
-    } log->WriteLine( node->OuterXml );
+    } TABS;
+    log->WriteLine( node->OuterXml );
     log->Flush();
 }
 
-void
+Consola::AuxXml^
 Consola::AuxXml::CloseScope( void )
 {
+    if (scope == State::Content) TABS;
     switch( scope ) {
     case State::Content:
     case State::Attribute:
     case State::Element: {
-        NewScope( depth >= 0 ? State::Content : State::Document );
+        NewScope( Depth >= 0 ? State::Content : State::Document );
     } break;
     case State::Document: {
         scope = State::NoScope;
-        depth = -1;
-        Log = nullptr;
+        state = nullptr;
+        states->Clear();
+        log->Flush();
+        log->Close();
     } break;
-    }
+    } return this;
+}
+
+Consola::AuxXml^
+Consola::AuxXml::CloseScope( String^ element )
+{
+    if (states->Contains(element)) {
+        while (Element != element) CloseScope();
+        if (Element == element) CloseScope();
+    }return this;
+}
+
+void
+Consola::AuxXml::NewScope( State newScope, bool closeActual )
+{
+    if( scope == State::NoScope ) {
+        scope = State::Document;
+        log->Write( "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" );
+    } bool closeCurrentScope = false;
+    switch( scope ) {
+    case State::Attribute:
+        if( !( (newScope & (State::Content|State::Comment)) != State::NoScope ) ) {
+            log->Write( "/" ); 
+        } log->Write( ">" );
+        if (!newScope.HasFlag(State::Content)) log->Write("\n");
+        log->Flush();
+        break;
+    case State::Element:
+        if( state != nullptr && newScope == State::Content ) {
+            log->Write(String::Format("</{0}>\n", state));
+        } else log->Write( "/>\n" );
+        log->Flush();
+        closeCurrentScope = closeActual;
+        break;
+    case State::Comment:
+        log->Write( " -->\n" );
+        log->Flush();
+        closeCurrentScope = closeActual;
+        break;
+    case State::Content:
+        if (closeActual) {
+            log->Write("</{0}>\n", state);
+            log->Flush();
+            closeCurrentScope = closeActual;
+        } break;
+    case State::CData:
+        log->Write( "\"]>\n" );
+        log->Flush();
+        closeCurrentScope = closeActual;
+        break;
+    } scope = newScope;
+    if( closeCurrentScope ) {
+        states->RemoveAt( Depth );
+        if (states->Count > 0) {
+            state = states[Depth];
+        } else state = nullptr;
+    } 
 }
 
 void
 Consola::AuxXml::NewScope( State newScope )
 {
-    if( scope == State::NoScope ) {
-        scope = State::Document;
-        log->Write( "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" );
-    } switch( scope ) {
-    case State::Attribute:
-        if( !( (newScope & (State::Element|State::Content)) != State::NoScope ) ) {
-            --depth; log->Write( "/" );
-        } log->Write( ">\n" );
-        log->Flush();
-        break;
-    case State::Element:
-        if( state != nullptr && !(newScope == State::Content) ) {
-            TABS;
-            log->Write( String::Format( "</{0}>\n", state ) );
-        } else log->Write( "/>\n" );
-        log->Flush();
-        --depth;
-        break;
-    case State::Comment:
-        log->Write( " -->\n" );
-        log->Flush();
-        --depth;
-        break;
-    case State::Content:
-        TABS;
-        log->Write( "</{0}>\n", state );
-        log->Flush();
-        --depth;
-        break;
-    case State::CData:
-        log->Write( "\"]>\n" );
-        log->Flush();
-        --depth;
-    } scope = newScope;
-    if( states->Count > depth + 1 ) {
-        states->RemoveAt( depth + 1 );
-    } state = states->Count > 0 
-            ? states[depth]
-            : nullptr;
+    NewScope( newScope, true );
 }
-
 
 Consola::LogWriter^
 Consola::AuxilaryStream::Log::get( void )

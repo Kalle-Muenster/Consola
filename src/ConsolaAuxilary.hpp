@@ -77,15 +77,17 @@ namespace Consola
             Comment
         };
 
-        void    CloseScope( void );
+        AuxXml^ CloseScope( void );
+        AuxXml^ CloseScope( String^ element );
         void    WriteNode( XmlNode^ node );
-        void    WriteContent( String^ format, ...array<Object^>^ objects );
-        void    WriteElement( String^ tagname, ...array<String^>^ attributes );
-        void    WriteAttribute( String^ name, Object^ value );
+        AuxXml^ WriteContent( String^ format, ...array<Object^>^ objects );
+        AuxXml^ WriteElement( String^ tagname, ...array<String^>^ attributes );
+        AuxXml^ WriteAttribute( String^ name, Object^ value );
         void    NewScope( State newScope );
+        void    NewScope( State newScope, bool dontClose );
 
         void closeLog(void) override {
-            while( depth >= 0 && scope > State::NoScope ) {
+            while( states->Count > 0 && scope > State::NoScope ) {
                 CloseScope();
             }
         }
@@ -103,13 +105,16 @@ namespace Consola
             State get(void) { return scope; }
         }
 
+        property String^ Element {
+            String^ get(void) { return state == nullptr ? String::Empty : state; }
+        }
+
         property int Depth { 
-            int get(void) { return depth; }
+            int get(void) { return states->Count-1; }
         }
 
     private:
-
-        int depth;
+        bool notabs,nocontent;
         State scope;
         System::Collections::Generic::List<String^>^ states;
         String^ state;
