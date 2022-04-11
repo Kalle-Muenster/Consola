@@ -1,45 +1,29 @@
 {
   "version": 3,
   "targets": {
-    "net5.0": {
-      "Consola/1.0.0": {
-        "type": "project",
-        "compile": {
-          "bin/placeholder/Consola.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Consola.dll": {}
-        }
-      }
-    }
+    "net5.0": {}
   },
-  "libraries": {
-    "Consola/1.0.0": {
-      "type": "project",
-      "path": "../ConsolaCore5/ConsolaCore5.vcxproj",
-      "msbuildProject": "../ConsolaCore5/ConsolaCore5.vcxproj"
-    }
-  },
+  "libraries": {},
   "projectFileDependencyGroups": {
-    "net5.0": [
-      "Consola >= 1.0.0"
-    ]
+    "net5.0": []
   },
   "packageFolders": {
     "C:\\Users\\kalle\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "0.0.1.5",
+    "version": "0.0.1.6",
     "restore": {
-      "projectUniqueName": "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\ConsolaTests.csproj",
-      "projectName": "ConsolaStreams",
-      "projectPath": "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\ConsolaTests.csproj",
+      "projectUniqueName": "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\Consola.Tests.csproj",
+      "projectName": "Consola",
+      "projectPath": "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\Consola.Tests.csproj",
       "packagesPath": "C:\\Users\\kalle\\.nuget\\packages\\",
-      "outputPath": "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\obj\\",
+      "outputPath": "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaCore5Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
         "C:\\Users\\kalle\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -51,16 +35,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {}
+        "C:\\Program Files\\dotnet": {},
+        "d:\\LIBRARIES": {},
+        "https://www.nuget.org/api/v2/": {}
       },
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
-          "projectReferences": {
-            "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaCore5\\ConsolaCore5.vcxproj": {
-              "projectPath": "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaCore5\\ConsolaCore5.vcxproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
