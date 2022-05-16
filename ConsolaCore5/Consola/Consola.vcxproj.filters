@@ -48,6 +48,9 @@
     <ClInclude Include="..\..\src\stringpool\enumoperators.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\stringpool\versionmacro.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">

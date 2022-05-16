@@ -11,10 +11,11 @@
 #include <.byteOrder.h>
 
 using namespace   System;
-using namespace   System::Collections::Generic;
 using namespace   System::IO;
-using namespace   System::Threading::Tasks;
+using namespace   System::Text;
 using namespace   System::Threading;
+using namespace   System::Threading::Tasks;
+using namespace   System::Collections::Generic;
 
 #include "ConsolaLogger.hpp"
 #include "ConsolaStream.hpp"
@@ -24,16 +25,111 @@ using namespace   System::Threading;
 #include <enumoperators.h>
 
 
+typedef Dictionary<String^,String^> StringDict;
+typedef Tuple<StringDict^,StringBuilder^,Delegate^,Consola::Utility::Flags> ParameterTuple;
+
+
+
+/*------------------------- Consola::Utility HelerFunctions -----------------------------*/
+
+int 
+_performSystemCall( String^ command )
+{
+    array<byte>^ Cmd = Encoding::Default->GetBytes(command);
+    pin_ptr<byte> cmdptr(&Cmd[0]);
+    const char* cmd = (const char*)cmdptr;
+    while (*++cmd);
+    while (*--cmd) if (*cmd == '\\') break;
+    if (!*cmd) {
+        array<byte>^ Wrk = Encoding::Default->GetBytes(Directory::GetCurrentDirectory());
+        pin_ptr<byte> wrkptr(&Wrk[0]);
+        const char* wrk = (const char*)wrkptr;
+        uint val = Consola::StdStream::keygenerator->Next(_CRT_INT_MAX);
+        while ( !Consola::StdStream::Inp->lockup(val) ) {
+            Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 5 );
+        } cmd = Consola::Utility::merge( wrk, cmd );
+        Consola::StdStream::Inp->unlock( val );
+    } else {
+        cmd = (const char*)cmdptr;
+    } return system( cmd );
+}
+
+ParameterTuple^
+_evaluateParameters( array<Object^>^ args, Consola::Utility::Flags flags )
+{
+     StringBuilder^ parameters = nullptr;
+     StringDict^ environment = nullptr;
+     Delegate^ onexit = nullptr;
+
+     for (int x = 0; x < args->Length; ++x ) {
+         if (args[x]->GetType() == array<String^>::typeid) {
+             array<String^>^ strarg = safe_cast<array<String^>^>( args[x] );
+             parameters = gcnew System::Text::StringBuilder( strarg[0] );
+             for (int i = 1; i < strarg->Length; ++i)
+                 parameters->Append( String::Format(" {0}", args[i]) );
+         }
+         else if (args[x]->GetType() == String::typeid) {
+             parameters = gcnew System::Text::StringBuilder( args[0]->ToString() );
+         }
+         else if (args[x]->GetType() == Dictionary<String^, String^>::typeid) {
+             environment = safe_cast<Dictionary<String^, String^>^>( args[x] );
+         }
+         else if (args[x]->GetType() == Consola::Utility::ProcessFinishedDelegate::typeid) {
+             onexit = safe_cast<Consola::Utility::ProcessFinishedDelegate^>( args[x] );
+             enum_utils::addFlag( flags, Consola::Utility::Flags::Hidden );
+         }
+         else if (args[x]->GetType() == Action<int>::typeid) {
+             onexit = safe_cast<Action<int>^>( args[x] );
+         }
+     } return gcnew ParameterTuple( environment, parameters, onexit, flags );
+}
+
+System::Diagnostics::Process^ 
+_instanciateNewProcess( String^ cmd, Consola::Utility::Flags flg, StringDict^ env, StringBuilder^ arg )
+{
+    System::Diagnostics::ProcessStartInfo^ info = arg
+        ? gcnew System::Diagnostics::ProcessStartInfo( cmd, arg->ToString() )
+        : gcnew System::Diagnostics::ProcessStartInfo( cmd );
+
+    info->RedirectStandardOutput = !enum_utils::hasFlag(flg, Consola::Utility::Flags::Detached);
+    info->RedirectStandardError = !enum_utils::hasFlag(flg, Consola::Utility::Flags::Detached);
+    info->CreateNoWindow = enum_utils::hasFlag(flg, Consola::Utility::Flags::Hidden);
+    info->UseShellExecute = enum_utils::hasFlag(flg, Consola::Utility::Flags::Shell);
+    info->WorkingDirectory = Consola::StdStream::Cwd;
+
+    if( env ) {
+        IEnumerator<KeyValuePair<String^,String^>>^ it = env->GetEnumerator();
+        while( it->MoveNext() ) {
+            info->Environment->Add( it->Current.Key, it->Current.Value );
+        } it->~IEnumerator<KeyValuePair<String^,String^>>();
+    } 
+
+    System::Diagnostics::Process^ proc = gcnew System::Diagnostics::Process();
+    proc->StartInfo = info;
+
+    if (!enum_utils::hasFlag(flg, Consola::Utility::Flags::Detached)) {
+        proc->EnableRaisingEvents = true;
+        if (!enum_utils::hasFlag(flg, Consola::Utility::Flags::Hidden)) {
+            proc->ErrorDataReceived += Consola::StdStream::Err->GetDelegate();
+            proc->OutputDataReceived += Consola::StdStream::Out->GetDelegate();
+        } 
+    } return proc;
+}
+
+
+/*------------------------- Consola::Utility Implementation -----------------------------*/
+
 unsigned
-Consola::Utility::VersionNumber()
+Consola::Utility::VersionNumber::get(void)
 {
     return CONSOLA_VERSION_NUMBER;
 }
 
 String^
-Consola::Utility::VersionString()
+Consola::Utility::VersionString::get(void)
 {
-    return gcnew String(CONSOLA_VERSION_STRING);
+    const char vers[] = CONSOLA_VERSION_STRING;
+    return gcnew String( vers );
 }
 
 System::String^
@@ -46,6 +142,13 @@ System::Int32
 Consola::Utility::ProgramProc()
 {
     return System::Diagnostics::Process::GetCurrentProcess()->Id;
+}
+
+System::String^
+Consola::Utility::ProgramPath()
+{
+    String^ path = System::Diagnostics::Process::GetCurrentProcess()->MainModule->FileName;
+    return path->Substring( 0, path->LastIndexOf('\\') );
 }
 
 System::String^
@@ -68,97 +171,37 @@ Consola::Utility::MachineArch()
 }
 
 int
-Consola::Utility::CommandExec( String^ command, Flags flags, ...array<Object^>^ args )
+Consola::Utility::CommandLine( String^ command, Flags flags, ...array<Object^>^ args )
 {
-    int result = -1;
-    if ( !enum_utils::anyFlag( flags, Flags::Asynch | Flags::Detach ) ) {
-        array<byte>^ Cmd = System::Text::Encoding::Default->GetBytes( command );
-        pin_ptr<byte> cmdptr( &Cmd[0] );
-        const char* cmd = (const char*)cmdptr;
-        while (*++cmd);
-        while (*--cmd) if (*cmd == '\\') break;
-        if (! *cmd ) {
-            array<byte>^ Wrk = System::Text::Encoding::Default->GetBytes( Directory::GetCurrentDirectory() );
-            pin_ptr<byte> wrkptr( &Wrk[0] );
-            const char* wrk = (const char*)wrkptr;
-            uint val = StdStream::keygenerator->Next(_CRT_INT_MAX );
-            while( !StdStream::Inp->lockup( val ) ) {
-                Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 5 );
-            } cmd = merge( wrk, cmd );
-            StdStream::Inp->unlock( val );
-        } else {
-            cmd = (const char*)cmdptr;
-        } result = system( cmd );
-    } else {
-        Dictionary<String^,String^>^ environment = nullptr;
-        System::Text::StringBuilder^ parameters = nullptr;
-        Delegate^ onexit = nullptr;
-        if (args) {
-            for (int x = 0; x < args->Length; ++x ) {
-                if ( args[x]->GetType() == array<String^>::typeid ) {
-                    array<String^>^ strarg = safe_cast<array<String^>^>( args[x] );
-                    parameters = gcnew System::Text::StringBuilder( strarg[0] );
-                    for (int i = 1; i < strarg->Length; ++i)
-                        parameters->Append(String::Format(" {0}", args[i]));
-                } else if (args[x]->GetType() == String::typeid) {
-                    parameters = gcnew System::Text::StringBuilder( args[0]->ToString() );
-                } else if (args[x]->GetType() == Dictionary<String^,String^>::typeid) {
-                    environment = safe_cast<Dictionary<String^,String^>^>( args[x] );
-                } else if (args[x]->GetType() == ProcessFinishedDelegate::typeid) {
-                    onexit = safe_cast<ProcessFinishedDelegate^>( args[x] );
-                    enum_utils::addFlag( flags, Flags::Hidden );
-                } else if ( args[x]->GetType() == Action<int>::typeid ) {
-                    onexit = safe_cast<Action<int>^>( args[x] );
-                }
-            }
-        }
-        System::Diagnostics::ProcessStartInfo^ setuproc;
-        if( parameters ) {
-            setuproc = gcnew System::Diagnostics::ProcessStartInfo(
-                command, parameters->ToString()
-            );
-        } else {
-            setuproc = gcnew System::Diagnostics::ProcessStartInfo(
-                command
-            );
-        }
-        setuproc->RedirectStandardOutput = !enum_utils::hasFlag( flags, Flags::Detach );
-        setuproc->RedirectStandardError = !enum_utils::hasFlag( flags, Flags::Detach );
-        setuproc->CreateNoWindow = enum_utils::hasFlag( flags, Flags::Hidden );
-        setuproc->UseShellExecute = enum_utils::hasFlag( flags, Flags::Shell );
-        setuproc->WorkingDirectory = StdStream::Cwd;
-        if( environment ) {
-            IEnumerator<KeyValuePair<String^,String^>>^ it = environment->GetEnumerator();
-            while ( it->MoveNext() ) {
-                setuproc->Environment->Add( it->Current.Key, it->Current.Value );
-            } it->~IEnumerator<KeyValuePair<String^,String^>>();
-        }
-        
-        System::Diagnostics::Process^ proc = gcnew System::Diagnostics::Process();
-        proc->StartInfo = setuproc;
-        if ( !enum_utils::hasFlag( flags, Flags::Detach ) ) {
-            proc->EnableRaisingEvents = true;
-            if ( !enum_utils::hasFlag( flags, Flags::Hidden ) ) {
-                proc->ErrorDataReceived += StdStream::Err->GetDelegate();
-                proc->OutputDataReceived += StdStream::Out->GetDelegate();
-            } proc->Exited += gcnew EventHandler(ended);
-        } if ( proc->Start() ) {
+    if ( enum_utils::anyFlag( flags, Flags::Asynch | Flags::Detached ) ) {
+        ParameterTuple^ proc_args = _evaluateParameters( args, flags );
+        System::Diagnostics::Process^ proc = _instanciateNewProcess( 
+            command, flags = proc_args->Item4, proc_args->Item1, proc_args->Item2
+        );
+
+        if ( !enum_utils::hasFlag( flags, Flags::Detached ) ) {
+            proc->Exited += gcnew EventHandler(ended);
+        } 
+
+        int result = -1;
+        if( proc->Start() ) {
             result = proc->Id;
-            if ( onexit != nullptr ) {
-                if (onexit->GetType() == ProcessFinishedDelegate::typeid)
-                    exits->Add( result, dynamic_cast<ProcessFinishedDelegate^>(onexit) );
+            if (proc_args->Item3 != nullptr) {
+                if (proc_args->Item3->GetType() == ProcessFinishedDelegate::typeid)
+                    exits->Add(result, dynamic_cast<ProcessFinishedDelegate^>(proc_args->Item3));
                 else {
                     proc->BeginErrorReadLine();
                     proc->BeginOutputReadLine();
-                    axits->Add( result, dynamic_cast<Action<int>^>(onexit) );
+                    axits->Add(result, dynamic_cast<Action<int>^>(proc_args->Item3));
                 }
             }
         }
-    } return result;
+        return result;
+    } else return _performSystemCall( command );
 }
 
 int
-Consola::Utility::CommandExec( String^ command, Action<int>^ onexit )
+Consola::Utility::CommandLine( String^ command, Action<int>^ onexit )
 {
     String^ parameters = String::Empty;
     if (command[0] == '\"') {
@@ -170,16 +213,15 @@ Consola::Utility::CommandExec( String^ command, Action<int>^ onexit )
         parameters = command->Substring(split);
         command = command->Substring(0, split);
     }
-    
-    return CommandExec( command, Flags::Asynch, parameters, onexit );
+    return CommandLine( command, Flags::Asynch, parameters, onexit );
 }
-
 
 int
-Consola::Utility::CommandExec( String^ command )
+Consola::Utility::CommandLine( String^ command )
 {
-    return CommandExec( command, Flags::Simple );
+    return CommandLine( command, Flags::Simple );
 }
+
 
 void
 Consola::Utility::ended(Object^ sender, EventArgs^ e)

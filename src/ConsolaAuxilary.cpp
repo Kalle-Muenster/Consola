@@ -17,21 +17,22 @@ using namespace   System::Threading;
 #include "ConsolaLogger.hpp"
 #include "ConsolaStream.hpp"
 #include "ConsolaAuxilary.hpp"
+#include <enumoperators.h>
 
 
-#define TABS if(notabs) notabs = false; else for (int i = 0; i < Depth; ++i) log->Write( "    " )
+#define TABS if( notabs ) notabs = false; else for( int i = 0; i < Depth; ++i ) log->Write( "    " )
 
 
 Consola::AuxilaryStream::AuxilaryStream( fourCC name )
     : StdStream( Direction::Aux )
-    , typ(name)
+    , typ( name )
 {
-    if (auxeen == nullptr) {
+    if( auxeen == nullptr ) {
         auxeen = gcnew array<fourCC>(1) { name };
         auxtrm = gcnew array<AuxilaryStream^>(1) { this };
         aux = this;
-    }
-    else auxtrm[extendRaum(typ, Direction::Inp)] = this;
+    } else
+        auxtrm[extendRaum( typ, Direction::Inp )] = this;
 }
 
 Consola::AuxilaryStream::~AuxilaryStream()
@@ -59,9 +60,10 @@ Consola::AuxilaryStream::Xml::get(void)
 
 int
 Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
+    int size = 0;
     switch (how) {
     case Direction::Out: {
-        int size = auxeen->Length;
+        size = auxeen->Length;
         array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>( auxtrm->Length + 1 );
         array<unsigned>^ nameExtender = gcnew array<unsigned>( auxeen->Length + 1 );
         auxtrm->CopyTo( raumExtender, 0 );
@@ -69,37 +71,36 @@ Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
         auxtrm = raumExtender;
         auxeen = nameExtender;
         auxeen[size] = des;
-        return size;
     } break;
     case Direction::Inp: {
         if (auxtrm->Length > 1) {
-            int position = auxeen->Length - 1;
+            size = auxeen->Length - 1;
             array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>( auxtrm->Length - 1 );
             array<unsigned>^ nameExtender = gcnew array<unsigned>( auxeen->Length - 1 );
-            for( int i = position, n = position - 1; i >= 0; --i, --n ) {
+            for( int i = size, n = size - 1; i >= 0; --i, --n ) {
                 if( auxeen[i] != des ) {
                     raumExtender[n] = auxtrm[i];
                     nameExtender[n] = auxeen[i];
-                } else position = n++;
+                } else size = n++;
             }
             auxtrm = raumExtender;
             auxeen = nameExtender;
-            return position;
         }
         else {
             auxtrm = nullptr;
             auxeen = nullptr;
-            return 0;
+            size = 0;
         }
     } break;
-    default: how = Direction::Err; break;
+    default: how = Direction::Err; size = 0; break;
     }
+    return size;
 }
 
 Consola::AuxXml^
 Consola::AuxXml::WriteContent( System::String^ format, ...array<Object^>^ content )
 {
-    if (scope != State::Content) {
+    if( scope != State::Content ) {
         NewScope(State::Content);
     }
     Log->Write( format, content );
@@ -116,13 +117,14 @@ Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
     TABS; log->Write( String::Format( "<{0}", tagname ) );
     scope = State::Attribute;
     if( attribute->Length == 0 ) log->Flush();
-    for (int i = 0; i < attribute->Length; ++i) {
+    for( int i = 0; i < attribute->Length; ++i ) {
         String^ a = attribute[i]->ToString();
-        if (a->Contains("=")) {
-            array<String^>^ kv = a->Split('=');
-            WriteAttribute(kv[0], kv[1]);
+        if( a->Contains("=") ) {
+            array<String^>^ kv = a->Split( '=' );
+            WriteAttribute( kv[0], kv->Length > 1
+                          ? kv[1]: String::Empty );
         } else {
-            WriteAttribute(a, nullptr);
+            WriteAttribute( a, nullptr );
         }
     } return this;
 }
@@ -130,10 +132,10 @@ Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
 Consola::AuxXml^
 Consola::AuxXml::WriteAttribute( String^ name, Object^ value )
 {
-    if (scope == State::Element) scope == State::Attribute;
+    if (scope == State::Element) scope = State::Attribute;
     if (scope == State::Attribute) {
-        if( value != nullptr ) log->Write( String::Format(" {0}=\"{1}\"", name, value->ToString() ) );
-        else log->Write(" " + name);
+        log->Write( " " + name );
+        if ( value ) log->Write( "=\"" + value->ToString() + "\"" );
         log->Flush();
     } return this;
 }
@@ -141,8 +143,8 @@ Consola::AuxXml::WriteAttribute( String^ name, Object^ value )
 void
 Consola::AuxXml::WriteNode( System::Xml::XmlNode^ node )
 {
-    if( scope == State::Content || scope == State::Element || scope == State::Attribute ) {
-        NewScope(State::Content);
+    if ( enum_utils::anyFlag( State::Content|State::Element|State::Attribute, scope ) ) { // == State::Content || scope == State::Element || scope == State::Attribute ) {
+        NewScope( State::Content );
     } TABS;
     log->WriteLine( node->OuterXml );
     log->Flush();
@@ -151,9 +153,9 @@ Consola::AuxXml::WriteNode( System::Xml::XmlNode^ node )
 Consola::AuxXml^
 Consola::AuxXml::CloseScope( void )
 {
-    if (scope == State::Content) TABS;
+    //if (scope == State::Content) TABS;
     switch( scope ) {
-    case State::Content:
+    case State::Content: TABS;
     case State::Attribute:
     case State::Element: {
         NewScope( Depth >= 0 ? State::Content : State::Document );
@@ -171,7 +173,7 @@ Consola::AuxXml::CloseScope( void )
 Consola::AuxXml^
 Consola::AuxXml::CloseScope( String^ element )
 {
-    if (states->Contains(element)) {
+    if( states->Contains( element ) ) {
         while (Element != element) CloseScope();
         if (Element == element) CloseScope();
     }return this;
@@ -180,21 +182,22 @@ Consola::AuxXml::CloseScope( String^ element )
 void
 Consola::AuxXml::NewScope( State newScope, bool closeActual )
 {
-    if( scope == State::NoScope ) {
+    if( enum_utils::is_not( scope ) ) { // == State::NoScope ) {
         scope = State::Document;
         log->Write( "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" );
     } bool closeCurrentScope = false;
+
     switch( scope ) {
     case State::Attribute:
-        if( !( (newScope & (State::Content|State::Comment)) != State::NoScope ) ) {
+        if( !enum_utils::anyFlag( State::Content|State::Comment, newScope ) ) { // !( (newScope & (State::Content|State::Comment)) != State::NoScope ) ) {
             log->Write( "/" ); 
         } log->Write( ">" );
-        if (!newScope.HasFlag(State::Content)) log->Write("\n");
+        if ( !enum_utils::hasFlag( newScope, State::Content) ) log->Write("\n");
         log->Flush();
         break;
     case State::Element:
         if( state != nullptr && newScope == State::Content ) {
-            log->Write(String::Format("</{0}>\n", state));
+            log->Write( String::Format( "</{0}>\n", state ) );
         } else log->Write( "/>\n" );
         log->Flush();
         closeCurrentScope = closeActual;
@@ -205,8 +208,8 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
         closeCurrentScope = closeActual;
         break;
     case State::Content:
-        if (closeActual) {
-            log->Write("</{0}>\n", state);
+        if( closeActual ) {
+            log->Write( "</{0}>\n", state );
             log->Flush();
             closeCurrentScope = closeActual;
         } break;
@@ -216,6 +219,7 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
         closeCurrentScope = closeActual;
         break;
     } scope = newScope;
+
     if( closeCurrentScope ) {
         states->RemoveAt( Depth );
         if (states->Count > 0) {
@@ -239,7 +243,7 @@ Consola::AuxilaryStream::Log::get( void )
 void
 Consola::AuxilaryStream::Log::set( LogWriter^ value )
 {
-    if (((log != nullptr) && (log != value)) || (value == nullptr)) {
+    if( ( (log != nullptr) && (log != value) ) || (value == nullptr) ) {
         closeLog();
     } log = value;
 }

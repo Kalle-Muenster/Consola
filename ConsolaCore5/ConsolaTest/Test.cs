@@ -2,7 +2,7 @@
 /////////////////////////////////
 
 using Consola;
-using Consola.Tests;
+using Consola.Test;
 using System.Collections.Generic;
 
 
@@ -16,7 +16,7 @@ StdStream.Init(
     CreationFlags.CreateLog
 );
 
-TestSuite test = new ConsolaTest(
+Test test = new ConsolaTest(
     Args.Contains("-v") ||
     Args.Contains("--verbose")
 ).Run();

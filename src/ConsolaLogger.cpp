@@ -91,8 +91,8 @@ Consola::LogWriter::Notlog( String^ name ) {
 System::IO::FileInfo^ 
 Consola::LogWriter::Info::get( void )
 {
-    for (int i = 0; i < LogWriter::Infos->Length; ++i) {
-        if(this == LogWriter::Files[i])
+    for ( int i = 0; i < LogWriter::Infos->Length; ++i ) {
+        if( this == LogWriter::Files[i] )
             return LogWriter::Infos[i];
     } return nullptr;
 }

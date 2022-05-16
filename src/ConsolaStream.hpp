@@ -35,7 +35,7 @@ namespace Consola
         LoggingFlagsMask = 0x0000000f
     };
 
-    public ref class StdStream
+    public ref class StdStream abstract
     {
     public:
         enum class Direction : uint {
@@ -308,7 +308,7 @@ namespace Consola
             okopierer = kopierer;
         }
         operator O() { return this->okopierer; }
-        virtual ILocked^ l() override { return this; }
+        virtual ILocked^ l() { return this; }
 
     public:
         virtual void End() {

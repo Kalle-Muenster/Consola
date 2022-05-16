@@ -18,29 +18,38 @@ namespace Consola
     public ref class Utility
     {
     public:
+
+        [FlagsAttribute()]
         enum class Flags : unsigned {
-            Simple, Asynch, Detach, Hidden = 4, Shell = 8
+            Simple = 0, Asynch = 1, Detached = 2, Hidden = 4, Shell = 8
         };
 
-        delegate void ProcessFinishedDelegate(int result, String^ stdOut, String^ stdErr);
+        delegate void ProcessFinishedDelegate(
+            int result, String^ stdOut, String^ stdErr
+        );
 
         static Utility() {
             exits = gcnew Dictionary<int,ProcessFinishedDelegate^>(0);
             axits = gcnew Dictionary<int,Action<int>^>(0);
         }
-        static unsigned VersionNumber();
-        static String^  VersionString();
+
+        static property unsigned VersionNumber{ unsigned get(void); };
+        static property String^  VersionString{ String^ get(void); };
+
         static Int32    ProgramProc();
         static String^  ProgramName();
+        static String^  ProgramPath();
         static String^  MachineName();
         static String^  MachineArch();
 
-        static int      CommandExec( String^ command );
-        static int      CommandExec( String^ command, Action<int>^ onexit );
-        static int      CommandExec( String^ command, Flags flags, ...array<Object^>^ );
+        static int      CommandLine( String^ command );
+        static int      CommandLine( String^ command, Action<int>^ onexit );
+        static int      CommandLine( String^ command, Flags flags, ...array<Object^>^ );
+
+    internal:
+        static const char*  merge( const char* a, const char* b );
 
     private:
-        static const char*  merge( const char* a, const char* b );
         static void         ended( Object^ sender, EventArgs^ e );
         static Dictionary<int,ProcessFinishedDelegate^>^    exits;
         static Dictionary<int,Action<int>^>^                axits;

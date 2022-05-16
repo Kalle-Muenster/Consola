@@ -7,6 +7,12 @@
 #ifndef PCH_H
 #define PCH_H
 
+#include <.byteOrder.h>
+#if WORD_BYTESIZE == 8
+#define CPUARCHITECTURE L"x64"
+#else
+#define CPUARCHITECTURE L"x86"
+#endif
 #include <settings.h>
 
 // Fügen Sie hier Header hinzu, die vorkompiliert werden sollen.

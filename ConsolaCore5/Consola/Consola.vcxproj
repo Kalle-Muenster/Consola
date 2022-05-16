@@ -23,9 +23,10 @@
     <ProjectGuid>{C5293268-18BD-4F1D-B97F-873EF5E7B2F7}</ProjectGuid>
     <Keyword>NetCoreCProj</Keyword>
     <RootNamespace>ConsolaCore5</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <TargetFramework>net5.0</TargetFramework>
     <ProjectName>Consola</ProjectName>
+    <TargetFrameworkVersion>NET5</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -100,6 +101,12 @@
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>Consola</TargetName>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <CopyLocalProjectReference>false</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
+    <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>./;$(ProjectDir)../../src/stringpool;$(ProjectDir)../../src;$(IncludePath)</IncludePath>
@@ -107,23 +114,39 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <CopyLocalProjectReference>false</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
+    <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>./;$(ProjectDir)../../src/stringpool;$(ProjectDir)../../src;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
-    <AllProjectBMIsArePublic>
-    </AllProjectBMIsArePublic>
+    <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <ManagedAssembly>true</ManagedAssembly>
+    <CopyLocalProjectReference>false</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>./;$(ProjectDir)../../src/stringpool;$(ProjectDir)../../src;$(IncludePath)</IncludePath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformToolset)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>Consola</TargetName>
-    <AllProjectBMIsArePublic />
+    <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <CopyLocalProjectReference>false</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <AllProjectIncludesArePublic>false</AllProjectIncludesArePublic>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,25 +154,34 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>Default</LanguageStandard>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <SDLCheck>true</SDLCheck>
       <CompileAsManaged>NetCore</CompileAsManaged>
+      <DisableSpecificWarnings>4669</DisableSpecificWarnings>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000106</Version>
+      <Version>$(ConsolaVersionUInt32)</Version>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
-      <PreventDllBinding>true</PreventDllBinding>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <PreventDllBinding>false</PreventDllBinding>
+      <RegisterOutput>false</RegisterOutput>
     </Link>
     <Manifest>
       <UpdateFileHashes>true</UpdateFileHashes>
+      <AssemblyIdentity>Consola, processorArchitecture=x86, publicKeyToken=3a8d8238dbb3e275, version=$(ConsolaVersionString)</AssemblyIdentity>
     </Manifest>
+    <ResourceCompile>
+      <Culture />
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -157,25 +189,35 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>Default</LanguageStandard>
+      <PreprocessorDefinitions>_DEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <SDLCheck>true</SDLCheck>
       <CompileAsManaged>NetCore</CompileAsManaged>
+      <DisableSpecificWarnings>4669</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000106</Version>
+      <Version>$(ConsolaVersionUInt32)</Version>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <PreventDllBinding>true</PreventDllBinding>
+      <PreventDllBinding>false</PreventDllBinding>
+      <RegisterOutput>false</RegisterOutput>
     </Link>
     <Manifest>
       <UpdateFileHashes>true</UpdateFileHashes>
+      <AssemblyIdentity>Consola, processorArchitecture=AMD64, publicKeyToken=3a8d8238dbb3e275, version=$(ConsolaVersionString)</AssemblyIdentity>
     </Manifest>
+    <ResourceCompile>
+      <Culture />
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -183,29 +225,38 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4669</DisableSpecificWarnings>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <CompileAsManaged>NetCore</CompileAsManaged>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000106</Version>
+      <Version>$(ConsolaVersionUInt32)</Version>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <GenerateWindowsMetadata>
       </GenerateWindowsMetadata>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
-      <PreventDllBinding>true</PreventDllBinding>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <PreventDllBinding>false</PreventDllBinding>
+      <RegisterOutput>false</RegisterOutput>
     </Link>
     <Manifest>
       <UpdateFileHashes>true</UpdateFileHashes>
+      <AssemblyIdentity>Consola, processorArchitecture=x86, publicKeyToken=3a8d8238dbb3e275, version=$(ConsolaVersionString)</AssemblyIdentity>
     </Manifest>
+    <ResourceCompile>
+      <Culture />
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -213,28 +264,37 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4669</DisableSpecificWarnings>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <CompileAsManaged>NetCore</CompileAsManaged>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
-      <Version>00000106</Version>
+      <Version>$(ConsolaVersionUInt32)</Version>
       <SubSystem>NotSet</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <PreventDllBinding>true</PreventDllBinding>
+      <PreventDllBinding>false</PreventDllBinding>
+      <RegisterOutput>false</RegisterOutput>
     </Link>
     <Manifest>
       <UpdateFileHashes>true</UpdateFileHashes>
+      <AssemblyIdentity>Consola, processorArchitecture=AMD64, publicKeyToken=3a8d8238dbb3e275, version=$(ConsolaVersionString)</AssemblyIdentity>
     </Manifest>
+    <ResourceCompile>
+      <Culture />
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ConsolaAuxilary.hpp" />
@@ -244,6 +304,7 @@
     <ClInclude Include="..\..\src\stringpool\.byteOrder.h" />
     <ClInclude Include="..\..\src\stringpool\.stringPool.h" />
     <ClInclude Include="..\..\src\stringpool\enumoperators.h" />
+    <ClInclude Include="..\..\src\stringpool\versionmacro.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="settings.h" />

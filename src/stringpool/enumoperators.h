@@ -193,7 +193,7 @@ BEGIN_NAMESPACE
         operator +(eType value, eType add) {
         return eType(value + (slong)add);
     }
-    // additioning assignment
+    // accumulative assignment
     template<typename eType> DECLARE_OPERATOR eType&
         operator +=(eType& value, slong incrementor) {
         value = eType((slong)value + incrementor);
@@ -217,22 +217,22 @@ BEGIN_NAMESPACE
     // 'variable' contains ALL bits of 'exactMatch'
     template<typename eType> DECLARE_OPERATOR bool
         hasFlag(eType variable, eType exact) {
-        return is_val(exact) && exact == (variable & exact);
+        return is_val(exact) && exact==(variable & exact);
     }
     // 'variable' contains ANY 'ofThese' several bits
     template<typename eType> DECLARE_OPERATOR bool
         anyFlag(eType ofThese, eType inVariable) {
         return (ofThese & inVariable) != eType(0);
     }
-    // 'set' passed flag bits on the passed variable
+    // add 'allThese' bits to the passed 'variable'  
     template<typename eType> DECLARE_OPERATOR eType
-        addFlag(eType& variable, eType addflags) {
-        return variable |= addflags;
+        addFlag(eType& variable, eType setThese) {
+        return variable |= setThese;
     }
-    // 'remove' passed flag bits from passed variable
+    // remove 'allThese' bit bits from 'variable'
     template<typename eType> DECLARE_OPERATOR eType
-        remFlag(eType& variable, eType flagmask) {
-        return variable NOTAND_ASSIGN( flagmask );
+        remFlag(eType& variable, eType allThese) {
+        return variable NOTAND_ASSIGN( allThese );
     }
 
 ENDOF_NAMESPACE

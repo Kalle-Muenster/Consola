@@ -79,23 +79,21 @@ namespace Consola.TestApp
             } while ( getching );
         }
 
+        public Form1(object pinoekel) : this()
+        {
+            std = pinoekel as StdStreams;
+        }
         public Form1()
         {
             InitializeComponent();
-            uint ver = Utility.VersionNumber();
-            string vers = string.Format("{0}.{1}.{2}.{3}", ((ver & 0xff000000) >> 24),
-                               ((ver & 0x00ff0000) >> 16), ((ver & 0x0000ff00) >> 8), (ver & 0x000000ff) );
-            if ( vers != Utility.VersionString() )
-            {
-                vers = "Unknown Version";
-                lbl_version.ForeColor = Color.Red;
-            }
-            else lbl_version.ForeColor = Color.Green;
-            lbl_version.Text = "Consola v." + vers;
+            uint ver = Utility.VersionNumber;
+            lbl_version.ForeColor = Color.Green;
+            lbl_version.Text = "Consola v." + Utility.VersionString;            
         }
 
         private void button1_Click( object sender, EventArgs e )
         {
+            
             StdStream.Init( CreationFlags.TryConsole );
             StdStream.Out.WriteLine( "This is a test!" );
         }
@@ -236,7 +234,7 @@ namespace Consola.TestApp
 
         private void button7_Click( object sender, EventArgs e )
         {
-            InputField.Text = string.Format( "processid: {0}", Utility.CommandExec( InputField.Text, getReturnCode ) );
+            InputField.Text = string.Format( "processid: {0}", Utility.CommandLine( InputField.Text, getReturnCode ) );
             Paint += Form1_Paint;
         }
 

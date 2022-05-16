@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsolaTestGUI", "ConsolaTestGUI\ConsolaTestGUI.csproj", "{DF92A1E9-ED83-4DB6-9324-647848E24774}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C5293268-18BD-4F1D-B97F-873EF5E7B2F7} = {C5293268-18BD-4F1D-B97F-873EF5E7B2F7}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Consola", "ConsolaCore5\ConsolaCore5.vcxproj", "{C5293268-18BD-4F1D-B97F-873EF5E7B2F7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Consola", "Consola\Consola.vcxproj", "{C5293268-18BD-4F1D-B97F-873EF5E7B2F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

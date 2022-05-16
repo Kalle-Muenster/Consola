@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net5.0-windows10.0.22000.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Platforms>x86;x64</Platforms>
     <ApplicationIcon>obstacle.ico</ApplicationIcon>
@@ -11,9 +11,15 @@
     <PackageId>Consola</PackageId>
     <PackageIcon>karen.png</PackageIcon>
     <PackageTags>Console;StdStreams</PackageTags>
-    <AssemblyVersion>0.1.0.6</AssemblyVersion>
-    <FileVersion>0.1.0.6</FileVersion>
+    <AssemblyVersion>0.0.1.6</AssemblyVersion>
+
+    <FileVersion>0.0.1.6</FileVersion>
+
     <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -35,10 +41,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsolaCore5\ConsolaCore5.vcxproj">
-      <Private>true</Private>
-      <ReferenceOutputAssembly>True</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="..\Consola\Consola.vcxproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Consola">
+      <HintPath>..\..\bin\core5\v142\x64\Debug\Consola.dll</HintPath>
+      <CopyLocal>True</CopyLocal>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Consola.Test</id>
+    <version>0.1.7</version>
+    <authors>Consola.Test</authors>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework="net5.0">
+        <dependency id="Consola" version="1.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\WORKSPACE\PROJECTS\Consola\bin\core5\v142\ConTesto\x64\Release\net5.0\Consola.Test.dll" target="lib\net5.0\Consola.Test.dll" />
+  </files>
+</package>

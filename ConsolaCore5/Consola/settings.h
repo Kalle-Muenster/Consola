@@ -2,24 +2,26 @@
 #define ProjectSettingsIncluded
 
 
-#ifndef CONSOLA_VERSION_NUMBER
-#define CONSOLA_VERSION(ma,mi,re,bu) ( \
-     (bu&0xff) | ((re&0xff)<<8) | \
-    ((mi&0xff)<<16) | ((ma&0xff)<<24) \
-)
-#define CONSOLA_VERSION_NUMBER \
-        CONSOLA_VERSION(0,0,1,6)
-#define CONSOLA_VERSION_STRING \
-                       "0.0.1.6"
+#ifndef CONSOLA_VERSION
+#define SET_VERSION_STRING "0.0.1.6"
+#else
+#define SET_VERSION_STRING CONSOLA_VERSION
 #endif
+#include <versionmacro.h>
+#define CONSOLA_VERSION_NUMBER VERSION_NUMBER
+#define CONSOLA_VERSION_STRING VERSION_STRING
+
 
 #ifdef _DEBUG
+#define CONSOLA_CONFIGU L"Debug"
 #undef  DEBUG
 #define CYCLE_COUNT (16)
 #else
+#define CONSOLA_CONFIGU L"Release"
 #define CYCLE_COUNT (32)
 #endif
 #define DEBUG (0)
+
 
 #define SET_NAMESPACE (-1)
 #define NO_CHECKPOINT_MODE

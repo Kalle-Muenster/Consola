@@ -273,7 +273,7 @@ Consola::StdStream::asynchronRawDataWrite( Object^ taskData )
     oset = (int)(size & 0x00000000ffffffff);
     size = (size & 0xffffffff00000000) >> 32;
     while (true) if (lock.up()) {
-        _writeByteDataToStdtStream( lock.direct, rawData, oset, size );
+        _writeByteDataToStdtStream( lock.direct, rawData, oset, (int)size );
         lock.un();
         return;
     }
@@ -638,12 +638,13 @@ Consola::StdStream::systemArrayToStdOut( array<T>^ data, int oset, int size )
 {
     uint key = keygenerator->Next( INT_MAX );
     if ( lockup( key ) ) {
-        _writeSystemArrayToStdtStream<T>( dir, data, (int)oset, size );
+        _writeSystemArrayToStdtStream<T>( dir, data, oset, size );
         unlock( key );
     } else { Task^ task;
-        ulong sizeinfo = ulong(oset | (size << 32));
+        ulong info = size;
+        info = (oset | (info << 32));
         Action<Object^>^ fu = gcnew Action<Object^>( this->asynchronArrayWrite<T> );
-        task = gcnew Task( fu, gcnew array<Object^>{ StreamLocker(this,key), data, sizeinfo } );
+        task = gcnew Task( fu, gcnew array<Object^>{ StreamLocker(this,key), data, info } );
         task->Start();
     }
 }
@@ -657,9 +658,10 @@ Consola::StdStream::rawDataToStdOut( IntPtr data, int oset, int size )
         unlock(key);
     } else {
         Task^ task;
-        ulong sizeinfo = ulong(oset | (size << 32));
+        ulong info = size;
+        info = (oset | (info << 32));
         Action<Object^>^ fu = gcnew Action<Object^>( this->asynchronRawDataWrite );
-        task = gcnew Task(fu, gcnew array<Object^>{ StreamLocker(this, key), data, sizeinfo });
+        task = gcnew Task(fu, gcnew array<Object^>{ StreamLocker(this, key), data, info });
         task->Start();
     }
 }
@@ -735,9 +737,10 @@ Consola::StdStream::rawDataFromStdIn( IntPtr dst, int offset, int length )
         returnvalue = _rawDataFromStdIn( dst,offset, length );
     else {
         Task<uint>^ task;
-        ulong sizeinfo = ulong(offset | (length << 32));
+        ulong info = length;
+        info = (offset | (info << 32));
         Func<Object^,uint>^ fu = gcnew Func<Object^,uint>( this->asynchronRawDataRead );
-        task = Task<uint>::Factory->StartNew(fu, gcnew array<Object^>{ StreamLocker(this, key), sizeinfo });
+        task = Task<uint>::Factory->StartNew(fu, gcnew array<Object^>{ StreamLocker(this, key), info });
         returnvalue = task->GetAwaiter().GetResult();
     } unlock(key);
     return returnvalue;

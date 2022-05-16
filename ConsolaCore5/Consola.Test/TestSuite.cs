@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Consola
 {
-    namespace Tests
+    namespace Test
     {
         [Flags]
         public enum TestResults : uint
@@ -12,7 +12,7 @@ namespace Consola
             PASS = 1397965136u, FAIL = 1279869254u, SKIP = 1346980691u
         }
 
-        abstract public class TestSuite
+        abstract public class Test
         {
             private uint step = 0;
             private int count = -1;
@@ -25,11 +25,17 @@ namespace Consola
             private int failsgone;
             public event Action TestRun;
 
-            private void WriteXmlStepResult(uint casenum,int stepnum,TestResults result, string description)
+            private void WriteXmlStepResult( uint casenum, int stepnum, TestResults result, string description )
             {
-                StdStream.Aux.Xml.WriteElement("teststep", new string[] { $"result={result}", $"ordinal={step}.{count}" })
+                StdStream.Aux.Xml.WriteElement("teststep", new string[] { $"result={result}", $"number={step}.{count}" })
                     .WriteElement("description").WriteContent(description)
                 .CloseScope("teststep");
+            }
+
+            private void WriteXmlDescription( uint casenum, int stepnum, string description )
+            {
+                StdStream.Aux.Xml.WriteElement( "description", new string[] {"level=INFO",$"related={StdStream.Aux.Xml.Element}-{casenum}.{stepnum}" } )
+                                 .WriteContent( description ).CloseScope();
             }
 
             private void WriteXmlCaseResult( uint casenum, string casename, int failed, int total, int skips )
@@ -59,7 +65,8 @@ namespace Consola
                 if (failures < 0) return failures;
                 if (count > 0)
                 {
-                    if (flags.HasFlag(TestResults.XmlOutput)) WriteXmlStepResult( step, count, TestResults.PASS, description );
+                    if( flags.HasFlag(TestResults.XmlOutput) ) 
+                        WriteXmlStepResult( step, count, TestResults.PASS, description );
                     StdStream.Out.WriteLine("PASS [{0}.{1}]: {2}", step, count, description);
                     return (int) (count - (failures - failsgone));
                 }
@@ -76,7 +83,8 @@ namespace Consola
                 if (failures < 0) return failures;
                 if (count > 0)
                 {
-                    if (flags.HasFlag(TestResults.XmlOutput)) WriteXmlStepResult( step, count, TestResults.FAIL, description);
+                    if( flags.HasFlag(TestResults.XmlOutput) )
+                        WriteXmlStepResult( step, count, TestResults.FAIL, description);
                     StdStream.Err.WriteLine("FAIL [{0}.{1}]: {2}", step, count, description);
                     StdStream.Out.Log.WriteLine("FAIL [{0}.{1}]: {2}", step, count, description);
                     return ++failures - failsgone;
@@ -97,7 +105,9 @@ namespace Consola
                 if (failures < 0) return;
                 if (count > 0)
                 {
-                    if (flags.HasFlag(TestResults.XmlOutput)) WriteXmlStepResult(step, count, TestResults.SKIP, description);
+                    if( flags.HasFlag(TestResults.XmlOutput) )
+                        WriteXmlStepResult( step, count, TestResults.SKIP, description );
+
                     StdStream.Out.WriteLine("SKIP [{0}.{1}]: {2}", step, count, description);
                 }
                 else
@@ -115,7 +125,10 @@ namespace Consola
 
                 if (count > 0)
                 {
-                    if (flags.HasFlag(TestResults.XmlOutput)) StdStream.Aux.Xml.WriteElement("erroreport", new string[] { $"ordinal={step}.{count}" }).WriteContent(description).CloseScope("erroreport");
+                    if( flags.HasFlag(TestResults.XmlOutput) )
+                        StdStream.Aux.Xml.WriteElement( "erroreport", new string[] { $"number={step}.{count}" } )
+                                         .WriteContent( description ).CloseScope( "erroreport" );
+
                     description = string.Format("FATAL [{0}.{1}]: {2}", step, count, description);
                 }
                 else
@@ -150,6 +163,16 @@ namespace Consola
 
 
             // Step actions
+            public void InfoStep( string fmt, params object[] args )
+            {
+                if( flags > TestResults.TextOutput ) {
+                    string description = string.Format( fmt, args );
+                    StdStream.Out.WriteLine( "INFO [{0}.{1}]: {2}", step, count, description );
+                    if( flags.HasFlag( TestResults.XmlOutput ) )
+                        WriteXmlDescription( step, count, description );
+                }
+            }
+
             public void SkipStep(string fmt, params object[] args)
             {
                 ++count;
@@ -303,19 +326,22 @@ namespace Consola
                 failsgone = failures;
                 int returnval = gones;
                 if (successive) {
-                    if (flags.HasFlag(TestResults.XmlOutput)) WriteXmlCaseResult( step, current, 0, total, gones );
+                    if (flags.HasFlag(TestResults.XmlOutput)) 
+                        WriteXmlCaseResult( step, current, 0, total, gones );
                     returnval = setPassed( string.Format( "{0}: {1}", current, total ) );
                 } else {
                     if (gones == 0) {
-                        if (flags.HasFlag(TestResults.XmlOutput)) WriteXmlCaseResult( step, current, gones, total, total);
+                        if (flags.HasFlag(TestResults.XmlOutput))
+                            WriteXmlCaseResult( step, current, gones, total, total);
                         setSkipped( string.Format( "{0}: {1}", current, total ) );
                     } else {
-                        if (flags.HasFlag(TestResults.XmlOutput)) WriteXmlCaseResult( step, current, gones, total, 0 );
+                        if (flags.HasFlag(TestResults.XmlOutput))
+                            WriteXmlCaseResult( step, current, gones, total, 0 );
                         if (Verbose) {
                             returnval = setFailed( string.Format( "{0}: {1}", current, gones ) );
                         }
                     }
-                } // GC.Collect();
+                } 
 
                 return returnval;
             }
@@ -343,18 +369,19 @@ namespace Consola
                 return CloseCase( false );
             }
 
-            public TestSuite(bool logall) : this(logall, false) { }
-            public TestSuite(bool logall,bool xmlresults)
+            public Test() : this( true ) { }
+            public Test( bool logall ) : this( logall, false ) { }
+            public Test( bool logall, bool logxml )
             {
-                TestRun += Test;
                 errors = new List<string>();
                 Verbose = logall;
-                if (xmlresults) flags |= TestResults.XmlOutput;
+                if ( logxml ) flags |= TestResults.XmlOutput;
                 failures = 0;
                 count = 0;
                 skiperror = 0;
                 skipfails = -1;
                 current = "";
+                TestRun += TestSuite;
             }
 
             private void Header()
@@ -393,20 +420,23 @@ namespace Consola
                 {
                     StdStream.Out.WriteLine("\n...All PASSED");
                     if (flags.HasFlag(TestResults.XmlOutput))
-                        StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=PASS", $"failures={failures}" }).CloseScope("suiteresult");
+                        StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=PASS", $"failures={failures}" })
+                                           .CloseScope("suiteresult");
                 }
                 else if (hasFailed())
                 {
                     StdStream.Err.WriteLine("\n...{0} FAILS", failures);
                     StdStream.Out.Log.WriteLine("\n...{0} FAILS", failures);
                     if (flags.HasFlag(TestResults.XmlOutput))
-                        StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=FAIL", $"failures={failures}" }).CloseScope("suiteresult");
+                        StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=FAIL", $"failures={failures}" })
+                                           .CloseScope("suiteresult");
                 }
                 else
                 {
                     StdStream.Out.WriteLine("\n...was SKIPPED");
                     if (flags.HasFlag(TestResults.XmlOutput))
-                        StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=SKIP", $"failures={failures}" }).CloseScope("suiteresult");
+                        StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=SKIP", $"failures={failures}" })
+                                           .CloseScope("suiteresult");
                 }
             }
 
@@ -421,7 +451,8 @@ namespace Consola
                     {
                         setFatal(string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), SkipOnError);
                         if (flags.HasFlag(TestResults.XmlOutput)) {
-                            StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" }).WriteContent( exception.Message ).CloseScope();
+                            StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" })
+                                             .WriteContent( exception.Message ).CloseScope();
                         }
 
                         if (SkipOnError)
@@ -431,11 +462,12 @@ namespace Consola
                         }
                         else break;
                     }
-                if (flags.HasFlag(TestResults.XmlOutput)) StdStream.Aux.Xml.closeLog();
+                if (flags.HasFlag(TestResults.XmlOutput)) 
+                    StdStream.Aux.Xml.closeLog();
                 return failures;
             }
 
-            public TestSuite Run()
+            public Test Run()
             {
                 Header();
 
@@ -448,7 +480,8 @@ namespace Consola
                     {
                         setFatal(string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), true);
                         if (flags.HasFlag(TestResults.XmlOutput)) {
-                            StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" }).WriteContent(exception.Message).CloseScope("errorreport");
+                            StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" })
+                                .WriteContent(exception.Message).CloseScope("errorreport");
                         }
                         if (SkipOnError)
                         {
@@ -459,11 +492,12 @@ namespace Consola
                     }
 
                 Footer();
-                if (flags.HasFlag(TestResults.XmlOutput)) StdStream.Aux.Xml.closeLog();
+                if (flags.HasFlag(TestResults.XmlOutput))
+                    StdStream.Aux.Xml.closeLog();
                 return this;
             }
 
-            virtual protected void Test() {}
+            virtual protected void TestSuite() {}
         }
     }
 }

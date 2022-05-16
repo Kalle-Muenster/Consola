@@ -7,16 +7,15 @@ using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
 [assembly:AssemblyTitleAttribute(L"Consola")];
-[assembly:AssemblyDescriptionAttribute(L"")];
-[assembly:AssemblyConfigurationAttribute(L"")];
+[assembly:AssemblyDescriptionAttribute(CPUARCHITECTURE)];
+[assembly:AssemblyConfigurationAttribute(CONSOLA_CONFIGU)];
 [assembly:AssemblyCompanyAttribute(L"")];
 [assembly:AssemblyProductAttribute(L"Consola")];
 [assembly:AssemblyCopyrightAttribute(L"Copyright (c)  2021")];
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
-
 [assembly:AssemblyVersionAttribute(CONSOLA_VERSION_STRING)];
 
-[assembly:ComVisible(false)];
+[assembly:ComVisible(true)];
 
 [assembly:CLSCompliantAttribute(true)];

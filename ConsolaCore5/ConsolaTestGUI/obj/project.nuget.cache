@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "hwbgRX9A+yczst681vjuF2oec9IXu9aqzAn8M3mYAb7MVBLRHgCKizFL4Nc5Ow0Eg4B94N7pIsJAcK92eCsGBg==",
+  "dgSpecHash": "TG4nyd9qxXwISLiQenVMcMTfCmWAij+uP59mc8uHclPFxcsZRi6iDxKTz0XyFh5YMtwQHGmzpxOzmlazF3UzKQ==",
   "success": true,
   "projectFilePath": "C:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\kalle\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.22000.24\\microsoft.windows.sdk.net.ref.10.0.22000.24.nupkg.sha512"
+  ],
   "logs": []
 }
