@@ -154,7 +154,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION="$(ConsolaVersionString)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
@@ -189,7 +189,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION="$(ConsolaVersionString)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
@@ -225,7 +225,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_X86_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION="$(ConsolaVersionString)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -264,7 +264,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION=$(ConsolaVersionString);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_AMD64_;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;CONSOLA_VERSION="$(ConsolaVersionString)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
