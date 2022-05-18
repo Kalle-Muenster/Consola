@@ -7,7 +7,7 @@ using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
 [assembly:AssemblyTitleAttribute(L"Consola")];
-[assembly:AssemblyDescriptionAttribute(CPUARCHITECTURE)];
+[assembly:AssemblyDescriptionAttribute(CONSOLA_CPU_ARCHITECTURE)];
 [assembly:AssemblyConfigurationAttribute(CONSOLA_CONFIGU)];
 [assembly:AssemblyCompanyAttribute(L"")];
 [assembly:AssemblyProductAttribute(L"Consola")];

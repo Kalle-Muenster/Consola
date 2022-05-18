@@ -2,14 +2,16 @@
 #define ProjectSettingsIncluded
 
 
-#ifndef CONSOLA_VERSION
-#define SET_VERSION_STRING "0.0.1.6"
-#else
 #define SET_VERSION_STRING CONSOLA_VERSION
-#endif
 #include <versionmacro.h>
 #define CONSOLA_VERSION_NUMBER VERSION_NUMBER
 #define CONSOLA_VERSION_STRING VERSION_STRING
+
+#if defined( __x86_64__) || defined(_WIN64)
+#define CONSOLA_CPU_ARCHITECTURE L"x64"
+#elif defined(_M_IX86) || defined(__x86__)
+#define CONSOLA_CPU_ARCHITECTURE L"x86"
+#endif
 
 
 #ifdef _DEBUG

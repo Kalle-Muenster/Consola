@@ -13,8 +13,7 @@
 #define ENUM_OPERATOR_NAMESPACE enum_utils
 //#define DO_NOT_INLINE_OPERATORS (1)
 //#define APPEND_TILDE_FOR_ANDNOT (1)
-//#define DO_NOT_COUNT_NULL_VALID (1)
-
+//#define TREAT_NULL_VALUES_VALID (1)
 
 #ifndef EMPTY
 #define EMPTY_(T) ((T)-1)
@@ -47,10 +46,10 @@
 #endif
 #endif
 
-#ifdef  DO_NOT_COUNT_NULL_VALID
-#define VALIDITY(check) check > NULL && check
+#ifdef  TREAT_NULL_VALUES_VALID
+#define VALIDITY( check ) check  
 #else
-#define VALIDITY(check) check
+#define VALIDITY( check ) check > NULL && check
 #endif
 
 #ifdef  APPEND_TILDE_FOR_ANDNOT

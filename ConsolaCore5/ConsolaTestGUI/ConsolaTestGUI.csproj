@@ -11,45 +11,37 @@
     <PackageId>Consola</PackageId>
     <PackageIcon>karen.png</PackageIcon>
     <PackageTags>Console;StdStreams</PackageTags>
-    <AssemblyVersion>0.0.1.6</AssemblyVersion>
-
-    <FileVersion>0.0.1.6</FileVersion>
-
-    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyVersion>0.0.1.7</AssemblyVersion>
+    <FileVersion>0.0.1.7</FileVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
     <Nullable>disable</Nullable>
+    <Version>0.1.7</Version>
+    <BaseOutputPath>..\..\bin\core5\</BaseOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <OutputPath>..\..\bin\core5\Test\x86\Debug</OutputPath>
+	<PlatformTarget>x86</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x86\Debug</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutputPath>..\..\bin\core5\Test\x64\Debug</OutputPath>
+	<PlatformTarget>x64</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x64\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutputPath>..\..\bin\core5\Test\x64\Release</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x64\Release</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <OutputPath>..\..\bin\core5\Test\x86\Release</OutputPath>
+	<PlatformTarget>x86</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x86\Release</OutputPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Consola\Consola.vcxproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Consola">
-      <HintPath>..\..\bin\core5\v142\x64\Debug\Consola.dll</HintPath>
-      <CopyLocal>True</CopyLocal>
-    </Reference>
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
@@ -59,6 +51,13 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+	<Reference Include="Consola">
+		<HintPath>$(BaseOutputPath)$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
+		<Private>True</Private>
+	</Reference>
+  </ItemGroup>
+	
   <ItemGroup>
     <None Update="karen.png">
       <Pack>True</Pack>

@@ -28,7 +28,7 @@ namespace Consola
             private void WriteXmlStepResult( uint casenum, int stepnum, TestResults result, string description )
             {
                 StdStream.Aux.Xml.WriteElement("teststep", new string[] { $"result={result}", $"number={step}.{count}" })
-                    .WriteElement("description").WriteContent(description)
+                    .WriteElement("description").WriteContent( description )
                 .CloseScope("teststep");
             }
 
@@ -42,7 +42,7 @@ namespace Consola
             {
                 TestResults result = failed == 0 ? total > skips ? TestResults.PASS : TestResults.SKIP : TestResults.FAIL;
                 StdStream.Aux.Xml.WriteElement("caseresult", new string[] {
-                    $"result={result}",$"ordinal={casenum}",$"name={casename}",$"failed={failed}",
+                    $"result={result}",$"number={casenum}",$"name={casename}",$"failed={failed}",
                     $"passed={total-(skips+failed)}",$"skipped={skips}" }
                 ).CloseScope("testcase");
             }
@@ -65,9 +65,9 @@ namespace Consola
                 if (failures < 0) return failures;
                 if (count > 0)
                 {
-                    if( flags.HasFlag(TestResults.XmlOutput) ) 
+                    if( flags.HasFlag( TestResults.XmlOutput ) ) 
                         WriteXmlStepResult( step, count, TestResults.PASS, description );
-                    StdStream.Out.WriteLine("PASS [{0}.{1}]: {2}", step, count, description);
+                    StdStream.Out.WriteLine( "PASS [{0}.{1}]: {2}", step, count, description );
                     return (int) (count - (failures - failsgone));
                 }
                 else
@@ -481,7 +481,7 @@ namespace Consola
                         setFatal(string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), true);
                         if (flags.HasFlag(TestResults.XmlOutput)) {
                             StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" })
-                                .WriteContent(exception.Message).CloseScope("errorreport");
+                                .WriteContent( exception.Message ).CloseScope( "errorreport" );
                         }
                         if (SkipOnError)
                         {
