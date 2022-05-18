@@ -1,7 +1,7 @@
 bin/
-*/obj/
 */.vs
-*/obj
+*obj/Release/
+*obj/Debug/
 *.vc.db
-*/x64
-*/x86
+x64/
+x86/
