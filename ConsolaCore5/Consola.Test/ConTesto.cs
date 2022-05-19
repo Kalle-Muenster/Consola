@@ -73,7 +73,7 @@ namespace Consola
                 else
                 {
                     StdStream.Out.WriteLine("---------------------------------------------------------------------");
-                    StdStream.Out.WriteLine("CASE[{0}]-{1} Tests PASSED", step, description);
+                    StdStream.Out.WriteLine("CASE [{0}, {1}]: Tests PASSED", step, description);
                     return failures - failsgone;
                 }
             }
@@ -92,10 +92,10 @@ namespace Consola
                 else
                 {
                     StdStream.Err.WriteLine("---------------------------------------------------------------------");
-                    StdStream.Err.WriteLine("CASE[{0}]-{1} Tests FAILED", step, description);
+                    StdStream.Err.WriteLine("CASE [{0}, {1}]: Tests FAILED", step, description);
                     StdStream.Out.Log.WriteLine(
                         "---------------------------------------------------------------------");
-                    StdStream.Out.Log.WriteLine("CASE[{0}]-{1} Tests FAILED", step, description);
+                    StdStream.Out.Log.WriteLine("CASE [{0}, {1}]: Tests FAILED", step, description);
                     return failures - failsgone;
                 }
             }
@@ -112,7 +112,7 @@ namespace Consola
                 }
                 else
                 {
-                    StdStream.Out.WriteLine("CASE[{0}]-{1} test steps SKIPPED", step, description);
+                    StdStream.Out.WriteLine("CASE [{0}, {1}]: test steps SKIPPED", step, description);
                 }
             }
 
@@ -133,7 +133,7 @@ namespace Consola
                 }
                 else
                 {
-                    description = string.Format("CASE[{0}]-{1} test crashed", step, description);
+                    description = string.Format("CASE [{0}, {1}]: test crashed", step, description);
                 }
 
                 StdStream.Err.WriteLine(description);
@@ -229,7 +229,7 @@ namespace Consola
             {
                 Delegate[] steps = section.GetInvocationList();
                 int pastfails = failures;
-                TestRun += () => { CloseCase( (Runner(steps)-pastfails) == 0 ); };
+                TestRun += () => { CloseCase( ( Runner(steps)-pastfails ) == 0 ); };
             }
 
 
@@ -409,7 +409,7 @@ namespace Consola
                     if (flags.HasFlag(TestResults.XmlOutput))
                         StdStream.Aux.Xml.WriteElement("suiteresult", new string[] { "result=NORESULT", $"errors={errs.Length}" });
                     for (int i = 0; i < errs.Length; ++i) { 
-                        StdStream.Err.WriteLine("ERROR[{0}]: {1}", i, errs[i]);
+                        StdStream.Err.WriteLine("ERROR [{0}]: {1}", i, errs[i]);
                         if (flags.HasFlag(TestResults.XmlOutput))
                             StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"number={i}" }).WriteContent( errs[i] ).CloseScope();
                     } if (flags.HasFlag(TestResults.XmlOutput))
@@ -442,57 +442,44 @@ namespace Consola
 
             private int Runner( Delegate[] steplist )
             {
-                foreach (Action testrun in steplist)
-                    try
-                    {
-                        testrun();
+                foreach (Action testrun in steplist) try {
+                    testrun();
+                } catch (Exception exception) {
+                    setFatal(string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), SkipOnError);
+                    if (flags.HasFlag(TestResults.XmlOutput)) {
+                        StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" })
+                                         .WriteContent( exception.Message ).CloseScope();
                     }
-                    catch (Exception exception)
-                    {
-                        setFatal(string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), SkipOnError);
-                        if (flags.HasFlag(TestResults.XmlOutput)) {
-                            StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" })
-                                             .WriteContent( exception.Message ).CloseScope();
-                        }
+                    if (SkipOnError) {
+                        ++skiperror;
+                        continue;
+                    } else break;
+                }
 
-                        if (SkipOnError)
-                        {
-                            ++skiperror;
-                            continue;
-                        }
-                        else break;
-                    }
-                if (flags.HasFlag(TestResults.XmlOutput)) 
+                if (flags.HasFlag(TestResults.XmlOutput)) {
                     StdStream.Aux.Xml.closeLog();
-                return failures;
+                } return failures;
             }
 
             public Test Run()
             {
                 Header();
 
-                foreach (Action testrun in TestRun.GetInvocationList())
-                    try
-                    {
-                        testrun();
-                    }
-                    catch (Exception exception)
-                    {
-                        setFatal(string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), true);
-                        if (flags.HasFlag(TestResults.XmlOutput)) {
-                            StdStream.Aux.Xml.WriteElement("errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" })
-                                .WriteContent( exception.Message ).CloseScope( "errorreport" );
-                        }
-                        if (SkipOnError)
-                        {
-                            ++skiperror;
-                            continue;
-                        }
-                        else break;
-                    }
+                foreach( Action testrun in TestRun.GetInvocationList() ) try {
+                    testrun();
+                } catch ( Exception exception ) {
+                    setFatal( string.Format("{0}: {1} {2}", current, errors.Count, exception.Message), true );
+                    if ( flags.HasFlag(TestResults.XmlOutput) ) {
+                        StdStream.Aux.Xml.WriteElement( "errorreport", new string[] { $"testcase={current}", $"number={errors.Count}" } )
+                            .WriteContent( exception.Message ).CloseScope( "errorreport" );
+                    } if ( SkipOnError ) {
+                        ++skiperror;
+                        continue;
+                    } else break;
+                }
 
                 Footer();
-                if (flags.HasFlag(TestResults.XmlOutput))
+                if ( flags.HasFlag( TestResults.XmlOutput ) )
                     StdStream.Aux.Xml.closeLog();
                 return this;
             }
