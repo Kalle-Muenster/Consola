@@ -3,9 +3,9 @@ using Flags = Consola.CreationFlags;
 
 namespace Consola
 {
-    internal static class Extensions
+    public static class Extensions
     {
-        internal static Flags flags( this Consola.CreationFlags flags )
+        public static Flags flags( this Consola.CreationFlags flags )
         {
             return (Flags)flags;
         } 
