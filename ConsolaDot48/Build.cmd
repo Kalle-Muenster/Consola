@@ -17,7 +17,7 @@ set DotNetVersionString=dot48
 echo No dependencies!
 
 :: Set parameters and solution files
-call .\..\Args "%~1" "%~2" "%~3" "%~4" Consola.sln Consola.Test.sln
+call %_root_%\Args "%~1" "%~2" "%~3" "%~4" Consola.sln Consola.Test.sln
 
 :: Do the build
 cd %_here_%
@@ -25,4 +25,4 @@ call MsBuild %_target_% %_args_%
 cd %_call_%
 
 :: Cleanup Environment
-call .\..\Args ParameterCleanUp
+call %_root_%\Args ParameterCleanUp
