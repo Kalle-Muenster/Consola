@@ -76,7 +76,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;..\..\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
@@ -85,7 +85,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;..\..\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
@@ -96,7 +96,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;..\..\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
@@ -105,7 +105,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./;C:\WORKSPACE\PROJECTS\GITSPACE\Consola\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
+    <IncludePath>./;..\..\src\stringpool;D:\LIBRARIES\INCLUDES;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>

@@ -12,6 +12,7 @@ set _root_=%CD%
 set ConsolaVersionNumber=00000107
 set ConsolaVersionString=0.0.1.7
 set DotNetVersionString=dot48
+set _tool_=v142
 
 :: Set Dependency locations
 echo No dependencies!

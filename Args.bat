@@ -12,6 +12,7 @@ set _arch_=
 set _conf_=
 set _args_=
 set _name_=
+set _tool_=
 goto DONE
 
 :CHECK_ARGS
@@ -58,6 +59,6 @@ if not "%_call_%"=="%_here_%" (
 )
 if "%_clean_%"=="" set %_name_%BinRoot=%_build_%
 set _build_=%_build_%\%_arch_%\%_conf_%
-set _args_=/p:Configuration=%_conf_%;Platform=%_arch_%;OutDir=%_build_%%_clean_%
+set _args_=/p:Configuration=%_conf_%;Platform=%_arch_%;PlatformToolset=%_tool_%;OutDir=%_build_%%_clean_%
 
 :DONE
