@@ -80,12 +80,12 @@ Consola::LogWriter::NewLog( String^ name )
 
 void
 Consola::LogWriter::DelLog( String^ name ) {
-    loggt_not( stopt(name), true );
+    loggt_not( stopt( name ), true );
 }
 
 void
 Consola::LogWriter::Notlog( String^ name ) {
-    loggt_not( stopt(name), false );
+    loggt_not( stopt( name ), false );
 }
 
 System::IO::FileInfo^ 

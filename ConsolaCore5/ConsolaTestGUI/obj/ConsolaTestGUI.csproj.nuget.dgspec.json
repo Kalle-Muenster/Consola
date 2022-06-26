@@ -1,21 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj": {}
+    "c:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj": {}
   },
   "projects": {
-    "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj": {
+    "c:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj": {
       "version": "0.1.7",
       "restore": {
-        "projectUniqueName": "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj",
+        "projectUniqueName": "c:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj",
         "projectName": "Consola",
-        "projectPath": "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj",
+        "projectPath": "c:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaTestGUI\\ConsolaTestGUI.csproj",
         "packagesPath": "C:\\Users\\kalle\\.nuget\\packages\\",
-        "outputPath": "C:\\WORKSPACE\\PROJECTS\\GITSPACE\\Consola\\ConsolaCore5\\ConsolaTestGUI\\obj\\",
+        "outputPath": "c:\\WORKSPACE\\PROJECTS\\Consola\\ConsolaCore5\\ConsolaTestGUI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
           "C:\\Users\\kalle\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -23,13 +22,11 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net5.0-windows10.0.22000"
+          "net5.0-windows10.0.22000.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet": {},
-          "d:\\LIBRARIES": {},
-          "https://www.nuget.org/api/v2/": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0-windows10.0.22000": {
@@ -73,7 +70,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

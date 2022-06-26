@@ -203,6 +203,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\ConsolaAuxilary.cpp" />
     <ClCompile Include="..\..\src\ConsolaLogger.cpp" />
+    <ClCompile Include="..\..\src\ConsolaParser.cpp" />
     <ClCompile Include="..\..\src\ConsolaStream.cpp" />
     <ClCompile Include="..\..\src\ConsolaUtils.cpp" />
     <ClCompile Include="..\..\src\stringpool\.byteOrder.cc">
@@ -229,6 +230,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\ConsolaAuxilary.hpp" />
     <ClInclude Include="..\..\src\ConsolaLogger.hpp" />
+    <ClInclude Include="..\..\src\ConsolaParser.hpp" />
     <ClInclude Include="..\..\src\ConsolaStream.hpp" />
     <ClInclude Include="..\..\src\ConsolaUtils.hpp" />
     <ClInclude Include="..\..\src\stringpool\.byteOrder.h" />

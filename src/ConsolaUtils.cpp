@@ -41,7 +41,7 @@ _performSystemCall( String^ command )
     while (*++cmd);
     while (*--cmd) if (*cmd == '\\') break;
     if (!*cmd) {
-        array<byte>^ Wrk = Encoding::Default->GetBytes(Directory::GetCurrentDirectory());
+        array<byte>^ Wrk = Encoding::Default->GetBytes( Directory::GetCurrentDirectory() );
         pin_ptr<byte> wrkptr(&Wrk[0]);
         const char* wrk = (const char*)wrkptr;
         uint val = Consola::StdStream::keygenerator->Next(_CRT_INT_MAX);
@@ -71,7 +71,7 @@ _evaluateParameters( array<Object^>^ args, Consola::Utility::Flags flags )
          else if (args[x]->GetType() == String::typeid) {
              parameters = gcnew System::Text::StringBuilder( args[0]->ToString() );
          }
-         else if (args[x]->GetType() == Dictionary<String^, String^>::typeid) {
+         else if (args[x]->GetType() == Dictionary<String^,String^>::typeid) {
              environment = safe_cast<Dictionary<String^, String^>^>( args[x] );
          }
          else if (args[x]->GetType() == Consola::Utility::ProcessFinishedDelegate::typeid) {
@@ -133,32 +133,32 @@ Consola::Utility::VersionString::get(void)
 }
 
 System::String^
-Consola::Utility::ProgramName()
+Consola::Utility::NameOfTheCommander()
 {
     return System::Diagnostics::Process::GetCurrentProcess()->ProcessName;
 }
 
 System::Int32
-Consola::Utility::ProgramProc()
+Consola::Utility::ProcessOfIdentity()
 {
     return System::Diagnostics::Process::GetCurrentProcess()->Id;
 }
 
 System::String^
-Consola::Utility::ProgramPath()
+Consola::Utility::PathOfTheCommander()
 {
     String^ path = System::Diagnostics::Process::GetCurrentProcess()->MainModule->FileName;
     return path->Substring( 0, path->LastIndexOf('\\') );
 }
 
 System::String^
-Consola::Utility::MachineName()
+Consola::Utility::NameOfTheMachinery()
 {
     return System::Diagnostics::Process::GetCurrentProcess()->MachineName;
 }
 
 System::String^
-Consola::Utility::MachineArch()
+Consola::Utility::ArchitectureOfChip()
 {
 #ifdef _WIN64
     String^ bits = "64bit ";
@@ -173,6 +173,7 @@ Consola::Utility::MachineArch()
 int
 Consola::Utility::CommandLine( String^ command, Flags flags, ...array<Object^>^ args )
 {
+    if ( args == nullptr ) args = System::Array::Empty<Object^>();
     if ( enum_utils::anyFlag( flags, Flags::Asynch | Flags::Detached ) ) {
         ParameterTuple^ proc_args = _evaluateParameters( args, flags );
         System::Diagnostics::Process^ proc = _instanciateNewProcess( 
@@ -186,17 +187,16 @@ Consola::Utility::CommandLine( String^ command, Flags flags, ...array<Object^>^ 
         int result = -1;
         if( proc->Start() ) {
             result = proc->Id;
-            if (proc_args->Item3 != nullptr) {
+            if( proc_args->Item3 != nullptr ) {
                 if (proc_args->Item3->GetType() == ProcessFinishedDelegate::typeid)
-                    exits->Add(result, dynamic_cast<ProcessFinishedDelegate^>(proc_args->Item3));
+                    exits->Add( result, dynamic_cast<ProcessFinishedDelegate^>(proc_args->Item3) );
                 else {
                     proc->BeginErrorReadLine();
                     proc->BeginOutputReadLine();
-                    axits->Add(result, dynamic_cast<Action<int>^>(proc_args->Item3));
+                    axits->Add( result, dynamic_cast<Action<int>^>(proc_args->Item3) );
                 }
             }
-        }
-        return result;
+        } return result;
     } else return _performSystemCall( command );
 }
 
@@ -224,7 +224,7 @@ Consola::Utility::CommandLine( String^ command )
 
 
 void
-Consola::Utility::ended(Object^ sender, EventArgs^ e)
+Consola::Utility::ended( Object^ sender, EventArgs^ e )
 {
     System::Diagnostics::Process^ proc = dynamic_cast<System::Diagnostics::Process^>( sender );
     if (exits->ContainsKey( proc->Id )) {

@@ -28,7 +28,7 @@ const char*       EmptyString = "\0";
 #include "ConsolaStream.hpp"
 #include "ConsolaAuxilary.hpp"
 #include "ConsolaUtils.hpp"
-
+#include "ConsolaParser.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,15 +382,15 @@ uint Consola::StdStream::asynchronRawDataRead( Object^ taskData )
 Consola::StdStreams::StdStreams(void)
     : StdStream( Direction::Non )
 {
-    nam = Utility::ProgramName() + "_{0}.log";
+    nam = Utility::NameOfTheCommander() + "_{0}.log";
     StdStream::Init();
 }
 
-Consola::StdStreams::StdStreams(CreationFlags createConsole)
+Consola::StdStreams::StdStreams( CreationFlags createConsole )
     : StdStream(Direction::Non)
 {
-    nam = Utility::ProgramName() + "_{0}.log";
-    StdStream::Init(createConsole);
+    nam = Utility::NameOfTheCommander() + "_{0}.log";
+    StdStream::Init( createConsole );
 }
 
 Consola::StdStream::StdStream( Direction dir )
@@ -430,7 +430,7 @@ Consola::StdStream::RedirectStreams( void )
 void
 Consola::StdStream::Init( void )
 {
-    nam = Utility::ProgramName()
+    nam = Utility::NameOfTheCommander()
         + "_{0}.log";
     Init( CreationFlags::TryConsole );
 }
@@ -465,7 +465,7 @@ Consola::StdStream::Init( CreationFlags creationflags )
 {
     loggingstate = creationflags & CreationFlags::LoggingFlagsMask;
     if( nam == nullptr )
-        nam = Utility::ProgramName()
+        nam = Utility::NameOfTheCommander()
             + "_{0}.log";
 
     creationflags = creationflags & ~CreationFlags::LoggingFlagsMask;
@@ -795,6 +795,60 @@ String^
 Consola::StdInp::ReadAll( void )
 {
     return systemStringFromStdIn( EMPTY );
+}
+
+byte* 
+_getPointerToPrimitive( Object^ primitiv, int* size )
+{
+    if (*size < 0) *size = System::Runtime::InteropServices::Marshal::SizeOf( primitiv );
+    return (byte*)System::Runtime::InteropServices::Marshal::GetIUnknownForObject( primitiv ).ToPointer();
+}
+
+String^
+Consola::StdInp::ReadTill( Object^ termi )
+{
+    Type^ typie = termi->GetType();
+    array<byte>^ sequence = Array::Empty<byte>();
+    if ( typie == String::typeid ) {
+        sequence = System::Text::Encoding::Default->GetBytes( termi->ToString() );
+    } else if ( typie->IsPrimitive ) {
+        if( Type::GetTypeCode(typie) >= System::TypeCode::Single )
+            sequence = System::Text::Encoding::Default->GetBytes( termi->ToString() );
+        else {
+            int size = 0;
+            byte* data = _getPointerToPrimitive( termi, &size );
+            sequence = gcnew array<byte>( size );
+            for( int i = 0; i < size; ++i ) sequence[i] = *data++;
+        }
+    } else if( typie->IsEnum ) {
+        return ReadTill( Convert::ToInt64( termi, System::Globalization::CultureInfo::CurrentCulture ) );
+    } else if( typie->IsArray ) {
+        if( typie->GetElementType()->IsPrimitive ) {
+            Array^ data = (Array^)termi;
+            int leng = data->GetLength(0);
+            int size = 0;
+            byte* pntr = _getPointerToPrimitive( data->GetValue(0), &size );
+            sequence = gcnew array<byte>( size * leng );
+            int pos = 0;
+            do { for( int i = 0; i < size; ++i ) sequence[(pos*size)+i] = *pntr++;
+                if( ++pos < leng ) pntr = _getPointerToPrimitive( data->GetValue( ++pos ), &size );
+            } while( pos < leng );
+        } else {
+            // if some array of class objects ... call ToString() on each element and concatanate these to one long string so
+            return ReadTill( termi->ToString() );
+        } 
+    } else {
+        return ReadTill( termi->ToString() );
+       // if some array of class objects ... either call ToString() on each element and concatanate these to one long string so
+       // or mayse serialize each element to bynary data structure representing its member field and property values for concatanating a byte[]
+    }
+
+    System::Text::StringBuilder^ buildi = gcnew System::Text::StringBuilder();
+    StreamParser^ parsi = gcnew StreamParser( sequence );
+    do { buildi->Append( parsi->Check( (char)GetChar() ) );
+    } while( !parsi->Found );
+     
+    return buildi->ToString();
 }
 
 String^

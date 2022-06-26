@@ -184,7 +184,8 @@ namespace Consola
         wchar_t GetChar( void );
         String^ ReadAll( void );
         String^ ReadLine( void );
-
+        String^ ReadTill( Object^ terminator );
+        
         String^   Read( uint charCount );
         uint      Read( IntPtr dst, uint cbOffset, uint cbSize );
         generic<class T> where T : ValueType

@@ -25,9 +25,9 @@ namespace Consola
         static array<FileInfo^>^  Infos = gcnew array<FileInfo^>(0);
         static array<LogWriter^>^ Files = gcnew array<LogWriter^>(0);
         
-        static int  loggt(void);
-        static int  stopt(String^ name);
-        static void loggt_not(int idx, bool deleteFile);
+        static int  loggt( void );
+        static int  stopt( String^ name );
+        static void loggt_not( int idx, bool deleteFile );
 
     internal: 
         LogWriter( Stream^ filestream )
@@ -54,7 +54,7 @@ namespace Consola
             return this << obj;
         }
         property FileInfo^ Info {
-            FileInfo^ get(void);
+            FileInfo^ get( void );
         }
     };
 

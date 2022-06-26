@@ -330,8 +330,8 @@ namespace Consola
 
             // Case handling:
             // NextCase(name) - begins a new test case section named 'name'
-            // CloseCase(name) - closes a test cases and generates summary
-            // SkipCase(name) - doesn't execute but loggs test case was skiped 
+            // CloseCase(name) - closes a test cases and generate a summary
+            // SkipCase(name) - doesn't executes but log that test case skiped 
             public bool NextCase( string casename )
             {
                 if( SkipNextTest ) {
