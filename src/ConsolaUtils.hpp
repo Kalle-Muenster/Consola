@@ -36,11 +36,11 @@ namespace Consola
         static property unsigned VersionNumber{ unsigned get(void); };
         static property String^  VersionString{ String^ get(void); };
 
-        static Int32    ProgramProc();
-        static String^  ProgramName();
-        static String^  ProgramPath();
-        static String^  MachineName();
-        static String^  MachineArch();
+        static String^  NameOfTheCommander();
+        static Int32    ProcessOfIdentity();
+        static String^  PathOfTheCommander();
+        static String^  NameOfTheMachinery();
+        static String^  ArchitectureOfChip();
 
         static int      CommandLine( String^ command );
         static int      CommandLine( String^ command, Action<int>^ onexit );
