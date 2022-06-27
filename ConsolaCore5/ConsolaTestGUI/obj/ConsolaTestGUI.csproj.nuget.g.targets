@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="EmitMSBuildWarning" BeforeTargets="Build">
-    <Warning Text="Pakete, die MSBuild-Ziele und Eigenschaftendateien enthalten, können nicht vollständig in Projekten für mehrere Frameworks installiert werden. Die MSBuild-Ziele und Eigenschaftendateien wurden ignoriert." />
-  </Target>
-</Project>
