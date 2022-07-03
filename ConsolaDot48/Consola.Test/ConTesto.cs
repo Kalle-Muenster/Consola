@@ -100,18 +100,6 @@ namespace Consola
                 ).CloseScope( "testcase" );
             }
 
-            //private string CheckedStringFormat( string fmt, params object[] args )
-            //{
-            //    if( args == null ) return fmt;
-            //    char[] fmtarg = new char[3] { '{','_','}' };
-            //    for( int i= 0; i < args.Length; ++i ) {
-            //        fmtarg[i] = (char)(i+48);
-            //        if( !fmt.Contains( new string(fmtarg) )) {
-            //            fmt += (" " + fmtarg);
-            //        }
-            //    } return string.Format( fmt, args );
-            //}
-
             public bool Verbose
             {
                 get { return (flags & TestResults.Verbose) > 0; }
@@ -222,9 +210,9 @@ namespace Consola
             {
                 if( flags > TestResults.TextOutput ) {
                     string description = string.Format( fmt, args );
-                    StdStream.Out.WriteLine( "INFO [{0}.{1}]: {2}", step, count, description );
+                    StdStream.Out.WriteLine( "INFO [{0}.{1}]: {2}", step, count+1, description );
                     if( flags.HasFlag( TestResults.XmlOutput ) )
-                        WriteXmlStepInfo( step, count, description );
+                        WriteXmlStepInfo( step, count+1, description );
                 }
             }
 
