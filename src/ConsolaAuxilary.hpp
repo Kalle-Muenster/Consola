@@ -8,7 +8,7 @@
 #ifndef _ConsolaAuxilary_hpp_
 #define _ConsolaAuxilary_hpp_
 
-
+#using <System.Xml.dll>
 using namespace System::Xml;
 
 

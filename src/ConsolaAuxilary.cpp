@@ -45,7 +45,7 @@ Consola::AuxXml::AuxXml(void)
 {
     scope = State::NoScope;
     state = nullptr;
-    states = gcnew System::Collections::Generic::List<String^>();
+    states = gcnew System::Collections::Generic::List<String^>(4);
     nocontent = notabs = false;
 }
 
@@ -223,7 +223,7 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
     if( closeCurrentScope ) {
         states->RemoveAt( Depth );
         if (states->Count > 0) {
-            state = states[Depth];
+            state = states->ToArray()[Depth];
         } else state = nullptr;
     } 
 }

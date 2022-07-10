@@ -100,7 +100,7 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>Consola</TargetName>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
     <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
@@ -113,7 +113,7 @@
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
     <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
@@ -127,7 +127,7 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
     <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <ManagedAssembly>true</ManagedAssembly>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
@@ -141,7 +141,7 @@
     <OutDir>$(ProjectDir)..\..\bin\core5\$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>Consola</TargetName>
     <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
     <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>

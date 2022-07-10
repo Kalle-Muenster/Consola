@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>x86;x64</Platforms>
+    <ApplicationIcon>obstacle.ico</ApplicationIcon>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <StartupObject>Consola.TestApp.Program</StartupObject>
+    <PackageId>Consola</PackageId>
+    <PackageIcon>karen.png</PackageIcon>
+    <PackageTags>Console;StdStreams</PackageTags>
+    <AssemblyVersion>0.0.1.7</AssemblyVersion>
+    <FileVersion>0.0.1.7</FileVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <Nullable>disable</Nullable>
+    <Version>0.1.7</Version>
+    <BaseOutputPath>..\..\bin\dot60\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+	<PlatformTarget>x86</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x86\Debug</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<PlatformTarget>x64</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x64\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x64\Release</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+	<PlatformTarget>x86</PlatformTarget>
+    <OutputPath>$(BaseOutputPath)TestGUI\x86\Release</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+	<Reference Include="Consola">
+		<HintPath>$(BaseOutputPath)$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
+		<Private>True</Private>
+	</Reference>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Update="karen.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>

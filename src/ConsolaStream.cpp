@@ -77,7 +77,7 @@ _readStringFromStdIn( uint condition = NULL ) { pool_scope
     char Buffer[MAX_NAM_LEN] = { ' ' };
     Buffer[MAX_NAM_LEN - 1] = '\0';
     int plan = MAX_NAM_LEN, size = 0;
-    Text::StringBuilder^ builder = gcnew Text::StringBuilder();
+    Text::StringBuilder^ builder = gcnew Text::StringBuilder(MAX_NAM_LEN);
     do { size += _readFromStdIn( condition, &Buffer[0], plan );
         builder->Append( gcnew String( pool_get() ) );
     } while ( plan < 0 );
@@ -152,11 +152,12 @@ void _writeSystemStringToStdtStream( uint direction, String^ string )
 {
     if ( string == nullptr ) string = String::Empty;
     char buffer[128];
-    const int end = string->Length;
+    array<wchar_t>^ str = string->ToCharArray();
+    const int end = str->Length;
     const int lst = end - 1;
     for(int i = 0; i < end; ++i) {
         int I = i % 128;
-        buffer[I] = (char)string[i];
+        buffer[I] = (char)str[i];
         if( (I == 127) || (i == lst) ) {
             fwrite( &buffer[0], 1, I + 1, __acrt_iob_func(direction) );
         }
@@ -180,7 +181,8 @@ uint _writeByteArrayToStdtStream( uint direction, array<byte>^ data, int oset, i
 
 uint _writeByteDataToStdtStream( uint direction, IntPtr data, int oset, int size )
 {
-    if (data == IntPtr::Zero) { data = IntPtr(""); size = 0; }
+    char nostring[1] = {'\0'};
+    if (data == IntPtr::Zero) { data = IntPtr(&nostring[0]); size = 0; }
     byte buffer[128];
     const int end = size;
     const int lst = end - 1;
@@ -936,7 +938,7 @@ Consola::OutStream::Write( String^ format, ...array<Object^>^ parameter )
 bool
 Consola::StdStream::HasConsole( void )
 {
-    return GetConsoleWindow() > 0;
+    return GetConsoleWindow() > HWND(0);
 };
 
 generic<class T> where T : ValueType void

@@ -100,7 +100,11 @@ _instanciateNewProcess( String^ cmd, Consola::Utility::Flags flg, StringDict^ en
     if( env ) {
         IEnumerator<KeyValuePair<String^,String^>>^ it = env->GetEnumerator();
         while( it->MoveNext() ) {
-            info->Environment->Add( it->Current.Key, it->Current.Value );
+#ifdef Dotnet6Build
+            info->EnvironmentVariables->Add(it->Current.Key, it->Current.Value); 
+#else
+            info->Environment->Add(it->Current.Key, it->Current.Value);
+#endif
         } it->~IEnumerator<KeyValuePair<String^,String^>>();
     } 
 
@@ -204,7 +208,7 @@ int
 Consola::Utility::CommandLine( String^ command, Action<int>^ onexit )
 {
     String^ parameters = String::Empty;
-    if (command[0] == '\"') {
+    if ( command->StartsWith( "\"" ) ) {
         int split = command->IndexOf('\"', 1) + 1;
         parameters = command->Substring(split);
         command = command->Substring(0,split);
@@ -229,13 +233,17 @@ Consola::Utility::ended( Object^ sender, EventArgs^ e )
     System::Diagnostics::Process^ proc = dynamic_cast<System::Diagnostics::Process^>( sender );
     if (exits->ContainsKey( proc->Id )) {
         Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 100 );
-        exits[proc->Id]( proc->ExitCode, proc->StandardOutput->ReadToEnd(), proc->StandardError->ReadToEnd() );
+        Consola::Utility::ProcessFinishedDelegate^ onFinished;
+        if( exits->TryGetValue( proc->Id, onFinished ) )
+            onFinished( proc->ExitCode, proc->StandardOutput->ReadToEnd(), proc->StandardError->ReadToEnd() );
         exits->Remove( proc->Id );
     } else if( axits->ContainsKey( proc->Id ) ) {
         Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 100 );
         proc->ErrorDataReceived -= StdStream::Err->GetDelegate();
         proc->OutputDataReceived -= StdStream::Out->GetDelegate();
-        axits[proc->Id]( proc->ExitCode );
+        Action<int>^ onFinished;
+        if( axits->TryGetValue( proc->Id, onFinished ) )
+            onFinished( proc->ExitCode );
         axits->Remove( proc->Id );
     } proc->Exited -= gcnew EventHandler( ended );
     proc->~Process();
