@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consola.Test", "Consola.Test\Consola.Test.csproj", "{CFDCFE9C-F121-4CA3-98EF-C800A9A653E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolaWFtest", "ConsolaWFtest\ConsolaWFtest.csproj", "{BB405788-C5B4-4D13-98FF-50E7B3DE3C0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolaTestGUI", "ConsolaTestGUI\ConsolaTestGUI.csproj", "{BB405788-C5B4-4D13-98FF-50E7B3DE3C0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

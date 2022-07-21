@@ -388,7 +388,7 @@ Consola::StdStreams::StdStreams(void)
     StdStream::Init();
 }
 
-Consola::StdStreams::StdStreams( CreationFlags createConsole )
+Consola::StdStreams::StdStreams( Consola::CreationFlags createConsole )
     : StdStream(Direction::Non)
 {
     nam = Utility::NameOfTheCommander() + "_{0}.log";
@@ -434,13 +434,13 @@ Consola::StdStream::Init( void )
 {
     nam = Utility::NameOfTheCommander()
         + "_{0}.log";
-    Init( CreationFlags::TryConsole );
+    Init( Consola::CreationFlags::TryConsole );
 }
 
 void
 Consola::StdStream::Init( String^ logfile )
 {
-    Init( CreationFlags::TryConsole, logfile );
+    Init( Consola::CreationFlags::TryConsole, logfile );
 }
 
 void
@@ -456,35 +456,35 @@ Consola::StdStream::SetLogName( String^ logfilename )
 }
 
 void
-Consola::StdStream::Init( CreationFlags flags, String^ logfile )
+Consola::StdStream::Init( Consola::CreationFlags flags, String^ logfile )
 {
     SetLogName( logfile );
-    Init( flags | CreationFlags::AppendLog );
+    Init( flags | Consola::CreationFlags::AppendLog );
 }
 
 void
-Consola::StdStream::Init( CreationFlags creationflags )
+Consola::StdStream::Init( Consola::CreationFlags creationflags )
 {
-    loggingstate = creationflags & CreationFlags::LoggingFlagsMask;
+    loggingstate = creationflags & Consola::CreationFlags::LoggerMask;
     if( nam == nullptr )
         nam = Utility::NameOfTheCommander()
             + "_{0}.log";
 
-    creationflags = creationflags & ~CreationFlags::LoggingFlagsMask;
+    creationflags = creationflags & ~Consola::CreationFlags::LoggerMask;
 
-    if( creationflags == CreationFlags::None ) {
-        creationflags = CreationFlags::TryConsole;
+    if( creationflags == Consola::CreationFlags::None ) {
+        creationflags = Consola::CreationFlags::TryConsole;
     }
         if ( consolestate != creationflags )
     switch ( consolestate = creationflags )
     {
-    case CreationFlags::NewConsole:
+    case Consola::CreationFlags::NewConsole:
         CreateConsole();
         break;
-    case CreationFlags::UseConsole:
+    case Consola::CreationFlags::UseConsole:
         RedirectStreams();
         break;
-    case CreationFlags::TryConsole:
+    case Consola::CreationFlags::TryConsole:
         if ( !GetConsoleWindow() )
             CreateConsole();
         else
@@ -497,16 +497,25 @@ Consola::StdStream::Init( CreationFlags creationflags )
         gcnew StdOut();
         gcnew StdErr();
     }
-    if( loggingstate != CreationFlags::None ) {
+    if( loggingstate != Consola::CreationFlags::None ) {
         oup->createLog();
-        if( !loggingstate.HasFlag( CreationFlags::NoInputLog ) )
+        if( !loggingstate.HasFlag( Consola::CreationFlags::NoInputLog ) )
             inp->createLog();
-        if( !loggingstate.HasFlag( CreationFlags::SharedLogs ) )
+        if( !loggingstate.HasFlag( Consola::CreationFlags::SharedLogs ) )
              err->createLog();
         else err->Log = oup->log;
     }
 }
 
+Consola::CreationFlags
+Consola::StdStream::CreationFlags::get(void)
+{
+    return loggingstate == Consola::CreationFlags::None
+         ? consolestate == Consola::CreationFlags::None
+                         ? Consola::CreationFlags::None
+                         : Consola::CreationFlags::ByDefault
+         : loggingstate;
+}
 
 bool
 Consola::StdStream::strmlockup( StdStream^ strm, uint key )
@@ -545,7 +554,7 @@ Consola::StdStream::createLog()
 {
     if( log == nullptr ) {
         String^ logfileName = String::Format(nam, (Direction)dir);
-        if ( !loggingstate.HasFlag( CreationFlags::CreateLog ) ) {
+        if ( !loggingstate.HasFlag( Consola::CreationFlags::CreateLog ) ) {
             log = LogWriter::AddLog( logfileName );
         } else {
             log = LogWriter::NewLog( logfileName );
@@ -802,7 +811,7 @@ Consola::StdInp::ReadAll( void )
 byte* 
 _getPointerToPrimitive( Object^ primitiv, int* size )
 {
-    if (*size < 0) *size = System::Runtime::InteropServices::Marshal::SizeOf( primitiv );
+    if (size) *size = System::Runtime::InteropServices::Marshal::SizeOf( primitiv );
     return (byte*)System::Runtime::InteropServices::Marshal::GetIUnknownForObject( primitiv ).ToPointer();
 }
 
@@ -823,7 +832,7 @@ Consola::StdInp::ReadTill( Object^ termi )
             for( int i = 0; i < size; ++i ) sequence[i] = *data++;
         }
     } else if( typie->IsEnum ) {
-        return ReadTill( Convert::ToInt64( termi, System::Globalization::CultureInfo::CurrentCulture ) );
+        return ReadTill( Convert::ChangeType( termi, typie->GetEnumUnderlyingType() ) );
     } else if( typie->IsArray ) {
         if( typie->GetElementType()->IsPrimitive ) {
             Array^ data = (Array^)termi;
@@ -833,21 +842,21 @@ Consola::StdInp::ReadTill( Object^ termi )
             sequence = gcnew array<byte>( size * leng );
             int pos = 0;
             do { for( int i = 0; i < size; ++i ) sequence[(pos*size)+i] = *pntr++;
-                if( ++pos < leng ) pntr = _getPointerToPrimitive( data->GetValue( ++pos ), &size );
+                if( ++pos < leng ) pntr = _getPointerToPrimitive( data->GetValue( ++pos ), NULL );
             } while( pos < leng );
         } else {
-            // if some array of class objects ... call ToString() on each element and concatanate these to one long string so
+            // if some array of class objects ... call ToString() on each element and concatanate to one long string
             return ReadTill( termi->ToString() );
         } 
     } else {
         return ReadTill( termi->ToString() );
-       // if some array of class objects ... either call ToString() on each element and concatanate these to one long string so
+       // if some array of class objects ... either call ToString() on each element and concatanate all to one long string
        // or mayse serialize each element to bynary data structure representing its member field and property values for concatanating a byte[]
     }
 
-    System::Text::StringBuilder^ buildi = gcnew System::Text::StringBuilder();
+    System::Text::StringBuilder^ buildi = gcnew System::Text::StringBuilder(0);
     StreamParser^ parsi = gcnew StreamParser( sequence );
-    do { buildi->Append( parsi->Check( (char)GetChar() ) );
+    do { buildi->Append( parsi->Check( (byte)GetChar() ) );
     } while( !parsi->Found );
      
     return buildi->ToString();
@@ -916,12 +925,12 @@ Consola::StdInp::GetChar( void )
 void
 Consola::OutStream::WriteLine( String^ line )
 {
-    systemStringToStdOut( String::Format( "{0}\n", line ) );
+    systemStringToStdOut( String::Format( "{0}\r\n", line ) );
 }
 void
 Consola::OutStream::WriteLine( String^ format, ...array<Object^>^ parameter )
 {
-    systemStringToStdOut( String::Format( format + "\n", parameter ) );
+    systemStringToStdOut( String::Format( format + "\r\n", parameter ) );
 }
 
 void

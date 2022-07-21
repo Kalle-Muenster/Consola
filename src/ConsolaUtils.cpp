@@ -30,7 +30,7 @@ typedef Tuple<StringDict^,StringBuilder^,Delegate^,Consola::Utility::Flags> Para
 
 
 
-/*------------------------- Consola::Utility HelerFunctions -----------------------------*/
+/*------------------------- Consola::Utility HelperFunctions ----------------------------*/
 
 int 
 _performSystemCall( String^ command )
@@ -133,7 +133,7 @@ String^
 Consola::Utility::VersionString::get(void)
 {
     const char vers[] = CONSOLA_VERSION_STRING;
-    return gcnew String( vers );
+    return gcnew String( vers, 0, 7 );
 }
 
 System::String^
@@ -185,7 +185,7 @@ Consola::Utility::CommandLine( String^ command, Flags flags, ...array<Object^>^ 
         );
 
         if ( !enum_utils::hasFlag( flags, Flags::Detached ) ) {
-            proc->Exited += gcnew EventHandler(ended);
+            proc->Exited += gcnew EventHandler( ended );
         } 
 
         int result = -1;
@@ -231,7 +231,7 @@ void
 Consola::Utility::ended( Object^ sender, EventArgs^ e )
 {
     System::Diagnostics::Process^ proc = dynamic_cast<System::Diagnostics::Process^>( sender );
-    if (exits->ContainsKey( proc->Id )) {
+    if( exits->ContainsKey( proc->Id ) ) {
         Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 100 );
         Consola::Utility::ProcessFinishedDelegate^ onFinished;
         if( exits->TryGetValue( proc->Id, onFinished ) )

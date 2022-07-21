@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="Consola.cs" />
     <Compile Include="ConTesto.cs" />
+    <Compile Include="ConTrol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

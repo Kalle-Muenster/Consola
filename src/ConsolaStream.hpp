@@ -32,7 +32,7 @@ namespace Consola
         TryConsole = 0x00000030, AppendLog = 0x00000001,
         NoInputLog = 0x00000004, CreateLog = 0x00000002,
         SharedLogs = 0x00000008, OutputLog = 0x0000000e,
-        LoggingFlagsMask = 0x0000000f
+        LoggerMask = 0x0000000f, ByDefault = 0x01000000
     };
 
     public ref class StdStream abstract
@@ -53,6 +53,10 @@ namespace Consola
         static DirectoryInfo^ CwdInfo() {
             return gcnew DirectoryInfo(Cwd);
         }
+        static property Consola::CreationFlags CreationFlags {
+            Consola::CreationFlags get(void);
+        }
+
         static void    SetLogName( String^ logFile );
         static bool    HasConsole( void );
         virtual       ~StdStream( void );
@@ -62,6 +66,7 @@ namespace Consola
                 return Direction( dir );
             }
         }
+
         property LogWriter^ Log {
             virtual LogWriter^ get( void ) {
                 return log == nullptr
@@ -149,8 +154,8 @@ namespace Consola
 
     private:
 
-        static CreationFlags   consolestate = CreationFlags(-1);
-        static CreationFlags   loggingstate = CreationFlags(-1);
+        static Consola::CreationFlags   consolestate = Consola::CreationFlags(-1);
+        static Consola::CreationFlags   loggingstate = Consola::CreationFlags(-1);
         static unsigned        instanzencounter = 0;
     };
 
@@ -426,8 +431,8 @@ namespace Consola
             : StdStream( Direction::Non ) {
             StdStream::Init( logfile );
         }
-        StdStreams(CreationFlags createConsole);
-        StdStreams( CreationFlags flags, String^ logfile )
+        StdStreams( Consola::CreationFlags createConsole);
+        StdStreams( Consola::CreationFlags flags, String^ logfile )
             : StdStream( Direction::Non ) {
             StdStream::Init( flags, logfile );
         }

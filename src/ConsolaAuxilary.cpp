@@ -61,39 +61,37 @@ Consola::AuxilaryStream::Xml::get(void)
 int
 Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
     int size = 0;
+    array<AuxilaryStream^>^ raumExtender = nullptr;
+    array<unsigned>^ nameExtender = nullptr;
     switch (how) {
     case Direction::Out: {
         size = auxeen->Length;
-        array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>( auxtrm->Length + 1 );
-        array<unsigned>^ nameExtender = gcnew array<unsigned>( auxeen->Length + 1 );
+        raumExtender = gcnew array<AuxilaryStream^>( auxtrm->Length + 1 );
+        nameExtender = gcnew array<unsigned>( auxeen->Length + 1 );
         auxtrm->CopyTo( raumExtender, 0 );
         auxeen->CopyTo( nameExtender, 0 );
-        auxtrm = raumExtender;
-        auxeen = nameExtender;
         auxeen[size] = des;
     } break;
     case Direction::Inp: {
         if (auxtrm->Length > 1) {
             size = auxeen->Length - 1;
-            array<AuxilaryStream^>^ raumExtender = gcnew array<AuxilaryStream^>( auxtrm->Length - 1 );
-            array<unsigned>^ nameExtender = gcnew array<unsigned>( auxeen->Length - 1 );
+            raumExtender = gcnew array<AuxilaryStream^>( auxtrm->Length - 1 );
+            nameExtender = gcnew array<unsigned>( auxeen->Length - 1 );
             for( int i = size, n = size - 1; i >= 0; --i, --n ) {
                 if( auxeen[i] != des ) {
                     raumExtender[n] = auxtrm[i];
                     nameExtender[n] = auxeen[i];
                 } else size = n++;
             }
-            auxtrm = raumExtender;
-            auxeen = nameExtender;
         }
         else {
-            auxtrm = nullptr;
-            auxeen = nullptr;
             size = 0;
         }
     } break;
     default: how = Direction::Err; size = 0; break;
     }
+    auxtrm = raumExtender;
+    auxeen = nameExtender;
     return size;
 }
 
@@ -176,13 +174,13 @@ Consola::AuxXml::CloseScope( String^ element )
     if( states->Contains( element ) ) {
         while (Element != element) CloseScope();
         if (Element == element) CloseScope();
-    }return this;
+    } return this;
 }
 
 void
 Consola::AuxXml::NewScope( State newScope, bool closeActual )
 {
-    if( enum_utils::is_not( scope ) ) { // == State::NoScope ) {
+    if( scope == State::NoScope ) {
         scope = State::Document;
         log->Write( "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" );
     } bool closeCurrentScope = false;
@@ -222,7 +220,7 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
 
     if( closeCurrentScope ) {
         states->RemoveAt( Depth );
-        if (states->Count > 0) {
+        if( states->Count > 0 ) {
             state = states->ToArray()[Depth];
         } else state = nullptr;
     } 

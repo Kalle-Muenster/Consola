@@ -106,7 +106,10 @@ namespace Consola
         }
 
         property String^ Element {
-            String^ get(void) { return state == nullptr ? String::Empty : state; }
+            String^ get(void) {
+                return state == nullptr 
+                     ? String::Empty : state;
+            }
         }
 
         property int Depth { 
@@ -114,7 +117,7 @@ namespace Consola
         }
 
     private:
-        bool notabs,nocontent;
+        bool notabs, nocontent;
         State scope;
         System::Collections::Generic::List<String^>^ states;
         String^ state;

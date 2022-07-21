@@ -7,7 +7,7 @@
     <FileVersion>0.0.1.7</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Consola.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Consola.snk</AssemblyOriginatorKeyFile>
     <BaseOutputPath>..\..\bin\core5\</BaseOutputPath>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Version>0.1.7</Version>

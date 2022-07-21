@@ -24,7 +24,7 @@ namespace Consola
             AppendLog = Flags.AppendLog,
             NoInputLog = Flags.NoInputLog,
             SharedLogs = Flags.SharedLogs,
-            LoggingFlags = Flags.LoggingFlagsMask
+            LoggingFlags = Flags.LoggerMask
         }
 
         public class Utility : ConsolaUtility {}
