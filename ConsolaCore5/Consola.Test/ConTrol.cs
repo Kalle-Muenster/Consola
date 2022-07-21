@@ -50,11 +50,11 @@ namespace Consola.Test
     [StructLayout(LayoutKind.Sequential, Size = 20)]
     internal struct KEYBDINPUT
     {
-        UInt16      wVk;  // ASCII value   (if dwFlgs is UNICODE then must be 0)
-        UInt16      wScan; // Unicode value (only applies when dwFlag is UNICODE)
-        KFLAGS      dwFlags; 
-        UInt32      time; // set 0 to make system fills in tiestamp on its own 
-        UIntPtr     dwExtraInfo;  // x64 8byte / x86 4byte
+        public UInt16      wVk;  // ASCII value   (if dwFlgs is UNICODE then must be 0)
+        public UInt16      wScan; // Unicode value (only applies when dwFlag is UNICODE)
+        public KFLAGS      dwFlags; 
+        public UInt32      time; // set 0 to make system fills in tiestamp on its own 
+        public UIntPtr     dwExtraInfo;  // x64 8byte / x86 4byte
     }
 
     [StructLayout(LayoutKind.Sequential, Size = 8)]
@@ -113,7 +113,7 @@ namespace Consola.Test
         public TYPED_INPUT( ConTrol.Typed flags, char key ) : this()
         {
             type = InputType.Typed;
-            data.wVk = (Int16)key;
+            data.wVk = (UInt16)key;
             data.wScan = 0;
             data.dwFlags = (KFLAGS)flags;
             data.time = 0;
@@ -159,7 +159,7 @@ namespace Consola.Test
 
         public enum Typed : uint 
         {
-            KeyDown = 0
+            KeyDown = 0,
             KeyUp = KFLAGS.KEYUP
         }
 
@@ -241,10 +241,10 @@ namespace Consola.Test
             TYPED_INPUT[] evs = new TYPED_INPUT[2] {
                 new TYPED_INPUT( Typed.KeyDown, key ),
                 new TYPED_INPUT( Typed.KeyUp, key )
-            }
+            };
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
                 uint size = (uint)sizeof(TYPED_INPUT);
-                return SendInput( 2, new IntPtr(ptr), size ) == 2;
+                return SendMouse( 2, new IntPtr(ptr), size ) == 2;
             } }
         }
 
@@ -253,7 +253,7 @@ namespace Consola.Test
             uint count = (uint)(sequence.Length*2);
             char[] text = sequence.ToCharArray();
             TYPED_INPUT[] evs = new TYPED_INPUT[count];
-            count = text.Length;
+            count = (uint)text.Length;
             for( int i = 0; i < count; ++i ) { int e = i*2;
                 char c = text[i];
                 evs[e] = new TYPED_INPUT( Typed.KeyDown, c );
@@ -261,7 +261,7 @@ namespace Consola.Test
             } count *= 2;
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
                 uint size = (uint)sizeof(TYPED_INPUT);
-                return SendInput( count, new IntPtr(ptr), size ) == count;
+                return SendMouse( count, new IntPtr(ptr), size ) == count;
             } }
         }
     }

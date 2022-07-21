@@ -66,6 +66,12 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <ProjectReference Include="..\Consola\Consola.vcxproj">
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+	
+  <ItemGroup>
     <Reference Include="Consola">
       <HintPath>$(BaseOutputPath)$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
     <Private>True</Private>
