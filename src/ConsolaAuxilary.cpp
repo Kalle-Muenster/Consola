@@ -219,9 +219,11 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
     } scope = newScope;
 
     if( closeCurrentScope ) {
-        states->RemoveAt( Depth );
+        int dp = Depth;
+        if( dp >= 0 ) states->RemoveAt( dp );
         if( states->Count > 0 ) {
-            state = states->ToArray()[Depth];
+            dp = Depth;
+            state = states->ToArray()[dp];
         } else state = nullptr;
     } 
 }
