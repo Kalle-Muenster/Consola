@@ -71,7 +71,8 @@ namespace Consola.Test
     {
         public UInt32     type;
         public MOUSEINPUT data;
-        public MOUSE_INPUT( ConTrol.Move f, int x, int y ) : this()
+        public MOUSE_INPUT( ConTrol.Move f, int x, int y )
+            : this()
         {
             type = InputType.Mouse;
             data.dx = (int)(x*34.2);
@@ -81,7 +82,8 @@ namespace Consola.Test
             data.time = 0;
         }
 
-        public MOUSE_INPUT( ConTrol.Wheels f, int w ) : this()
+        public MOUSE_INPUT( ConTrol.Wheels f, int w )
+            : this()
         {
             type = InputType.Mouse;
             data.dx = 0;
@@ -91,7 +93,8 @@ namespace Consola.Test
             data.time = 0;
         }
 
-        public MOUSE_INPUT( ConTrol.Button f ) : this()
+        public MOUSE_INPUT( ConTrol.Button f ) 
+            : this()
         {
             MFLAGS action = (MFLAGS)((uint)(f &~ (ConTrol.Button.UP|ConTrol.Button.DOWN))
                                    * (uint)( 1 + (f & ConTrol.Button.UP ) ));
@@ -110,7 +113,8 @@ namespace Consola.Test
         public UInt32     type;
         public KEYBDINPUT data;
 
-        public TYPED_INPUT( ConTrol.Typed flags, char key ) : this()
+        public TYPED_INPUT( ConTrol.Typed flags, char key )
+            : this()
         {
             type = InputType.Typed;
             data.wVk = (UInt16)key;
@@ -163,13 +167,18 @@ namespace Consola.Test
             KeyUp = KFLAGS.KEYUP
         }
 
+        private unsafe struct SIZE_OF {
+            public static readonly UInt32 MOUSE_DATA = (uint)Marshal.SizeOf<MOUSE_INPUT>(); 
+            public static readonly UInt32 TYPED_DATA = (uint)Marshal.SizeOf<TYPED_INPUT>();
+        }
+
         [DllImport( "User32.dll", EntryPoint = "SendInput" )]
-        private static extern UInt32 SendMouse( UInt32 cInputs, IntPtr pInputs, UInt32 cbSize );
+        private static extern UInt32 SendInput( UInt32 cInputs, IntPtr pInputs, UInt32 cbSize );
 
         public static bool Mouse( Move flags, int x, int y )
         {
             MOUSE_INPUT data = new MOUSE_INPUT( flags, x, y );
-            unsafe { return SendMouse(1, new IntPtr(&data), 40u) == 1; }
+            unsafe { return SendInput( 1, new IntPtr(&data), SIZE_OF.MOUSE_DATA ) == 1; }
         }
 
         public static bool Click( Button flags )
@@ -189,8 +198,7 @@ namespace Consola.Test
             }
             unsafe {
                 fixed( MOUSE_INPUT* ptr = &data[0] ) {
-                    uint size = (uint)sizeof(MOUSE_INPUT);
-                    return SendMouse(count, new IntPtr(ptr), size) == count;
+                    return SendInput( count, new IntPtr(ptr), SIZE_OF.MOUSE_DATA ) == count;
                 }
             }
         }
@@ -213,42 +221,40 @@ namespace Consola.Test
             }
             unsafe {
                 fixed( MOUSE_INPUT* ptr = &click[0] ) {
-                    uint size = (uint)sizeof(MOUSE_INPUT);
-                    return SendMouse(count, new IntPtr(ptr), size) == count;
+                    return SendInput( count, new IntPtr(ptr), SIZE_OF.MOUSE_DATA ) == count;
                 }
             }
         }
 
-        public bool Wheel( Wheels flags, int turn )
+        public static bool Wheel( Wheels flags, int turn )
         {
             MOUSE_INPUT ev = new MOUSE_INPUT( flags, turn );
-            unsafe { return SendMouse(1, new IntPtr(&ev), 40u) == 1; }
+            unsafe { return SendInput( 1, new IntPtr(&ev), SIZE_OF.MOUSE_DATA ) == 1; }
         }
 
-        public bool Wheel( Wheels flags, int turn, int atX, int atY )
+        public static bool Wheel( Wheels flags, int turn, int atX, int atY )
         {
             MOUSE_INPUT[] evs = new MOUSE_INPUT[2]{
                 new MOUSE_INPUT( ConTrol.Move.Absolute, atX, atY ),
                 new MOUSE_INPUT( flags, turn )
             };
             unsafe { fixed( MOUSE_INPUT* ptr = &evs[0] ) {
-                return SendMouse(2, new IntPtr(ptr), 40u) == 2; }
+                return SendInput( 2, new IntPtr(ptr), SIZE_OF.MOUSE_DATA ) == 2; }
             }
         }
 
-        public bool Type( char key )
+        public static bool Type( char key )
         {
             TYPED_INPUT[] evs = new TYPED_INPUT[2] {
                 new TYPED_INPUT( Typed.KeyDown, key ),
                 new TYPED_INPUT( Typed.KeyUp, key )
             };
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
-                uint size = (uint)sizeof(TYPED_INPUT);
-                return SendMouse( 2, new IntPtr(ptr), size ) == 2;
+                return SendInput( 2, new IntPtr(ptr), SIZE_OF.TYPED_DATA ) == 2;
             } }
         }
 
-        public bool Type( string sequence )
+        public static bool Type( string sequence )
         {
             uint count = (uint)(sequence.Length*2);
             char[] text = sequence.ToCharArray();
@@ -261,7 +267,7 @@ namespace Consola.Test
             } count *= 2;
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
                 uint size = (uint)sizeof(TYPED_INPUT);
-                return SendMouse( count, new IntPtr(ptr), size ) == count;
+                return SendInput( count, new IntPtr(ptr), SIZE_OF.TYPED_DATA ) == count;
             } }
         }
     }
