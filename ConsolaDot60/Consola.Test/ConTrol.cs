@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Runtime.InteropServices;
 
 
@@ -269,6 +270,21 @@ namespace Consola.Test
                 uint size = (uint)sizeof(TYPED_INPUT);
                 return SendInput( count, new IntPtr(ptr), SIZE_OF.TYPED_DATA ) == count;
             } }
+        }
+
+
+        public static Thread CreateTestRunner( Action testrun )
+        {
+            return CreateTestRunner( ApartmentState.STA, testrun );
+        }
+
+        public static Thread CreateTestRunner( ApartmentState forAppartmentState, Action testrun )
+        {
+            ThreadStart starter = new ThreadStart( testrun );
+            Thread thread = new Thread( starter );
+            thread.SetApartmentState( forAppartmentState );
+            thread.Start();
+            return thread;
         }
     }
 }
