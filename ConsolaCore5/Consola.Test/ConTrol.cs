@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 
 namespace Consola.Test
@@ -58,13 +59,23 @@ namespace Consola.Test
         public UIntPtr     dwExtraInfo;  // x64 8byte / x86 4byte
     }
 
+    [Flags]
+    internal enum TFLAGS : uint
+    {
+        MOVE          = 0x00000241,
+        DOWN          = 0x00000242,
+        LIFT          = 0x00000243,
+    }
+
     [StructLayout(LayoutKind.Sequential, Size = 8)]
     internal struct HARDWAREINPUT
     {
-        UInt32 uMsg;
-        UInt16 wParamL;
-        UInt16 wParamH;
+        public TFLAGS uMsg;
+        public UInt16 wParamL;
+        public UInt16 wParamH;
     }
+
+
 
 
     [StructLayout(LayoutKind.Sequential)]
@@ -76,8 +87,8 @@ namespace Consola.Test
             : this()
         {
             type = InputType.Mouse;
-            data.dx = (int)(x*34.2);
-            data.dy = y*61;
+            data.dx = (int)(x*ConTrol.SizeOf.SCALE.X);
+            data.dy = (int)(y*ConTrol.SizeOf.SCALE.Y);
             data.dw = 0;
             data.dwFlags = (MFLAGS)f;
             data.time = 0;
@@ -108,6 +119,17 @@ namespace Consola.Test
         }
     }
 
+    internal struct ScreenScale
+    {
+        public float X;
+        public float Y;
+        public ScreenScale( ConTrol.Point screen )
+        {
+            X = ( 65535.0f / screen.X );
+            Y = ( 65535.0f / screen.Y );
+        }
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct TYPED_INPUT
     {
@@ -126,16 +148,60 @@ namespace Consola.Test
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct CUSTOM_INPUT
+    internal struct TOUCH_INPUT
     {
         public UInt32        type;
         public HARDWAREINPUT data;
+
+        public TOUCH_INPUT( TFLAGS flags, int x, int y )
+        {
+            type = InputType.Other;
+            data.uMsg = flags;
+            data.wParamL = (ushort)( ConTrol.SizeOf.SCALE.X * x );
+            data.wParamH = (ushort)( ConTrol.SizeOf.SCALE.Y * y );
+        }
     }
 
     public class ConTrol
     {
-        private static int mX;
-        private static int mY;
+        [StructLayout(LayoutKind.Explicit,Size = 4)]
+        public struct Point
+        {
+            [FieldOffset(0)]
+            public UInt32 data;
+            [FieldOffset(0)]
+            public UInt16 X;
+            [FieldOffset(2)]
+            public UInt16 Y;
+
+            public Point( int x, int y ) : this()
+            {
+                X = (ushort)x;
+                Y = (ushort)y;
+            }
+
+            public static Point operator +( Point This, Point That )
+            {
+                This.X += That.X;
+                This.Y += That.Y;
+                return This;
+            }
+
+            public static Point operator -( Point This, Point That )
+            {
+                This.X -= That.X;
+                This.Y -= That.Y;
+                return This;
+            }
+        }
+
+        public struct SizeOf
+        {
+            internal static readonly UInt32 MOUSE_DATA = (uint)Marshal.SizeOf<MOUSE_INPUT>();
+            internal static readonly UInt32 TYPED_DATA = (uint)Marshal.SizeOf<TYPED_INPUT>();
+            internal static readonly ScreenScale SCALE = ConTrol.GetScreenScale();
+            public static readonly ConTrol.Point Screen = ConTrol.GetScreenSize();
+        }
 
         public enum Move : uint
         {
@@ -168,18 +234,32 @@ namespace Consola.Test
             KeyUp = KFLAGS.KEYUP
         }
 
-        private unsafe struct SIZE_OF {
-            public static readonly UInt32 MOUSE_DATA = (uint)Marshal.SizeOf<MOUSE_INPUT>(); 
-            public static readonly UInt32 TYPED_DATA = (uint)Marshal.SizeOf<TYPED_INPUT>();
-        }
+        [DllImport( "User32.dll", EntryPoint = "GetSystemMetrics" )]
+        private static extern Int32 GetSystemMetrics( int metricsrequestid );
 
         [DllImport( "User32.dll", EntryPoint = "SendInput" )]
         private static extern UInt32 SendInput( UInt32 cInputs, IntPtr pInputs, UInt32 cbSize );
 
+
+        internal static Point GetScreenSize()
+        {
+            return new Point( GetSystemMetrics(0), GetSystemMetrics(1) );
+        }
+
+        internal static ScreenScale GetScreenScale()
+        {
+            return new ScreenScale( GetScreenSize() );
+        }
+
+        public static bool Mouse( Move flags, ConTrol.Point point )
+        {
+            return Mouse( flags, point.X, point.Y );
+        }
+
         public static bool Mouse( Move flags, int x, int y )
         {
             MOUSE_INPUT data = new MOUSE_INPUT( flags, x, y );
-            unsafe { return SendInput( 1, new IntPtr(&data), SIZE_OF.MOUSE_DATA ) == 1; }
+            unsafe { return SendInput( 1, new IntPtr(&data), SizeOf.MOUSE_DATA ) == 1; }
         }
 
         public static bool Click( Button flags )
@@ -199,7 +279,7 @@ namespace Consola.Test
             }
             unsafe {
                 fixed( MOUSE_INPUT* ptr = &data[0] ) {
-                    return SendInput( count, new IntPtr(ptr), SIZE_OF.MOUSE_DATA ) == count;
+                    return SendInput( count, new IntPtr(ptr), SizeOf.MOUSE_DATA ) == count;
                 }
             }
         }
@@ -222,15 +302,20 @@ namespace Consola.Test
             }
             unsafe {
                 fixed( MOUSE_INPUT* ptr = &click[0] ) {
-                    return SendInput( count, new IntPtr(ptr), SIZE_OF.MOUSE_DATA ) == count;
+                    return SendInput( count, new IntPtr(ptr), SizeOf.MOUSE_DATA ) == count;
                 }
             }
+        }
+
+        public static bool Click( Button flags, ConTrol.Point point )
+        {
+            return Click( flags, point.X, point.Y );
         }
 
         public static bool Wheel( Wheels flags, int turn )
         {
             MOUSE_INPUT ev = new MOUSE_INPUT( flags, turn );
-            unsafe { return SendInput( 1, new IntPtr(&ev), SIZE_OF.MOUSE_DATA ) == 1; }
+            unsafe { return SendInput( 1, new IntPtr(&ev), SizeOf.MOUSE_DATA ) == 1; }
         }
 
         public static bool Wheel( Wheels flags, int turn, int atX, int atY )
@@ -240,8 +325,13 @@ namespace Consola.Test
                 new MOUSE_INPUT( flags, turn )
             };
             unsafe { fixed( MOUSE_INPUT* ptr = &evs[0] ) {
-                return SendInput( 2, new IntPtr(ptr), SIZE_OF.MOUSE_DATA ) == 2; }
+                return SendInput( 2, new IntPtr(ptr), SizeOf.MOUSE_DATA ) == 2; }
             }
+        }
+
+        public static bool Wheel( Wheels flags, int turn, ConTrol.Point point )
+        {
+            return Wheel( flags, turn, point.X, point.Y );
         }
 
         public static bool Type( char key )
@@ -251,7 +341,7 @@ namespace Consola.Test
                 new TYPED_INPUT( Typed.KeyUp, key )
             };
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
-                return SendInput( 2, new IntPtr(ptr), SIZE_OF.TYPED_DATA ) == 2;
+                return SendInput( 2, new IntPtr(ptr), SizeOf.TYPED_DATA ) == 2;
             } }
         }
 
@@ -268,23 +358,97 @@ namespace Consola.Test
             } count *= 2;
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
                 uint size = (uint)sizeof(TYPED_INPUT);
-                return SendInput( count, new IntPtr(ptr), SIZE_OF.TYPED_DATA ) == count;
+                return SendInput( count, new IntPtr(ptr), SizeOf.TYPED_DATA ) == count;
             } }
         }
+    }
 
+    public class Runner<A,T>
+    where T
+        : Suite<A>
+    where A
+        : class
+    {
+        private Suite<A> tst;
+        private Thread   run;
+        private int      prc;
+        private ParameterizedThreadStart runner;
 
-        public static Thread CreateTestRunner( Action testrun )
+        public Runner( T suite )
+        : this( suite, ApartmentState.STA )
         {
-            return CreateTestRunner( ApartmentState.STA, testrun );
         }
 
-        public static Thread CreateTestRunner( ApartmentState forAppartmentState, Action testrun )
+        public Runner( T suite, ApartmentState StateOfTheAut )
         {
-            ThreadStart starter = new ThreadStart( testrun );
-            Thread thread = new Thread( starter );
-            thread.SetApartmentState( forAppartmentState );
-            thread.Start();
-            return thread;
+            prc = -1;
+            tst = suite;
+            runner = new ParameterizedThreadStart(testrun);
+            run = new Thread(runner);
+            run.SetApartmentState( StateOfTheAut );
+        }
+
+        public Runner<A,T> Start()
+        {
+            if( Completed ) Reset();
+            run.Start( tst );
+            return this;
+        }
+
+        private void testrun( object arg )
+        {
+            prc = Thread.GetCurrentProcessorId();
+            Suite<A> tst = arg as Suite<A>;
+            if ( tst != null )
+                 tst.Run();
+        }
+
+        public void Abort()
+        {
+            if( run.ThreadState == ThreadState.Running ) {
+                run.Abort();
+                Thread.Sleep( 10 );
+                prc = -1;
+            }
+        }
+
+        public int ProcessorId()
+        {
+            return prc;
+        }
+
+        public void Reset()
+        {
+            ApartmentState ap = run.GetApartmentState();
+            if( run.ThreadState == ThreadState.Running ) {
+                run.Abort();
+                Thread.Sleep( 10 );
+            }
+            if( run.ThreadState == ThreadState.Stopped ) {
+                run = new Thread( runner );
+                run.SetApartmentState( ap );
+                prc = -1;
+            }
+        }
+
+        public bool Completed {
+            get { return run.ThreadState == ThreadState.Stopped; }
+        }
+        public Suite<A> GetResult()
+        {
+            while( run.ThreadState == ThreadState.Running ) {
+                Thread.Sleep( 100 );
+            } return tst;
+        }
+
+        public static Runner<A,T> CreateTestRunner( T SuiteInstance )
+        {
+            return CreateTestRunner( SuiteInstance, ApartmentState.STA );
+        }
+
+        public static Runner<A,T> CreateTestRunner( T SuiteInstance, ApartmentState StateOfTheAut )
+        {
+            return new Runner<A,T>( SuiteInstance, StateOfTheAut );
         }
     }
 }

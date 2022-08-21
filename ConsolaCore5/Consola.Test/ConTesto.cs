@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 namespace Consola
@@ -9,7 +10,7 @@ namespace Consola
         public enum TestResults : uint
         {
             TextOutput = 0, Verbose = 0x00000001u, XmlOutput= 0x00000002u,
-            SkipOnError = 4u, SkipOnFails = 8u,
+            SkipOnError = 4u, SkipOnFails = 8u, IsRunning = 0x00000010u,
             PASS = 1397965136u, FAIL = 1279869254u, SKIP = 1346980691u,
             NONE = 1162760014u
         } 
@@ -49,6 +50,7 @@ namespace Consola
 
         abstract public class Test
         {
+            private const uint Completed = 0xffffff00u;
             private uint step = 0;
             private int count = -1;
             private int failures = -1;
@@ -64,6 +66,7 @@ namespace Consola
             private Action StepsList;
             public event Action TestRun;
             private readonly string testsuite;
+            private int repeats = 0;
 
             private const string SingleLine = "---------------------------------------------------------------------";
             private const string DoubleLine = "=====================================================================";
@@ -126,6 +129,11 @@ namespace Consola
             {
                 get { return flags; }
                 set { flags = value; }
+            }
+
+            public bool Running
+            {
+                get { return ( (uint)flags & Completed ) == 0; }
             }
 
             // internals
@@ -279,7 +287,7 @@ namespace Consola
                 set { if (value != SkipOnFails) {
                         skipfails = value ? 0 : -1;
                         skipnext = false;
-                    }
+                    } 
                 }
             }
 
@@ -296,6 +304,11 @@ namespace Consola
                 get { return SkipOnFails && skipnext; }
                 set { if( value ) SkipOnFails = true;
                       skipnext = value; }
+            }
+
+            public int MaxRepeatCount {
+                get { return repeats; }
+                set { repeats = value; }
             }
 
             public string CurrentCase
@@ -427,7 +440,7 @@ namespace Consola
                                   | CreationFlags.NoInputLog
                                   | CreationFlags.CreateLog );
                 }
-                TestResults   config = flags;
+                TestResults   config  = TestResults.TextOutput;
                 if ( logall ) config |= TestResults.Verbose;
                 if ( logxml ) config |= TestResults.XmlOutput;
 
@@ -463,7 +476,7 @@ namespace Consola
                 if( StepsList != null ) {
                     TestRun += StepsList;
                     StepsList = null;
-                }
+                } flags |= TestResults.IsRunning;
             }
 
             public void AddTestStep( Action stepfunction )
@@ -488,23 +501,7 @@ namespace Consola
                     this, function, name, skiponfailues
                 ).RunTestCase;
             }
-/*
-            private Action MergeStepsToTestCase( Action steps, string name )
-            {
-                Delegate[] steplist = steps.GetInvocationList();
-                return () => { NextCase( name );
-                    int pastfails = failures;
-                    CloseCase( ( Runner( steplist ) - pastfails ) == 0 );
-                };
-            }
 
-            public void MergeQueue( string asNewTestCase )
-            {
-                if( StepsList == null ) throw new Exception("step list empty");
-                TestRun += MergeStepsToTestCase( StepsList, asNewTestCase );
-                StepsList = null;
-            }
-*/
             private void Header()
             {
                 StdStream.Out.Write( "\n" );
@@ -571,8 +568,7 @@ namespace Consola
                 }
 
                 if ( xml ) {
-                    StdStream.Aux.Xml.CloseScope(TESTSUITE);
-                //    StdStream.Aux.Xml.closeLog();
+                    StdStream.Aux.Xml.CloseScope( TESTSUITE );
                 }
             }
 
@@ -592,6 +588,13 @@ namespace Consola
                 } return failures;
             }
 
+            private void Cleaner()
+            {
+                if (repeats == runId ) {
+                    OnCleanUp();
+                }
+            }
+
             // call this for starting a test run (returns results)
             public Test Run()
             {
@@ -603,11 +606,105 @@ namespace Consola
                 
                 Footer();
 
+                Cleaner();
+
                 return this;
             }
 
             // overide this for implementing simple testrun function 
             virtual protected void TestSuite() {}
+
+            // overide this for implementing any cleanup logic maybe needed
+            virtual protected void OnCleanUp() {}
         }
+
+        [StructLayout(LayoutKind.Explicit, Size = 8)]
+        public struct Area
+        {
+            public static readonly Area Zero = new Area();
+            public static readonly Area Empty = new Area(-1,-1,-1,-1);
+
+            [FieldOffset(0)]
+            public UInt64 data;
+            [FieldOffset(0)]
+            public ConTrol.Point Point;
+            [FieldOffset(4)]
+            public ConTrol.Point Size;
+
+            public Area( ConTrol.Point size ) : this()
+            {
+                Size.data = size.data;
+            }
+
+            public Area( int w, int h ) : this()
+            {
+                Size.X = (ushort)w;
+                Size.Y = (ushort)h;
+            }
+
+            public Area( int x, int y, int w, int h )
+                : this( w, h )
+            {
+                Point.X = (ushort)x;
+                Point.Y = (ushort)y;
+            }
+
+            public Area( ConTrol.Point pos, ConTrol.Point siz ) : this()
+            {
+                Point.data = pos.data;
+                Size.data = siz.data;
+            }
+
+            public Area At( ConTrol.Point position )
+            {
+                return new Area(position, Size);
+            }
+
+            public ConTrol.Point Center {
+                get {
+                    ConTrol.Point p = Point;
+                    p.X += (ushort)( Size.X / 2 );
+                    p.Y += (ushort)( Size.Y / 2 );
+                    return p;
+                }
+                set {
+                    Point.X = (ushort)( value.X - Size.X / 2 );
+                    Point.Y = (ushort)( value.Y - Size.Y / 2 );
+                }
+            }
+        }
+
+        public abstract class Suite<T> : Test where T : class
+        {
+            protected T Aut;
+            protected Area Win;
+
+            abstract protected Area GetWindowArea();
+            abstract protected Area GetScreenArea( object descriptor );
+            abstract protected ConTrol.Point GetMenuPoint( string menupath );
+            protected ConTrol.Point GetTranslated( ConTrol.Point position )
+            {
+                return position + Win.Point;
+            }
+
+            protected ConTrol.Point GetXButton()
+            {
+                Win = GetWindowArea();
+                return new ConTrol.Point( ( Win.Point.X + Win.Size.X ) - 20, Win.Point.Y - 10 );
+            }
+
+            public Suite( T aut, bool logall, bool logxml )
+                : base( logall, logxml )
+            {
+                Aut = aut;
+                Win = GetWindowArea();
+            }
+
+            protected override void OnCleanUp()
+            {
+                ConTrol.Click( ConTrol.Button.L, GetXButton() );
+            }
+        }
+
     }
 }
