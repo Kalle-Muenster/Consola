@@ -87,7 +87,7 @@ namespace Consola
         void    NewScope( State newScope, bool dontClose );
 
         void closeLog(void) override {
-            while( states->Count > 0 && scope > State::NoScope ) {
+            while( statesCount > 0 && scope > State::NoScope ) {
                 CloseScope();
             }
         }
@@ -113,13 +113,16 @@ namespace Consola
         }
 
         property int Depth { 
-            int get(void) { return states->Count-1; }
+            int get(void) { return statesCount-1; }
         }
 
     private:
-        bool notabs, nocontent;
+        bool statesContains( String^ element );
+        bool notabs;
+        bool nocontent;
         State scope;
-        System::Collections::Generic::List<String^>^ states;
+        array<String^>^ states;
+        int statesCount;
         String^ state;
     };
 

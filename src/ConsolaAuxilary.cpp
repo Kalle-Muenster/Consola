@@ -45,7 +45,8 @@ Consola::AuxXml::AuxXml(void)
 {
     scope = State::NoScope;
     state = nullptr;
-    states = gcnew System::Collections::Generic::List<String^>(4);
+    states = gcnew array<String^>(20);
+    statesCount = 0;
     nocontent = notabs = false;
 }
 
@@ -111,7 +112,8 @@ Consola::AuxXml^
 Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
 {
     NewScope( State::Element, false );
-    states->Add( state = tagname );
+    state = tagname;
+    states[statesCount++] = gcnew String( state );
     TABS; log->Write( String::Format( "<{0}", tagname ) );
     scope = State::Attribute;
     if( attribute->Length == 0 ) log->Flush();
@@ -151,7 +153,6 @@ Consola::AuxXml::WriteNode( System::Xml::XmlNode^ node )
 Consola::AuxXml^
 Consola::AuxXml::CloseScope( void )
 {
-    //if (scope == State::Content) TABS;
     switch( scope ) {
     case State::Content: TABS;
     case State::Attribute:
@@ -161,17 +162,25 @@ Consola::AuxXml::CloseScope( void )
     case State::Document: {
         scope = State::NoScope;
         state = nullptr;
-        states->Clear();
+        statesCount = 0;
         log->Flush();
         log->Close();
     } break;
     } return this;
 }
 
+bool
+Consola::AuxXml::statesContains( String^ element )
+{
+    for( int i = statesCount-1; i >= 0; --i ) {
+        if (states[i] == element) return true;
+    } return false;
+}
+
 Consola::AuxXml^
 Consola::AuxXml::CloseScope( String^ element )
 {
-    if( states->Contains( element ) ) {
+    if( statesContains( element ) ) {
         while (Element != element) CloseScope();
         if (Element == element) CloseScope();
     } return this;
@@ -190,7 +199,7 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
         if( !enum_utils::anyFlag( State::Content|State::Comment, newScope ) ) { // !( (newScope & (State::Content|State::Comment)) != State::NoScope ) ) {
             log->Write( "/" ); 
         } log->Write( ">" );
-        if ( !enum_utils::hasFlag( newScope, State::Content) ) log->Write("\n");
+        if ( !enum_utils::hasFlag( newScope, State::Content ) ) log->Write("\n");
         log->Flush();
         break;
     case State::Element:
@@ -220,10 +229,10 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
 
     if( closeCurrentScope ) {
         int dp = Depth;
-        if( dp >= 0 ) states->RemoveAt( dp );
-        if( states->Count > 0 ) {
+        if( dp >= 0 ) --statesCount;
+        if( statesCount > 0 ) {
             dp = Depth;
-            state = states->ToArray()[dp];
+            state = states[dp];
         } else state = nullptr;
     } 
 }
