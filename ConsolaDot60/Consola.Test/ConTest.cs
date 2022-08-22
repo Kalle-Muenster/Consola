@@ -111,10 +111,9 @@ namespace Consola
                                    : TestResults.FAIL;
 
                 StdStream.Aux.Xml.WriteElement( CASERESULT, new string[] {
-                    $"number={casenum}", $"name={casename}", $"result={result}",
-                    $"failed={failed}", $"passed={total-(skips+failed)}",
-                    $"skipped={skips}" }
-                ).CloseScope( TESTCASE );
+                    $"number={casenum}", $"name={casename}", $"failed={failed}",
+                    $"passed={total-(skips+failed)}", $"skipped={skips}" }
+                ).WriteContent( result.ToString() ).CloseScope( TESTCASE );
             }
 
             public bool Verbose
@@ -541,7 +540,7 @@ namespace Consola
                 {
                     StdStream.Out.WriteLine("\n   All Tests PASSED\n");
                     if (xml)
-                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", "result=PASS", $"failures={failures}" })
+                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", $"failed={failures}" })
                                          .WriteContent("PASS")
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.PASS;
@@ -551,7 +550,7 @@ namespace Consola
                     StdStream.Err.WriteLine("\nTestrun FAILS total: {0}\n", failures);
                     StdStream.Out.Log.WriteLine("\nTestrun total FAILS total: {0}\n", failures);
                     if (xml)
-                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", "result=FAIL", $"failures={failures}" })
+                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", $"failed={failures}" })
                                          .WriteContent("FAIL") 
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.FAIL;
@@ -560,7 +559,7 @@ namespace Consola
                 {
                     StdStream.Out.WriteLine("\nWhole testrun was SKIPPED\n");
                     if (xml)
-                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", "result=NONE", $"failures={failures}" })
+                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", $"failed={failures}" })
                                          .WriteContent("SKIP")
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.SKIP;
