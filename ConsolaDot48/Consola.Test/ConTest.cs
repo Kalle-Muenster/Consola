@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 namespace Consola
@@ -100,7 +99,7 @@ namespace Consola
             private static void WriteXmlStepInfo( uint casenum, int stepnum, string description )
             {
                 StdStream.Aux.Xml.WriteElement( DESCRIPTION, new string[] {
-                    "level=INFO", $"related={StdStream.Aux.Xml.Element}-{casenum}.{stepnum}" }
+                    "level=INFO", $"relate={StdStream.Aux.Xml.Element}-{casenum}.{stepnum}" }
                 ).WriteContent( description ).CloseScope();
             }
 
@@ -352,7 +351,7 @@ namespace Consola
             // Case handling:
             // NextCase(name) - begins a new test case section named 'name'
             // CloseCase(name) - closes a test cases and generate a summary
-            // SkipCase(name) - doesn't executes but log that test case skiped 
+            // SkipCase(name) - doesn't execute but log a case was skiped 
             public bool NextCase( string casename )
             {
                 if( SkipNextTest ) {
@@ -529,7 +528,7 @@ namespace Consola
                     StdStream.Out.Log.WriteLine("\n...FATAL {0} Error happend:", errs.Length);
                     StdStream.Err.WriteLine("\n...FATAL {0} Error happend:", errs.Length);
                     if (xml)
-                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errs.Length}", "result=NONE", $"failures=-1" });
+                        StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errs.Length}", "result=NONE", $"failed=-1" });
                     for (int i = 0; i < errs.Length; ++i) { 
                         StdStream.Err.WriteLine("ERROR [{0}]: {1}", i, errs[i]);
                         if (xml)
@@ -617,94 +616,5 @@ namespace Consola
             // overide this for implementing any cleanup logic maybe needed
             virtual protected void OnCleanUp() {}
         }
-
-        [StructLayout(LayoutKind.Explicit, Size = 8)]
-        public struct Area
-        {
-            public static readonly Area Zero = new Area();
-            public static readonly Area Empty = new Area(-1,-1,-1,-1);
-
-            [FieldOffset(0)]
-            public UInt64 data;
-            [FieldOffset(0)]
-            public ConTrol.Point Point;
-            [FieldOffset(4)]
-            public ConTrol.Point Size;
-
-            public Area( ConTrol.Point size ) : this()
-            {
-                Size.data = size.data;
-            }
-
-            public Area( int w, int h ) : this()
-            {
-                Size.X = (ushort)w;
-                Size.Y = (ushort)h;
-            }
-
-            public Area( int x, int y, int w, int h )
-                : this( w, h )
-            {
-                Point.X = (ushort)x;
-                Point.Y = (ushort)y;
-            }
-
-            public Area( ConTrol.Point pos, ConTrol.Point siz ) : this()
-            {
-                Point.data = pos.data;
-                Size.data = siz.data;
-            }
-
-            public Area At( ConTrol.Point position )
-            {
-                return new Area(position, Size);
-            }
-
-            public ConTrol.Point Center {
-                get {
-                    ConTrol.Point p = Point;
-                    p.X += (ushort)( Size.X / 2 );
-                    p.Y += (ushort)( Size.Y / 2 );
-                    return p;
-                }
-                set {
-                    Point.X = (ushort)( value.X - Size.X / 2 );
-                    Point.Y = (ushort)( value.Y - Size.Y / 2 );
-                }
-            }
-        }
-
-        public abstract class Suite<T> : Test where T : class
-        {
-            protected T Aut;
-            protected Area Win;
-
-            abstract protected Area GetWindowArea();
-            abstract protected Area GetScreenArea( object descriptor );
-            abstract protected ConTrol.Point GetMenuPoint( string menupath );
-            protected ConTrol.Point GetTranslated( ConTrol.Point position )
-            {
-                return position + Win.Point;
-            }
-
-            protected ConTrol.Point GetXButton()
-            {
-                Win = GetWindowArea();
-                return new ConTrol.Point( ( Win.Point.X + Win.Size.X ) - 20, Win.Point.Y - 10 );
-            }
-
-            public Suite( T aut, bool logall, bool logxml )
-                : base( logall, logxml )
-            {
-                Aut = aut;
-                Win = GetWindowArea();
-            }
-
-            protected override void OnCleanUp()
-            {
-                ConTrol.Click( ConTrol.Button.L, GetXButton() );
-            }
-        }
-
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 
 namespace Consola.Test
@@ -14,7 +12,7 @@ namespace Consola.Test
     }
 
     [Flags]
-    public enum MFLAGS : uint {
+    internal enum MFLAGS : uint {
         MOVE = 0x0001, //	Movement occurred.
         LEFTDOWN = 0x0002, //	The left button was pressed.
         LEFTUP = 0x0004,   //	The left button was released.
@@ -49,6 +47,7 @@ namespace Consola.Test
         SCANCODE = 0x0008, // If specified, wScan identifies the key and wVk is ignored.
         UNICODE = 0x0004 // If specified, the system synthesizes a VK_PACKET keystroke. The wVk parameter must be zero. This flag can only be combined with the KEYEVENTF_KEYUP flag. For more information, see the Remarks section.
     }
+
     [StructLayout(LayoutKind.Sequential, Size = 20)]
     internal struct KEYBDINPUT
     {
@@ -360,95 +359,6 @@ namespace Consola.Test
                 uint size = (uint)sizeof(TYPED_INPUT);
                 return SendInput( count, new IntPtr(ptr), SizeOf.TYPED_DATA ) == count;
             } }
-        }
-    }
-
-    public class Runner<A,T>
-    where T
-        : Suite<A>
-    where A
-        : class
-    {
-        private Suite<A> tst;
-        private Thread   run;
-        private int      prc;
-        private ParameterizedThreadStart runner;
-
-        public Runner( T suite )
-        : this( suite, ApartmentState.STA )
-        {
-        }
-
-        public Runner( T suite, ApartmentState StateOfTheAut )
-        {
-            prc = -1;
-            tst = suite;
-            runner = new ParameterizedThreadStart(testrun);
-            run = new Thread(runner);
-            run.SetApartmentState( StateOfTheAut );
-        }
-
-        public Runner<A,T> Start()
-        {
-            if( Completed ) Reset();
-            run.Start( tst );
-            return this;
-        }
-
-        private void testrun( object arg )
-        {
-            prc = Thread.GetCurrentProcessorId();
-            Suite<A> tst = arg as Suite<A>;
-            if ( tst != null )
-                 tst.Run();
-        }
-
-        public void Abort()
-        {
-            if( run.ThreadState == ThreadState.Running ) {
-                run.Abort();
-                Thread.Sleep( 10 );
-                prc = -1;
-            }
-        }
-
-        public int ProcessorId()
-        {
-            return prc;
-        }
-
-        public void Reset()
-        {
-            ApartmentState ap = run.GetApartmentState();
-            if( run.ThreadState == ThreadState.Running ) {
-                run.Abort();
-                Thread.Sleep( 10 );
-            }
-            if( run.ThreadState == ThreadState.Stopped ) {
-                run = new Thread( runner );
-                run.SetApartmentState( ap );
-                prc = -1;
-            }
-        }
-
-        public bool Completed {
-            get { return run.ThreadState == ThreadState.Stopped; }
-        }
-        public Suite<A> GetResult()
-        {
-            while( run.ThreadState == ThreadState.Running ) {
-                Thread.Sleep( 100 );
-            } return tst;
-        }
-
-        public static Runner<A,T> CreateTestRunner( T SuiteInstance )
-        {
-            return CreateTestRunner( SuiteInstance, ApartmentState.STA );
-        }
-
-        public static Runner<A,T> CreateTestRunner( T SuiteInstance, ApartmentState StateOfTheAut )
-        {
-            return new Runner<A,T>( SuiteInstance, StateOfTheAut );
         }
     }
 }
