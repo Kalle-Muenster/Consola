@@ -118,6 +118,7 @@ namespace Consola
 
     private:
         bool statesContains( String^ element );
+        void pushState( String^ element );
         bool notabs;
         bool nocontent;
         State scope;

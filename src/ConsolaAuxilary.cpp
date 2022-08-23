@@ -45,7 +45,7 @@ Consola::AuxXml::AuxXml(void)
 {
     scope = State::NoScope;
     state = nullptr;
-    states = gcnew array<String^>(20);
+    states = gcnew array<String^>(5);
     statesCount = 0;
     nocontent = notabs = false;
 }
@@ -113,7 +113,7 @@ Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
 {
     NewScope( State::Element, false );
     state = tagname;
-    states[statesCount++] = gcnew String( state );
+    pushState( gcnew String( state ) );
     TABS; log->Write( String::Format( "<{0}", tagname ) );
     scope = State::Attribute;
     if( attribute->Length == 0 ) log->Flush();
@@ -143,7 +143,7 @@ Consola::AuxXml::WriteAttribute( String^ name, Object^ value )
 void
 Consola::AuxXml::WriteNode( System::Xml::XmlNode^ node )
 {
-    if ( enum_utils::anyFlag( State::Content|State::Element|State::Attribute, scope ) ) { // == State::Content || scope == State::Element || scope == State::Attribute ) {
+    if ( enum_utils::anyFlag( State::Content|State::Element|State::Attribute, scope ) ) {
         NewScope( State::Content );
     } TABS;
     log->WriteLine( node->OuterXml );
@@ -177,6 +177,16 @@ Consola::AuxXml::statesContains( String^ element )
     } return false;
 }
 
+void
+Consola::AuxXml::pushState( String^ element )
+{
+    if (statesCount >= states->Length) {
+        array<String^>^ neuarray = gcnew array<String^>(states->Length+5);
+        states->CopyTo( neuarray, 0 );
+        states = neuarray;
+    } states[statesCount++] = element;
+}
+
 Consola::AuxXml^
 Consola::AuxXml::CloseScope( String^ element )
 {
@@ -196,7 +206,7 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
 
     switch( scope ) {
     case State::Attribute:
-        if( !enum_utils::anyFlag( State::Content|State::Comment, newScope ) ) { // !( (newScope & (State::Content|State::Comment)) != State::NoScope ) ) {
+        if( !enum_utils::anyFlag( State::Content|State::Comment, newScope ) ) {
             log->Write( "/" ); 
         } log->Write( ">" );
         if ( !enum_utils::hasFlag( newScope, State::Content ) ) log->Write("\n");
