@@ -91,7 +91,8 @@ namespace Consola
                 );
                 if( description.Length > 0 ) {
                     StdStream.Aux.Xml.WriteElement( DESCRIPTION )
-                                     .WriteContent( description );
+                                     .WriteContent( description )
+                                       .CloseScope( DESCRIPTION );
                 } StdStream.Aux.Xml.WriteElement( STEPRESULT )
                                    .WriteContent( result.ToString() )
                                      .CloseScope( TESTSTEP );

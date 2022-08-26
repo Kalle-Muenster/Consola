@@ -8,8 +8,8 @@ namespace Consola.Test
     [StructLayout(LayoutKind.Explicit, Size = 8)]
     public struct Area
     {
-        public static readonly Area Zero = new Area();
-        public static readonly Area Empty = new Area(-1,-1,-1,-1);
+        public static readonly Area Zero = new Area( 0, 0, 0, 0 );
+        public static readonly Area Empty = new Area( -1, -1, -1, -1 );
 
         [FieldOffset(0)]
         public UInt64 data;
@@ -44,7 +44,7 @@ namespace Consola.Test
 
         public Area At( ConTrol.Point position )
         {
-            return new Area(position, Size);
+            return new Area( position, Size );
         }
 
         public ConTrol.Point Center {
@@ -118,10 +118,10 @@ namespace Consola.Test
         }
 
         /// <summary>
-        /// GetXButton() returns global screen coordinate of the Windows 'X' button
+        /// GetXButton() returns global screen coordinate of the Window 'X' button
         /// - which (for regular cases) should close the application when clicked
         /// </summary>
-        /// <returns>clickable point in global coordinates</returns>
+        /// <returns>clickable screen coordinates of mainwindows 'X' button</returns>
         virtual protected ConTrol.Point GetXButton()
         {
             Win = GetWindowArea();
@@ -148,10 +148,10 @@ namespace Consola.Test
     where A
         : class
     {
-        private Suite<A> tst;
-        private Thread   run;
-        private int      prc;
-        private ParameterizedThreadStart runner;
+        private Suite<A>                 tst;
+        private Thread                   run;
+        private int                      prc;
+        private ParameterizedThreadStart los;
 
         public Runner( T suite )
         : this(suite, ApartmentState.STA)
@@ -162,12 +162,12 @@ namespace Consola.Test
         {
             prc = -1;
             tst = suite;
-            runner = new ParameterizedThreadStart(testrun);
-            run = new Thread(runner);
-            run.SetApartmentState(StateOfTheAut);
+            los = new ParameterizedThreadStart( testrun );
+            run = new Thread( los );
+            run.SetApartmentState( StateOfTheAut );
         }
 
-        public Runner<A, T> Start()
+        public Runner<A,T> Start()
         {
             if( Completed ) Reset();
             run.Start(tst);
@@ -190,7 +190,7 @@ namespace Consola.Test
         {
             if( run.ThreadState == ThreadState.Running ) {
                 run.Abort();
-                Thread.Sleep(10);
+                Thread.Sleep( 10 );
                 prc = -1;
             }
         }
@@ -202,14 +202,14 @@ namespace Consola.Test
 
         public void Reset()
         {
-            ApartmentState ap = run.GetApartmentState();
+            ApartmentState current = run.GetApartmentState();
             if( run.ThreadState == ThreadState.Running ) {
                 run.Abort();
-                Thread.Sleep(10);
+                Thread.Sleep( 10 );
             }
             if( run.ThreadState == ThreadState.Stopped ) {
-                run = new Thread(runner);
-                run.SetApartmentState(ap);
+                run = new Thread( los );
+                run.SetApartmentState( current );
                 prc = -1;
             }
         }
@@ -220,19 +220,18 @@ namespace Consola.Test
         public Suite<A> GetResult()
         {
             while( run.ThreadState == ThreadState.Running ) {
-                Thread.Sleep(100);
-            }
-            return tst;
+                Thread.Sleep( 100 );
+            } return tst;
         }
 
         public static Runner<A,T> CreateTestRunner( T SuiteInstance )
         {
-            return CreateTestRunner(SuiteInstance, ApartmentState.STA);
+            return CreateTestRunner( SuiteInstance, ApartmentState.STA );
         }
 
         public static Runner<A,T> CreateTestRunner( T SuiteInstance, ApartmentState StateOfTheAut )
         {
-            return new Runner<A, T>(SuiteInstance, StateOfTheAut);
+            return new Runner<A,T>( SuiteInstance, StateOfTheAut );
         }
     }
 }

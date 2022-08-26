@@ -111,7 +111,7 @@ Consola::AuxXml::WriteContent( System::String^ format, ...array<Object^>^ conten
 Consola::AuxXml^
 Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
 {
-    NewScope( State::Element, false );
+    NewScope( State::Element, false ); // enum_utils::hasFlag(scope, State::Content) );
     state = tagname;
     pushState( gcnew String( state ) );
     TABS; log->Write( String::Format( "<{0}", tagname ) );
