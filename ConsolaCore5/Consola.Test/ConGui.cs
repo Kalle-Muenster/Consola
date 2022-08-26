@@ -176,7 +176,11 @@ namespace Consola.Test
 
         private void testrun( object arg )
         {
+#if Dotnet48
+            prc = Thread.GetDomainID();
+#else
             prc = Thread.GetCurrentProcessorId();
+#endif
             Suite<A> tst = arg as Suite<A>;
             if( tst != null )
                 tst.Run();
