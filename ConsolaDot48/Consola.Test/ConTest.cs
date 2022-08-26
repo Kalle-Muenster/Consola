@@ -70,10 +70,11 @@ namespace Consola
             private const string SingleLine = "---------------------------------------------------------------------";
             private const string DoubleLine = "=====================================================================";
             private const string HashLine   = "#####################################################################";
+            private const string DESCRIPTION = "description";
             private const string TESTCASE   = "testcase";
             private const string CASERESULT = "caseresult";
             private const string TESTSTEP   = "teststep";
-            private const string DESCRIPTION = "description";
+            private const string STEPRESULT = "stepresult";
             private const string TESTSUITE  = "testsuite";
             private const string SUITERESULT = "suiteresult";
 
@@ -86,20 +87,20 @@ namespace Consola
             private static void WriteXmlStepResult( uint casenum, int stepnum, TestResults result, string description )
             {
                 StdStream.Aux.Xml.WriteElement( TESTSTEP, 
-                    new string[] { $"number={casenum}.{stepnum}", $"result={result}" }
+                    new string[] { $"number={casenum}.{stepnum}" }
                 );
                 if( description.Length > 0 ) {
                     StdStream.Aux.Xml.WriteElement( DESCRIPTION )
-                                     .WriteContent( description )
+                                     .WriteContent( description );
+                } StdStream.Aux.Xml.WriteElement( STEPRESULT )
+                                   .WriteContent( result.ToString() )
                                      .CloseScope( TESTSTEP );
-                } else
-                StdStream.Aux.Xml.CloseScope();
             }
 
             private static void WriteXmlStepInfo( uint casenum, int stepnum, string description )
             {
-                StdStream.Aux.Xml.WriteElement( DESCRIPTION, new string[] {
-                    "level=INFO", $"relate={StdStream.Aux.Xml.Element}-{casenum}.{stepnum}" }
+                StdStream.Aux.Xml.WriteElement( DESCRIPTION, 
+                    new string[]{ $"related={TESTSTEP}-{casenum}.{stepnum}" }
                 ).WriteContent( description ).CloseScope();
             }
 
@@ -541,7 +542,7 @@ namespace Consola
                     StdStream.Out.WriteLine("\n   All Tests PASSED\n");
                     if (xml)
                         StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", $"failed={failures}" })
-                                         .WriteContent("PASS")
+                                         .WriteContent( "PASS" )
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.PASS;
                 }
@@ -551,7 +552,7 @@ namespace Consola
                     StdStream.Out.Log.WriteLine("\nTestrun total FAILS total: {0}\n", failures);
                     if (xml)
                         StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", $"failed={failures}" })
-                                         .WriteContent("FAIL") 
+                                         .WriteContent( "FAIL" ) 
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.FAIL;
                 }
@@ -560,7 +561,7 @@ namespace Consola
                     StdStream.Out.WriteLine("\nWhole testrun was SKIPPED\n");
                     if (xml)
                         StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errors.Count}", $"failed={failures}" })
-                                         .WriteContent("SKIP")
+                                         .WriteContent( "SKIP" )
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.SKIP;
                 }
