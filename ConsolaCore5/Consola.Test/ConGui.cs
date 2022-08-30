@@ -73,11 +73,11 @@ namespace Consola.Test
     /// - for a WPF application the MainWindow class. 
     /// 
     /// - other solutions like classes which offer access to the AUT
-    ///   via some kind of remote protocol may be practicable,.. 
+    ///   via some kind of remote protocol may be appropriate also,.. 
     /// 
     /// If using a Form or Window class accessing it from another thread
     /// will get a little bit tricky (most controls deny being accessed
-    /// from another thread. just primitive value variable can be used)..
+    /// from another thread. just primitive value variables can be used)..
     /// </typeparam>
     public abstract class Suite<T> : Test where T : class
     {
@@ -87,7 +87,11 @@ namespace Consola.Test
         // screen coordinates of the AUTs mainwindow rectangle
         protected Area Win;
 
-        // must implement retrieving screencoordinates of the AUT window
+        /// <summary>
+        /// derived testsuite must implement retrieving screencoordinates of 
+        /// the AUTs main window
+        /// </summary>
+        /// <returns>Area where AUTs main window is located on the screen</returns>
         abstract protected Area GetWindowArea();
 
         // must implement retrieving distinct, testrelevant locations on the AUT.
@@ -107,11 +111,10 @@ namespace Consola.Test
         // (via using '.' separated 'paths' as menupath parameter for exampe. )
         abstract protected ConTrol.Point GetMenuPoint( string menupath );
 
-        /// <summary>
-        /// GetTranslated(ConTrol.Point local) returns the given local coordinate
-        /// translated to global (screen) coordinates </summary>
-        /// <param name="local">local control coordinates</param>
-        /// <returns>global screen coordinates</returns>
+        /// <summary> GetTranslated( ConTrol.Point local )
+        /// Get global (screen) coordinates translated from given local coordinate
+        /// </summary><param name="local"> local control coordinates </param>
+        /// <returns> global screen coordinates </returns>
         protected ConTrol.Point GetTranslated( ConTrol.Point local )
         {
             return local + Win.Point;
@@ -137,7 +140,7 @@ namespace Consola.Test
 
         protected override void OnCleanUp()
         {
-            // auto close the AUT on test end by cllicking 'X'
+            // auto closes the AUT on test end by cllicking 'X'
             ConTrol.Click( ConTrol.Button.L, GetXButton() );
         }
     }
@@ -224,6 +227,7 @@ namespace Consola.Test
             } return tst;
         }
 
+        /*
         public static Runner<A,T> CreateTestRunner( T SuiteInstance )
         {
             return CreateTestRunner( SuiteInstance, ApartmentState.STA );
@@ -233,5 +237,6 @@ namespace Consola.Test
         {
             return new Runner<A,T>( SuiteInstance, StateOfTheAut );
         }
+        */
     }
 }

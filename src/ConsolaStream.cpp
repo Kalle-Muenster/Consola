@@ -417,6 +417,7 @@ Consola::StdStream::CreateConsole( void )
 {
     AllocConsole();
     RedirectStreams();
+    consolestate = Consola::CreationFlags::NewConsole;
 }
 
 void
@@ -425,6 +426,7 @@ Consola::StdStream::RedirectStreams( void )
     freopen("conin$", "r", stdin);
     freopen("conout$", "w", stdout);
     freopen("conout$", "w", stderr);
+    consolestate = Consola::CreationFlags::UseConsole;
 }
 
 
@@ -434,7 +436,7 @@ Consola::StdStream::Init( void )
 {
     nam = Utility::NameOfTheCommander()
         + "_{0}.log";
-    Init( Consola::CreationFlags::TryConsole );
+    Init( Consola::CreationFlags::None );
 }
 
 void

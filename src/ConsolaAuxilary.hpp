@@ -72,19 +72,23 @@ namespace Consola
 
     public:
         enum class State { 
-            NoScope, Document, Element,
-            Attribute, Content, CData,
-            Comment
+            NoScope = 0, Document = 1, Element = 2,
+            Attribute = 4, Content = 8, CData = 16,
+            Comment = 32
         };
 
         AuxXml^ CloseScope( void );
         AuxXml^ CloseScope( String^ element );
-        void    WriteNode( XmlNode^ node );
-        AuxXml^ WriteContent( String^ format, ...array<Object^>^ objects );
-        AuxXml^ WriteElement( String^ tagname, ...array<String^>^ attributes );
+        AuxXml^ WriteNode( XmlNode^ node );
+        AuxXml^ WriteCData( String^ data );
+        AuxXml^ WriteContent( String^ format, ...array<Object^>^ optjects );
+        AuxXml^ WriteElement( String^ tagname, ...array<String^>^ opttributes );
+        AuxXml^ WriteElement( String^ tagname, String^ contents, ...array<String^>^ opttributes );
         AuxXml^ WriteAttribute( String^ name, Object^ value );
+        AuxXml^ WriteComment( String^ format, ...array<Object^>^ optjects );
+
         void    NewScope( State newScope );
-        void    NewScope( State newScope, bool dontClose );
+        void    NewScope( State newScope, bool closeActualScope );
 
         void closeLog(void) override {
             while( statesCount > 0 && scope > State::NoScope ) {
@@ -120,7 +124,7 @@ namespace Consola
         bool statesContains( String^ element );
         void pushState( String^ element );
         bool notabs;
-        bool nocontent;
+        bool content;
         State scope;
         array<String^>^ states;
         int statesCount;

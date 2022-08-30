@@ -126,7 +126,8 @@ namespace Consola
 
         static void       CreateConsole( void );
         static void       RedirectStreams( void );
-
+        static bool       strmlockup( StdStream^ strm, uint );
+        static bool       strmunlock( StdStream^ strm, uint );
 
         const uint    dir;
         LogWriter^    log;
@@ -149,18 +150,17 @@ namespace Consola
         virtual bool  lockup(uint) abstract;
         virtual bool  unlock(uint) abstract;
         virtual bool  locked(void) abstract;
-        static  bool  strmlockup(StdStream^ strm, uint);
-        static  bool  strmunlock(StdStream^ strm, uint);
 
     private:
 
         static Consola::CreationFlags   consolestate = Consola::CreationFlags(-1);
         static Consola::CreationFlags   loggingstate = Consola::CreationFlags(-1);
-        static unsigned        instanzencounter = 0;
+        static unsigned             instanzencounter = 0;
     };
 
 
-    public ref class StdInp : public StdStream
+    public ref class StdInp
+        : public StdStream
     {
     internal:
         static volatile uint lockvar = EMPTY;
