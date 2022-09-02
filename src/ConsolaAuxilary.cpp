@@ -262,12 +262,10 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
     case State::Element:
         if( state != nullptr && newScope == State::Content ) {
             log->Write( ">\n" );
-            //    log->Write( String::Format( "</{0}>\n", state ) );
         } else {
             log->Write("/>\n");
             closeCurrentScope = true;
         } log->Flush();
-       // closeCurrentScope = closeActual;
         break;
     case State::Comment:
         if( !enum_utils::hasFlag( newScope, State::Comment ) ) {
