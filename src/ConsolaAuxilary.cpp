@@ -102,7 +102,7 @@ Consola::AuxXml::WriteContent( System::String^ format, ...array<Object^>^ textco
     if( scope != State::Content ) {
         NewScope(State::Content);
     }
-    Log->Write( format, textcontent );
+    Log->Write( String::Format( format, textcontent )->Replace( '<', '[' )->Replace( '>', ']' ) );
     Log->Flush();
     content = true;
     notabs = true;
