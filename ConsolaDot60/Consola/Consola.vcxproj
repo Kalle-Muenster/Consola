@@ -90,6 +90,7 @@
     <CopyLocalDebugSymbols>true</CopyLocalDebugSymbols>
     <ManagedAssembly>true</ManagedAssembly>
     <IncludePath>.\;.\..\..\src;.\..\..\src\stringpool;$(IncludePath)</IncludePath>
+    <LinkKeyFile>$(SolutionDir)..\Consola.snk</LinkKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\bin\dot60\$(PlatformTarget)\$(Configuration)\</OutDir>
@@ -120,6 +121,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Version>$(ConsolaVersionNumber)</Version>
     </Link>
+    <Manifest>
+      <AssemblyIdentity>Consola, Version=$(ConsolaVersionString), Culture=neutral, PublicKeyToken=3a8d8238dbb3e275, processorArchitecture=x86</AssemblyIdentity>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -141,6 +145,9 @@
       <Version>$(ConsolaVersionNumber)</Version>
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
+    <Manifest>
+      <AssemblyIdentity>Consola, Version=$(ConsolaVersionString), Culture=neutral, PublicKeyToken=3a8d8238dbb3e275, processorArchitecture=x86</AssemblyIdentity>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,6 +163,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Version>$(ConsolaVersionNumber)</Version>
     </Link>
+    <Manifest>
+      <AssemblyIdentity>Consola, Version=$(ConsolaVersionString), Culture=neutral, PublicKeyToken=3a8d8238dbb3e275, processorArchitecture=AMD64</AssemblyIdentity>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -177,6 +187,9 @@
       <Version>$(ConsolaVersionNumber)</Version>
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
+    <Manifest>
+      <AssemblyIdentity>Consola, Version=$(ConsolaVersionString), Culture=neutral, PublicKeyToken=3a8d8238dbb3e275, processorArchitecture=AMD64</AssemblyIdentity>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ConsolaAuxilary.cpp" />
