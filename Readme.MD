@@ -1,12 +1,7 @@
 Consola
 =======
 
-Consola.dll:      Threadsafe Std Stream Access and Log File Generation to be used from within DotNet Projects
-Consola.Test.dll: Small Test runner with xml result logger which can execute unit tests and also gui interaction   
-
-
-Consola.dll
------------
+# Threadsafe Std Stream Access and Log File Generation to be used from within DotNet Projects
 
 ## Simple short description:
 
@@ -90,5 +85,7 @@ any other thread will be able writing StdStream.Out again as soon either *stream
 
 Consola.Test
 ------------
+
+## Small Test runner with xml result logger which can execute unit tests and also gui interaction  
 
 some short description maybe gets added later....
