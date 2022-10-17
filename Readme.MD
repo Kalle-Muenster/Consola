@@ -1,9 +1,12 @@
 Consola
 =======
 
+Consola.dll:      Threadsafe Std Stream Access and Log File Generation to be used from within DotNet Projects
+Consola.Test.dll: Small Test runner with xml result logger which can execute unit tests and also gui interaction   
 
-Dll for Threadsafe Std Stream Access and Log File Generation to be used from within DotNet Projects
 
+Consola.dll
+-----------
 
 ## Simple short description:
 
@@ -83,3 +86,9 @@ stream.Put("ByBy").End();
 *this example ensures that all elements of list *ObjectList* are progressed and will be written to StdStream.Out as one consectuitive text block - with no interruption other threads could cause when writing output at same time.
 
 any other thread will be able writing StdStream.Out again as soon either *stream.End()* is called, or at least with *stream* leaving the actual scope. (it then, on disposal, calls *.End()* automatically as soon catched by the collector) 
+
+
+Consola.Test
+------------
+
+some short description maybe gets added later....
