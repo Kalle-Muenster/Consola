@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FA29A4AE-B202-4A1C-B275-9B528BCF1DA9}</ProjectGuid>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <RootNamespace>StdStreams</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
@@ -82,6 +82,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>Consola</TargetName>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -93,6 +94,9 @@
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Consola</TargetName>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <WindowsMetadataLinkKeyFile>
+    </WindowsMetadataLinkKeyFile>
+    <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -102,6 +106,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>Consola</TargetName>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -111,6 +116,7 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
     <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,6 +133,9 @@
     <Manifest>
       <AssemblyIdentity>Consola, version=$(ConsolaVersionString), publicKeyToken=3a8d8238dbb3e275, processorArchitecture=x86</AssemblyIdentity>
     </Manifest>
+    <Bscmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -152,10 +161,15 @@
       </CLRUnmanagedCodeCheck>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <Version>$(ConsolaVersionNumber)</Version>
+      <WindowsMetadataLinkDelaySign>
+      </WindowsMetadataLinkDelaySign>
     </Link>
     <Manifest>
       <AssemblyIdentity>Consola, version=$(ConsolaVersionString), publicKeyToken=3a8d8238dbb3e275, processorArchitecture=AMD64</AssemblyIdentity>
     </Manifest>
+    <Bscmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -179,6 +193,9 @@
     <Manifest>
       <AssemblyIdentity>Consola, version=$(ConsolaVersionString), publicKeyToken=3a8d8238dbb3e275, processorArchitecture=x86</AssemblyIdentity>
     </Manifest>
+    <Bscmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -198,7 +215,11 @@
     </Link>
     <Manifest>
       <AssemblyIdentity>Consola, version=$(ConsolaVersionString), publicKeyToken=3a8d8238dbb3e275, processorArchitecture=AMD64</AssemblyIdentity>
+      <GenerateCategoryTags>true</GenerateCategoryTags>
     </Manifest>
+    <Bscmake>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ConsolaAuxilary.cpp" />
@@ -244,9 +265,7 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
-    <Reference Include="System.Xml">
-      <HintPath>..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.XML.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Build.cmd" />

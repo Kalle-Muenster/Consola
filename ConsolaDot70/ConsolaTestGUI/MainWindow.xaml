@@ -1,0 +1,55 @@
+﻿<Window x:Class="ConsolaTestGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ConsolaTestGUI"
+        xmlns:c="clr-namespace:Consola;assembly=Consola"
+        xmlns:s="clr-namespace:System;assembly=System.Core"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+    </Window.Resources>
+    <Grid>
+        <Label x:Name="lbl_Version" Content="Consola.dll v. 0.0.1.7" Margin="20,20,36,351" FontSize="25">
+            <Label.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
+            </Label.Foreground>
+        </Label>
+        <Button x:Name="btn_Test" Content="Test" Margin="74,99,579,288" FontSize="25" Click="btn_Test_Click"/>
+        <Button x:Name="btn_Error" Content="Error" Margin="317,99,337,288" d:LayoutOverrides="HorizontalAlignment" FontSize="25" Click="btn_Error_Click"/>
+        <Button x:Name="btn_Write" Content="Writers" Margin="507,99,181,288" FontSize="25" Click="btn_WriteThreads_Click" />
+        <Button x:Name="btn_Stream" Content="Streams" Margin="643,99,53,288" FontSize="25" Click="btn_StreamThreads_Click" />
+        <GroupBox>
+            <Grid Margin="40,0,180,80" Height="170" VerticalAlignment="Bottom">
+                <RadioButton Content="SingleFileLog" Margin="34,19,0,0" Selector.Selected="radioButtons_Click" HorizontalAlignment="Left" Width="199" d:LayoutOverrides="HorizontalAlignment" Height="57" VerticalAlignment="Top" FontSize="25">
+                    <RadioButton.Foreground>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}"/>
+                    </RadioButton.Foreground>
+                </RadioButton>
+                <RadioButton Content="SeparateFiles" Margin="34,0,0,26" Selector.Selected="radioButtons_Click" HorizontalAlignment="Left" Width="199" Height="44" VerticalAlignment="Bottom" d:LayoutOverrides="HorizontalAlignment" FontSize="25">
+                    <RadioButton.Foreground>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}"/>
+                    </RadioButton.Foreground>
+                </RadioButton>
+                <RadioButton Content="CloseLogFiles" Margin="0,19,34,0" Selector.Selected="radioButtons_Click" HorizontalAlignment="Right" Width="248" Height="57" VerticalAlignment="Top" FontSize="25">
+                    <RadioButton.Foreground>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}"/>
+                    </RadioButton.Foreground>
+                </RadioButton>
+                <RadioButton Content="RemoveLogFile" Margin="0,0,25,26" Selector.Selected="radioButtons_Click" Height="49" VerticalAlignment="Bottom" FontSize="25" d:LayoutOverrides="VerticalAlignment" HorizontalAlignment="Right" Width="257">
+                    <RadioButton.Foreground>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}"/>
+                    </RadioButton.Foreground>
+                </RadioButton>
+            </Grid>
+        </GroupBox>
+        <TextBox x:Name="txt_Input" Margin="129,351,113,0" FontSize="25" Text="type some input..." Height="46" VerticalAlignment="Top" BorderThickness="5,2,5,2">
+            <TextBox.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}"/>
+            </TextBox.Foreground>
+        </TextBox>
+        <Button x:Name="btn_Input" Content="Read Line" Margin="61,351,0,37" Click="StartReadingStdIn" HorizontalAlignment="Left" Width="68" d:LayoutOverrides="HorizontalAlignment"/>
+        <Button x:Name="btn_Getch" Content="Get Chars" Margin="0,0,36,37" Click="GetCharOnStdIn" Height="46" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="77"/>
+    </Grid>
+</Window>

@@ -67,7 +67,9 @@
   <ItemGroup>
     <Reference Include="Consola">
       <HintPath>$(BaseOutputPath)$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
-    <Private>True</Private>
+      <Private>True</Private>
+	  <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </Reference>
   </ItemGroup>
 

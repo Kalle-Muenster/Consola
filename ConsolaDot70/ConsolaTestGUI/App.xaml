@@ -1,0 +1,9 @@
+﻿<Application x:Class="ConsolaTestGUI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ConsolaTestGUI"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+    <ImageSource x:Key="Icon">pack://application,,,/Resources/obstacle.ico</ImageSource>
+    </Application.Resources>
+</Application>

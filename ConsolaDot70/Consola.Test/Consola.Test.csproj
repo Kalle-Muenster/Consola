@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseOutputPath>§(ProjectDir)..\..\bin\dot70</BaseOutputPath>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(ProjectDir)..\..\Consola.snk</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Consola.Test</Title>
+    <Version>$(ConsolaVersionString)</Version>
+    <PackageProjectUrl>https://github.com/Kalle-Muenster/Consola</PackageProjectUrl>
+    <PackageIcon>obstacle.png</PackageIcon>
+    <PackageReadmeFile>Readme.MD</PackageReadmeFile>
+    <RepositoryUrl>http://eve:61900/!/#Consola</RepositoryUrl>
+    <RepositoryType>svn</RepositoryType>
+    <AssemblyVersion>$(ConsolaVersionString)</AssemblyVersion>
+    <FileVersion>$(ConsolaVersionNumber)</FileVersion>
+    <AssemblyName>Consola.Test</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Readme.MD">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Consola">
+      <HintPath>..\..\..\bin\dot70\$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="karen.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -217,9 +217,6 @@ uint _writeSystemArrayToStdtStream( uint direction, array<T>^ data, int oset, ul
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-// loose functions to be asynchronuosly executed
-
 const char*
 Consola::Utility::merge( const char* a, const char* b )
 { pool_scope
@@ -229,6 +226,9 @@ Consola::Utility::merge( const char* a, const char* b )
 
 return pool_merge(2); }
 
+
+////////////////////////////////////////////////////////////////////////////
+// loose functions to be asynchronuosly executed
 
 void
 Consola::StdStream::asynchronStreamWrite( Object^ taskData )
@@ -853,7 +853,7 @@ Consola::StdInp::ReadTill( Object^ termi )
     } else {
         return ReadTill( termi->ToString() );
        // if some array of class objects ... either call ToString() on each element and concatanate all to one long string
-       // or mayse serialize each element to bynary data structure representing its member field and property values for concatanating a byte[]
+       // or maybe serialize each element to bynary data structure representing its member field and property values for concatanating a byte[]
     }
 
     System::Text::StringBuilder^ buildi = gcnew System::Text::StringBuilder(0);

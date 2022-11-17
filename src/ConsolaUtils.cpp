@@ -25,9 +25,11 @@ using namespace   System::Collections::Generic;
 #include <enumoperators.h>
 
 
-typedef Dictionary<String^,String^> StringDict;
-typedef Tuple<StringDict^,StringBuilder^,Delegate^,Consola::Utility::Flags> ParameterTuple;
+using StringDict = Dictionary<String^,String^>;
+using ParameterTuple = Tuple<StringDict^,StringBuilder^,Delegate^,Consola::Utility::Flags>;
 
+static const char verstring[] = CONSOLA_VERSION_STRING;
+static const uint vernumber   = CONSOLA_VERSION_NUMBER;
 
 
 /*------------------------- Consola::Utility HelperFunctions ----------------------------*/
@@ -45,7 +47,7 @@ _performSystemCall( String^ command )
         pin_ptr<byte> wrkptr(&Wrk[0]);
         const char* wrk = (const char*)wrkptr;
         uint val = Consola::StdStream::keygenerator->Next(_CRT_INT_MAX);
-        while ( !Consola::StdStream::Inp->lockup(val) ) {
+        while ( !Consola::StdStream::Inp->lockup( val ) ) {
             Thread::Sleep( THREAD_WAITSTATE_CYCLE_TIME * 5 );
         } cmd = Consola::Utility::merge( wrk, cmd );
         Consola::StdStream::Inp->unlock( val );
@@ -72,7 +74,7 @@ _evaluateParameters( array<Object^>^ args, Consola::Utility::Flags flags )
              parameters = gcnew System::Text::StringBuilder( args[0]->ToString() );
          }
          else if (args[x]->GetType() == Dictionary<String^,String^>::typeid) {
-             environment = safe_cast<Dictionary<String^, String^>^>( args[x] );
+             environment = safe_cast<Dictionary<String^,String^>^>( args[x] );
          }
          else if (args[x]->GetType() == Consola::Utility::ProcessFinishedDelegate::typeid) {
              onexit = safe_cast<Consola::Utility::ProcessFinishedDelegate^>( args[x] );
@@ -91,17 +93,18 @@ _instanciateNewProcess( String^ cmd, Consola::Utility::Flags flg, StringDict^ en
         ? gcnew System::Diagnostics::ProcessStartInfo( cmd, arg->ToString() )
         : gcnew System::Diagnostics::ProcessStartInfo( cmd );
 
-    info->RedirectStandardOutput = !enum_utils::hasFlag(flg, Consola::Utility::Flags::Detached);
-    info->RedirectStandardError = !enum_utils::hasFlag(flg, Consola::Utility::Flags::Detached);
-    info->CreateNoWindow = enum_utils::hasFlag(flg, Consola::Utility::Flags::Hidden);
-    info->UseShellExecute = enum_utils::hasFlag(flg, Consola::Utility::Flags::Shell);
+    bool attached = !enum_utils::hasFlag( flg, Consola::Utility::Flags::Detached );
+    info->RedirectStandardOutput = attached;
+    info->RedirectStandardError = attached;
+    info->CreateNoWindow = enum_utils::hasFlag( flg, Consola::Utility::Flags::Hidden );
+    info->UseShellExecute = enum_utils::hasFlag( flg, Consola::Utility::Flags::Shell );
     info->WorkingDirectory = Consola::StdStream::Cwd;
 
     if( env ) {
         IEnumerator<KeyValuePair<String^,String^>>^ it = env->GetEnumerator();
         while( it->MoveNext() ) {
-#ifdef Dotnet6Build
-            info->EnvironmentVariables->Add(it->Current.Key, it->Current.Value); 
+#ifdef DotnetVersion >= 6
+            info->EnvironmentVariables->Add( it->Current.Key, it->Current.Value ); 
 #else
             info->Environment->Add(it->Current.Key, it->Current.Value);
 #endif
@@ -111,9 +114,9 @@ _instanciateNewProcess( String^ cmd, Consola::Utility::Flags flg, StringDict^ en
     System::Diagnostics::Process^ proc = gcnew System::Diagnostics::Process();
     proc->StartInfo = info;
 
-    if (!enum_utils::hasFlag(flg, Consola::Utility::Flags::Detached)) {
+    if( attached ) {
         proc->EnableRaisingEvents = true;
-        if (!enum_utils::hasFlag(flg, Consola::Utility::Flags::Hidden)) {
+        if( !enum_utils::hasFlag( flg, Consola::Utility::Flags::Hidden ) ) {
             proc->ErrorDataReceived += Consola::StdStream::Err->GetDelegate();
             proc->OutputDataReceived += Consola::StdStream::Out->GetDelegate();
         } 
@@ -126,14 +129,13 @@ _instanciateNewProcess( String^ cmd, Consola::Utility::Flags flg, StringDict^ en
 unsigned
 Consola::Utility::VersionNumber::get(void)
 {
-    return CONSOLA_VERSION_NUMBER;
+    return vernumber;
 }
 
 String^
 Consola::Utility::VersionString::get(void)
 {
-    const char vers[] = CONSOLA_VERSION_STRING;
-    return gcnew String( vers, 0, 7 );
+    return gcnew String( verstring, 0, 7 );
 }
 
 System::String^
@@ -225,7 +227,6 @@ Consola::Utility::CommandLine( String^ command )
 {
     return CommandLine( command, Flags::Simple );
 }
-
 
 void
 Consola::Utility::ended( Object^ sender, EventArgs^ e )
