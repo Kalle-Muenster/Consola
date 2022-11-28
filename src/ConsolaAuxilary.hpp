@@ -90,12 +90,12 @@ namespace Consola
         void    NewScope( State newScope );
         void    NewScope( State newScope, bool closeActualScope );
 
-        void closeLog(void) override {
+        void closeLog( void ) override {
             while( statesCount > 0 && scope > State::NoScope ) {
                 CloseScope();
             }
         }
-
+        
         virtual property LogWriter^ Log {
             LogWriter^ get(void) override;
             void set(LogWriter^ logger) override;

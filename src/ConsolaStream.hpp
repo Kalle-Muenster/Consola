@@ -9,7 +9,7 @@
 #define _ConsolaStream_hpp_
 
 using namespace System::Runtime;
-
+using namespace System::Text;
 
 namespace Consola
 {
@@ -131,6 +131,7 @@ namespace Consola
 
         const uint    dir;
         LogWriter^    log;
+        Encoding^     enc;
 
                       StdStream( Direction );
 

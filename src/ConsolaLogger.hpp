@@ -29,22 +29,19 @@ namespace Consola
         static int  stopt( String^ name );
         static void loggt_not( int idx, bool deleteFile );
 
-    internal: 
-        LogWriter( Stream^ filestream )
-            : StreamWriter(filestream,
-                System::Text::Encoding::Default,
-                sizeOfPoolInstance(), false ) {
+    internal:
+        LogWriter( Stream^ filestream, System::Text::Encoding^ encoding )
+            : StreamWriter(filestream, encoding, sizeOfPoolInstance(), false) {
         }
-        LogWriter( String^ fileName, bool append )
-            : StreamWriter(fileName, append,
-                System::Text::Encoding::Default,
-                sizeOfPoolInstance() ) {
+        LogWriter( String^ fileName, bool append, System::Text::Encoding^ encoding )
+            : StreamWriter(fileName, append, encoding, sizeOfPoolInstance()) {
         }
+
     public:
-        static LogWriter^ AddLog(String^ name);
-        static LogWriter^ NewLog(String^ name);
-        static void       DelLog(String^ name);
-        static void       Notlog(String^ name);
+        static LogWriter^ AddLog( String^ name, System::Text::Encoding^ encoding );
+        static LogWriter^ NewLog( String^ name, System::Text::Encoding^ encoding );
+        static void       DelLog( String^ name );
+        static void       Notlog( String^ name );
 
         LogWriter^ operator << ( Object^ obj ){
             this->Write( obj->ToString() );

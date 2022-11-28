@@ -61,30 +61,32 @@ Consola::LogWriter::loggt( void )
 }
 
 Consola::LogWriter^
-Consola::LogWriter::AddLog( String^ name )
+Consola::LogWriter::AddLog( String^ name, System::Text::Encoding^ encoding )
 {
     const int len = loggt();
     Infos[len] = gcnew FileInfo( name );
-    Files[len] = gcnew LogWriter( Infos[len]->FullName, true );
+    Files[len] = gcnew LogWriter( Infos[len]->FullName, true, encoding );
     return Files[len];
 }
 
 Consola::LogWriter^
-Consola::LogWriter::NewLog( String^ name )
+Consola::LogWriter::NewLog( String^ name, System::Text::Encoding^ encoding )
 {
     const int len = loggt();
     Infos[len] = gcnew FileInfo( name ); 
-    Files[len] = gcnew LogWriter( Infos[len]->FullName, false );
+    Files[len] = gcnew LogWriter( Infos[len]->FullName, false, encoding );
     return Files[len];
 }
 
 void
-Consola::LogWriter::DelLog( String^ name ) {
+Consola::LogWriter::DelLog( String^ name )
+{
     loggt_not( stopt( name ), true );
 }
 
 void
-Consola::LogWriter::Notlog( String^ name ) {
+Consola::LogWriter::Notlog( String^ name )
+{
     loggt_not( stopt( name ), false );
 }
 

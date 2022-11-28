@@ -40,9 +40,10 @@ Consola::AuxilaryStream::~AuxilaryStream()
     extendRaum( typ, Direction::Out );
 }
 
-Consola::AuxXml::AuxXml(void)
+Consola::AuxXml::AuxXml( void )
     : AuxilaryStream( byteOrder_stringTOfourCC("Xml") )
 {
+    enc = Encoding::UTF8;
     scope = State::NoScope;
     state = nullptr;
     states = gcnew array<String^>(5);
@@ -60,7 +61,7 @@ Consola::AuxilaryStream::Xml::get(void)
 }
 
 int
-Consola::AuxilaryStream::extendRaum( unsigned des, Direction how) {
+Consola::AuxilaryStream::extendRaum( unsigned des, Direction how ) {
     int size = 0;
     array<AuxilaryStream^>^ raumExtender = nullptr;
     array<unsigned>^ nameExtender = nullptr;
@@ -102,7 +103,7 @@ Consola::AuxXml::WriteContent( System::String^ format, ...array<Object^>^ textco
     if( scope != State::Content ) {
         NewScope(State::Content);
     }
-    Log->Write( String::Format( format, textcontent )->Replace( '<', '[' )->Replace( '>', ']' ) );
+    Log->Write( String::Format( format, textcontent )->Replace( "<", "&lt;" )->Replace( ">", "&gt;" ) );
     Log->Flush();
     content = true;
     notabs = true;
@@ -121,12 +122,12 @@ Consola::AuxXml::WriteElement( String^ tagname, ...array<String^>^ attribute )
     if( attribute->Length == 0 ) log->Flush();
     for( int i = 0; i < attribute->Length; ++i ) {
         String^ a = attribute[i]->ToString();
-        if( a->Contains("=") ) {
+        if( a->Contains( "=" ) ) {
             array<String^>^ kv = a->Split( '=' );
-            WriteAttribute( kv[0], kv->Length > 1
-                          ? kv[1]: nullptr );
+            WriteAttribute( kv[0]->Replace("<", "_")->Replace(">", "_"), kv->Length > 1
+                          ? kv[1]->Replace("<", "&lt;")->Replace(">", "&gt;") : nullptr );
         } else {
-            WriteAttribute( a, nullptr );
+            WriteAttribute( a->Replace("<", "_")->Replace(">", "_"), nullptr );
         }
     } return this;
 }
@@ -156,7 +157,7 @@ Consola::AuxXml::WriteComment( String^ format, ...array<Object^>^ optjects )
     if( !enum_utils::hasFlag( scope, State::Comment ) ) {
         NewScope( State::Comment, false );
         TABS; log->Write( "<!-- " );
-    } log->Write( format, optjects );
+    } log->Write( String::Format( format, optjects )->Replace('<','_')->Replace('>','_') );
     log->Flush();
     return this;
 }
@@ -166,8 +167,8 @@ Consola::AuxXml::WriteAttribute( String^ name, Object^ value )
 {
     if (scope == State::Element) scope = State::Attribute;
     if (scope == State::Attribute) {
-        log->Write( " " + name );
-        if ( value ) log->Write( "=\"" + value->ToString() + "\"" );
+        log->Write( " " + name->Replace('<','_')->Replace('>','_') );
+        if ( value ) log->Write( String::Format( "=\"{0}\"", value->ToString()->Replace("<","&lt;")->Replace(">","&gt;") ) );
         log->Flush();
     } return this;
 }
@@ -250,13 +251,12 @@ Consola::AuxXml::NewScope( State newScope, bool closeActual )
         scope = State::Document;
         log->Write( "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" );
     } bool closeCurrentScope = false;
-
     switch( scope ) {
     case State::Attribute:
         if( !enum_utils::anyFlag( State::Content|State::Comment|State::Element, newScope ) ) {
             log->Write( "/" ); 
         } log->Write( ">" );
-        if ( !enum_utils::hasFlag( newScope, State::Content ) ) log->Write("\n");
+        if ( !enum_utils::hasFlag( newScope, State::Content ) ) log->Write( "\n" );
         log->Flush();
         break;
     case State::Element:

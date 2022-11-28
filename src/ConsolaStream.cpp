@@ -381,7 +381,7 @@ uint Consola::StdStream::asynchronRawDataRead( Object^ taskData )
 
 // --- class member definitions: ---------------------
 
-Consola::StdStreams::StdStreams(void)
+Consola::StdStreams::StdStreams( void )
     : StdStream( Direction::Non )
 {
     nam = Utility::NameOfTheCommander() + "_{0}.log";
@@ -389,7 +389,7 @@ Consola::StdStreams::StdStreams(void)
 }
 
 Consola::StdStreams::StdStreams( Consola::CreationFlags createConsole )
-    : StdStream(Direction::Non)
+    : StdStream( Direction::Non )
 {
     nam = Utility::NameOfTheCommander() + "_{0}.log";
     StdStream::Init( createConsole );
@@ -397,7 +397,8 @@ Consola::StdStreams::StdStreams( Consola::CreationFlags createConsole )
 
 Consola::StdStream::StdStream( Direction dir )
     : dir((uint)dir)
-    , log(nullptr) {
+    , log(nullptr)
+    , enc(Encoding::Default) {
     if( dir == Direction::Inp || dir == Direction::Non ) { pool_scope
         if( keygenerator == nullptr ) keygenerator
             = gcnew Random( (int)DateTime::Now.Ticks );
@@ -557,9 +558,9 @@ Consola::StdStream::createLog()
     if( log == nullptr ) {
         String^ logfileName = String::Format(nam, (Direction)dir);
         if ( !loggingstate.HasFlag( Consola::CreationFlags::CreateLog ) ) {
-            log = LogWriter::AddLog( logfileName );
+            log = LogWriter::AddLog( logfileName, enc );
         } else {
-            log = LogWriter::NewLog( logfileName );
+            log = LogWriter::NewLog( logfileName, enc );
         } log->AutoFlush = false;
     } return log;
 }
@@ -895,7 +896,7 @@ Consola::StdInp::Read( IntPtr dst, uint cbOffset, uint cbSize )
 }
 
 int
-Consola::StdInp::CanRead(void)
+Consola::StdInp::CanRead( void )
 {
     int val = 0;
     uint key = keygenerator->Next( INT_MAX );
