@@ -73,7 +73,7 @@ namespace Consola.Test
     /// - for a WPF application the MainWindow class. 
     /// 
     /// - other solutions like classes which offer access to the AUT
-    ///   via some kind of remote protocol may be appropriate also,.. 
+    ///   via meta or mirror objects synched via remote protocol,.. 
     /// 
     /// If using a Form or Window class accessing it from another thread
     /// will get a little bit tricky (most controls deny being accessed
@@ -132,7 +132,7 @@ namespace Consola.Test
         }
 
         public Suite( T aut, bool logall, bool logxml )
-            : base(logall, logxml)
+            : base( logall, logxml )
         {
             Aut = aut;
             Win = GetWindowArea();
@@ -140,7 +140,7 @@ namespace Consola.Test
 
         protected override void OnCleanUp()
         {
-            // auto closes the AUT on test end by cllicking 'X'
+            // auto close the AUT on test end by cllicking 'X'
             ConTrol.Click( ConTrol.Button.L, GetXButton() );
         }
     }
@@ -157,7 +157,7 @@ namespace Consola.Test
         private ParameterizedThreadStart los;
 
         public Runner( T suite )
-        : this(suite, ApartmentState.STA)
+        : this( suite, ApartmentState.STA )
         {
         }
 
@@ -173,7 +173,7 @@ namespace Consola.Test
         public Runner<A,T> Start()
         {
             if( Completed ) Reset();
-            run.Start(tst);
+            run.Start( tst );
             return this;
         }
 
@@ -226,17 +226,5 @@ namespace Consola.Test
                 Thread.Sleep( 100 );
             } return tst;
         }
-
-        /*
-        public static Runner<A,T> CreateTestRunner( T SuiteInstance )
-        {
-            return CreateTestRunner( SuiteInstance, ApartmentState.STA );
-        }
-
-        public static Runner<A,T> CreateTestRunner( T SuiteInstance, ApartmentState StateOfTheAut )
-        {
-            return new Runner<A,T>( SuiteInstance, StateOfTheAut );
-        }
-        */
     }
 }

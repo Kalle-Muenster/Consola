@@ -81,7 +81,7 @@
     <OutDir>$(ProjectDir)..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\</OutDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>Consola</TargetName>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -93,7 +93,7 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Consola</TargetName>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <WindowsMetadataLinkKeyFile>
     </WindowsMetadataLinkKeyFile>
     <LinkDelaySign>false</LinkDelaySign>
@@ -105,7 +105,7 @@
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>Consola</TargetName>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -115,7 +115,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
     <TargetName>Consola</TargetName>
-    <LinkKeyFile>$(ProjectDir)..\Consola.snk</LinkKeyFile>
+    <LinkKeyFile>$(ProjectDir)..\..\Consola.snk</LinkKeyFile>
     <LinkDelaySign>false</LinkDelaySign>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -11,7 +11,8 @@ namespace Consola
             TextOutput = 0, Verbose = 0x00000001u, XmlOutput= 0x00000002u,
             SkipOnError = 4u, SkipOnFails = 8u, IsRunning = 0x00000010u,
             PASS = 1397965136u, FAIL = 1279869254u, SKIP = 1346980691u,
-            NONE = 1162760014u, INFO = 1330007625u, FATAL = NONE
+            NONE = 1162760014u, INFO = 1330007625u, TimeStamps = 0x80000000u,
+            FATAL = NONE
         } 
 
 
@@ -19,7 +20,7 @@ namespace Consola
         {
             internal class CaseContainer
             {
-                private static Dictionary<string,CaseContainer> caselist;
+                private static Dictionary<string,CaseContainer> list;
                 private Test   test;
                 private Action call;
                 private string name;
@@ -27,7 +28,7 @@ namespace Consola
 
                 static CaseContainer()
                 {
-                    caselist = new Dictionary<string, CaseContainer>();
+                    list = new Dictionary<string,CaseContainer>();
                 }
 
                 public CaseContainer( Test testrun, Action casefunc, string testcase, bool skiptest )
@@ -36,7 +37,7 @@ namespace Consola
                     call = casefunc;
                     name = testcase;
                     skip = skiptest;
-                    caselist.Add(name, this);
+                    list.Add( name, this );
                 }
 
                 public void RunTestCase()
@@ -47,15 +48,13 @@ namespace Consola
                         if( skip )
                             test.SkipNextTest =
                             failed > 0;
-                    } caselist.Remove( name );
+                    } list.Remove( name );
                 }
             }
 
-            private const uint Completed = 0xffffff00u;
             private uint step = 0;
             private int count = -1;
             private int failures = -1;
-            protected TestResults flags = 0;
             private TestResults conf = 0; 
             private string current;
             private int skiperror;
@@ -65,21 +64,25 @@ namespace Consola
             private int runId = -1;
             private List<string> errors = new List<string>();
             private Action StepsList;
-            public event Action TestRun;
             private readonly string testsuite;
             private int repeats = 0;
 
+            private const uint   Completed = 0x7fffff00u;
             private const string SingleLine = "---------------------------------------------------------------------";
             private const string DoubleLine = "=====================================================================";
             private const string HashLine   = "#####################################################################";
-            private const string StepForm = "{0} [{1}.{2}]: {3}";
+            private const string StepForm = "{0} [{1}.{2}]{4}: {3}";
             private const string STEPINFO = "stepinfo";
+            private const string TIMESTAMP = "timestamp";
             private const string TESTCASE   = "testcase";
             private const string CASERESULT = "caseresult";
             private const string TESTSTEP   = "teststep";
             private const string STEPRESULT = "stepresult";
             private const string TESTSUITE  = "testsuite";
             private const string SUITERESULT = "suiteresult";
+
+            protected TestResults flags = 0;
+            public event Action   TestRun;
 
             private static string NextCaseHeader( string nextcase )
             {
@@ -89,32 +92,50 @@ namespace Consola
 
             private static void WriteXmlStepEntry( TestResults result, uint casenum, int stepnum, string description )
             {
+                string timestomp;
+                if( result.HasFlag( TestResults.TimeStamps ) ) {
+                    DateTime time = DateTime.Now;
+                    timestomp = $"{time.Hour,2:D2}:{time.Minute,2:D2}:{time.Second,2:D2}.{time.Millisecond,3:D3}";
+                    if( result != TestResults.TimeStamps )
+                        result &= ~TestResults.TimeStamps;
+                } else {
+                    timestomp = string.Empty;
+                }
+
                 switch( result ) {
                     case TestResults.INFO: {
                         StdStream.Aux.Xml.WriteElement( STEPINFO,
-                            new string[]{ $"related={TESTSTEP}-{casenum}.{stepnum}" }
+                            new string[]{ $"{TESTSTEP}={casenum}.{stepnum}" }
                         ).WriteContent( description ).CloseScope();
                     } break;
+                    case TestResults.TimeStamps: {
+                        StdStream.Aux.Xml.WriteElement( TIMESTAMP,
+                            new string[] { $"{TESTSTEP}={casenum}.{stepnum}" }
+                        ).WriteContent( timestomp ).CloseScope();
+                    } break;
                     case TestResults.FATAL: {
-                        StdStream.Aux.Xml.WriteElement( "error" ) 
-                                       .WriteAttribute( "number", $"{casenum}.{stepnum}" )
-                                         .WriteContent( description )
+                        string[] attr = timestomp.Length > 0
+                                      ? new string[]{ $"number={casenum}.{stepnum}", $"time={timestomp}" }
+                                      : new string[]{ $"number={casenum}.{stepnum}" };
+                        StdStream.Aux.Xml.WriteElement( "error", attr ).WriteContent( description )
                                            .CloseScope( "error" );
                     } break;
                     default: {
-                        StdStream.Aux.Xml.WriteElement( TESTSTEP )
-                                       .WriteAttribute( "number", $"{casenum}.{stepnum}" );
-                        if( description.Length > 0 )
+                        string[] attr = timestomp.Length > 0
+                                      ? new string[]{ $"number={casenum}.{stepnum}", $"time={timestomp}" }
+                                      : new string[]{ $"number={casenum}.{stepnum}" };
+                        StdStream.Aux.Xml.WriteElement( TESTSTEP, attr );
+                            if( description.Length > 0 )
                             StdStream.Aux.Xml.WriteElement( STEPINFO )
                                              .WriteContent( description );
-                        StdStream.Aux.Xml.WriteElement( STEPRESULT )
-                                         .WriteContent( result.ToString() )
-                                           .CloseScope( TESTSTEP );
+                            StdStream.Aux.Xml.WriteElement( STEPRESULT )
+                                             .WriteContent( result.ToString() )
+                        .CloseScope( TESTSTEP );
                     } break;
                 }
             }
 
-            private static void WriteXmlCaseResult( uint casenum, string casename, int failed, int total, int skips )
+            private static void WriteXmlCaseResult( int failed, int total, int skips )
             {
                 TestResults result = failed == 0 ?
                      total > skips ? TestResults.PASS 
@@ -122,7 +143,6 @@ namespace Consola
                                    : TestResults.FAIL;
 
                 StdStream.Aux.Xml.WriteElement( CASERESULT, new string[] {
-                    //$"{TESTCASE}={casenum}-{casename}",
                     $"skipped={skips}", $"passed={total-(skips+failed)}", $"failed={failed}" }
                 ).WriteContent( result.ToString() ).CloseScope( TESTCASE );
             }
@@ -130,14 +150,26 @@ namespace Consola
             private static void WriteLogEntry( TestResults result, TestResults flags, uint casenum, int stepnum, string msgtext )
             {
                 if( msgtext == null ) msgtext = string.Empty;
+                result |= ( flags & TestResults.TimeStamps );
+
                 if ( flags.HasFlag( TestResults.XmlOutput ) ) {
                     WriteXmlStepEntry( result, casenum, stepnum, msgtext );
                 }
-                if ( result == TestResults.FAIL || result == TestResults.FATAL ) {
-                    StdStream.Err.WriteLine( StepForm, result, casenum, stepnum, msgtext );
-                    StdStream.Out.Log.WriteLine( StepForm, result, casenum, stepnum, msgtext );
+
+                string timestomp = string.Empty;
+                if( result.HasFlag( TestResults.TimeStamps ) ) {
+                    DateTime time = DateTime.Now;
+                    timestomp = $"[{time.Hour,2:D2}:{time.Minute,2:D2}:{time.Second,2:D2}.{time.Millisecond,3:D3}]";
+                    if( result != TestResults.TimeStamps ) {
+                        result &= ~TestResults.TimeStamps;
+                    }
+                }
+
+                if ( result.HasFlag( TestResults.FAIL ) || result.HasFlag( TestResults.FATAL ) ) {
+                    StdStream.Err.WriteLine( StepForm, result, casenum, stepnum, msgtext, timestomp );
+                    StdStream.Out.Log.WriteLine( StepForm, result, casenum, stepnum, msgtext, timestomp );
                 } else {
-                    StdStream.Out.WriteLine( StepForm, result, casenum, stepnum, msgtext );
+                    StdStream.Out.WriteLine( StepForm, result, casenum, stepnum, msgtext, timestomp );
                 }
             }
 
@@ -162,7 +194,7 @@ namespace Consola
                     WriteLogEntry( TestResults.FAIL, flags, step, count, description );
                     return ++failures - failsgone;
                 } else {
-                    description = String.Format("CASE [{0}, {1} Tests FAILED", step, description);
+                    description = String.Format( "CASE [{0}, {1} Tests FAILED", step, description );
                     StdStream.Err.WriteLine( SingleLine );
                     StdStream.Err.WriteLine( description );
                     StdStream.Out.Log.WriteLine( SingleLine );
@@ -218,10 +250,17 @@ namespace Consola
             /// it doesn't generates any result, but logs an info message </summary>
             /// <param name="message"> message to be logged (resolves contained '{}' format tags) </param>
             /// <param name="fmtargs"> optionally replacement arguments to be resolved in message text </param>
-            public void InfoStep( string fmt, params object[] args )
+            public void StepInfo( string fmt, params object[] args )
             {
-                if( flags > TestResults.TextOutput ) {
-                    WriteLogEntry( TestResults.INFO, flags, step, count+1, string.Format(fmt,args) );
+                if( flags.HasFlag( TestResults.Verbose ) ) {
+                    WriteLogEntry( TestResults.INFO, flags, step, count+1, string.Format( fmt, args ) );
+                }
+            }
+
+            public void StepTime()
+            {
+                if( flags.HasFlag( TestResults.Verbose ) ) {
+                    WriteLogEntry( TestResults.TimeStamps, flags, step, count+1, string.Empty );
                 }
             }
 
@@ -291,10 +330,9 @@ namespace Consola
                 );
             }
 
-
+           
             // flow control
-            public bool SkipOnFails
-            {
+            public bool SkipOnFails {
                 get { return skipfails >= 0; }
                 set { if (value != SkipOnFails) {
                         skipfails = value ? 0 : -1;
@@ -303,8 +341,7 @@ namespace Consola
                 }
             }
 
-            public bool SkipOnError
-            {
+            public bool SkipOnError {
                 get { return skiperror >= 0; }
                 set { if (value != SkipOnError) {
                         skiperror = value ? 0 : -1;
@@ -323,18 +360,22 @@ namespace Consola
                 set { repeats = value; }
             }
 
-            public string CurrentCase
-            {
-                get { return current; }
+            public (string Name, uint Number) CurrentCase {
+                get { return (current, step); }
             }
 
-            public int RunsExecuted
-            {
-                get { return runId; }
+            public int CurrentStep {
+                get { return count + 1; }
             }
 
             public bool Running {
                 get { return ( (uint)flags & Completed ) == 0; }
+            }
+
+
+            // result details
+            public int RunsExecuted {
+                get { return runId; }
             }
 
             public bool Verbose {
@@ -343,7 +384,11 @@ namespace Consola
                       else flags &= ~TestResults.Verbose; }
             }
 
-            // result details
+            public bool TimesStamps {
+                get { return ( flags & TestResults.TimeStamps ) != 0; }
+                set { if( value ) flags |= TestResults.TimeStamps;
+                      else flags &= ~TestResults.TimeStamps; }
+            }
             public TestResults Results {
                 get { return flags; }
                 set { flags = value; }
@@ -356,10 +401,10 @@ namespace Consola
 
             public bool hasPassed()
             {
-                return !(hasFailed() || wasErrors());
+                return !(hasFailed() || hasCrashed());
             }
 
-            public bool wasErrors()
+            public bool hasCrashed()
             {
                 return errors.Count > 0;
             }
@@ -409,14 +454,14 @@ namespace Consola
                 failsgone = failures;
                 int returnval = gones;
                 if( successive ) {
-                    if (xml) WriteXmlCaseResult( step, current, 0, total, gones );
+                    if (xml) WriteXmlCaseResult( 0, total, gones );
                     returnval = setPassed( string.Format( "{0}]: {1}", current, total ) );
                 } else {
                     if( gones == 0 ) {
-                        if (xml) WriteXmlCaseResult( step, current, gones, total, total );
+                        if (xml) WriteXmlCaseResult( gones, total, total );
                         setSkipped( string.Format( "{0}]: {1}", current, total ) );
                     } else {
-                        if (xml) WriteXmlCaseResult( step, current, gones, total, 0 );
+                        if (xml) WriteXmlCaseResult( gones, total, 0 );
                         if (Verbose) {
                             returnval = setFailed( string.Format( "{0}]: {1}", current, gones ) );
                         }
@@ -441,7 +486,7 @@ namespace Consola
 
             protected int SkipCase( string casename )
             {
-                string previous = CurrentCase;
+                string previous = current;
                 NextCase( casename );
                 SkipStep( "depending on {0}", previous );
                 return CloseCase( false );
@@ -453,9 +498,10 @@ namespace Consola
             }
             public Test( TestResults flags ) 
                 : this( flags.HasFlag( TestResults.Verbose ),
-                        flags.HasFlag( TestResults.XmlOutput ) ) {
+                        flags.HasFlag( TestResults.XmlOutput ),
+                        flags.HasFlag( TestResults.TimeStamps ) ) {
             }
-            public Test( bool logall, bool logxml )
+            public Test( bool logall, bool logxml, bool stamps )
             {
                 testsuite = this.GetType().Name;
                 if( StdStream.CreationFlags == CreationFlags.None ) {
@@ -466,11 +512,13 @@ namespace Consola
                 TestResults   config  = TestResults.TextOutput;
                 if ( logall ) config |= TestResults.Verbose;
                 if ( logxml ) config |= TestResults.XmlOutput;
+                if ( stamps ) config |= TestResults.TimeStamps;
 
-                TestRun += TestSuite;
+                TestRun += OnStartUp;
                 Initialize( config );
             }
-
+            public Test( bool logall, bool logxml ) 
+                 : this( logall, logxml, false ) { } 
 
             private void Initialize( TestResults config )
             {
@@ -514,7 +562,7 @@ namespace Consola
 
             public void AddSection( string name, Action section )
             {
-                TestRun += () => { InfoStep( "Test Section: {0}", name ); section(); };
+                TestRun += () => { StepInfo( "Test Section: {0}", name ); section(); };
             }
 
             public void AddTestCase( string name, Action function )
@@ -566,7 +614,7 @@ namespace Consola
                 if( !Running ) return;
                 bool xml = flags.HasFlag( TestResults.XmlOutput );
                 StdStream.Out.WriteLine( "\n{0}", DoubleLine );
-                if (wasErrors())
+                if( hasCrashed() )
                 {
                     string[] errs = getErrors();
                     StdStream.Out.Log.WriteLine("\n...FATAL {0} Error happend:", errs.Length);
@@ -574,14 +622,14 @@ namespace Consola
                     if (xml)
                         StdStream.Aux.Xml.WriteElement( SUITERESULT, new string[] { $"errors={errs.Length}", "result=NONE" });
                     for (int i = 0; i < errs.Length; ++i) { 
-                        StdStream.Err.WriteLine("ERROR [{0}]: {1}", i, errs[i]);
+                        StdStream.Err.WriteLine( "ERROR [{0}]: {1}", i, errs[i] );
                         if (xml)
                             StdStream.Aux.Xml.WriteElement( "error", new string[] { $"number={i}" } ).WriteContent( errs[i] );
                     } if (xml)
                         StdStream.Aux.Xml.CloseScope( SUITERESULT );
                     flags = TestResults.NONE;
                 }
-                else if (hasPassed())
+                else if( hasPassed() )
                 {
                     StdStream.Out.WriteLine("\n   All Tests PASSED\n");
                     if (xml)
@@ -590,7 +638,7 @@ namespace Consola
                                            .CloseScope( SUITERESULT );
                     flags = TestResults.PASS;
                 }
-                else if (hasFailed())
+                else if( hasFailed() )
                 {
                     StdStream.Err.WriteLine("\nTestrun FAILS total: {0}\n", failures);
                     StdStream.Out.Log.WriteLine("\nTestrun FAILS total: {0}\n", failures);
@@ -640,7 +688,7 @@ namespace Consola
             }
 
             /// <summary> Test.Run()
-            /// call this for starting a test run (returns results)
+            /// call this for starting a test run (it will return results)
             /// ...call it again for running same test once again </summary>
             /// <returns> Test instance with gained results </returns>
             public Test Run()
@@ -659,12 +707,12 @@ namespace Consola
             }
 
             /// <summary>
-            /// overide this for implementing simple testrun function 
+            /// override this for implementing testdata initialization or similar 
             /// </summary>
-            virtual protected void TestSuite() {}
+            virtual protected void OnStartUp() {}
 
             /// <summary>
-            /// overide this for implementing any cleanup logic maybe needed
+            /// override this for implementing any cleanup logic maybe needed
             /// </summary>
             virtual protected void OnCleanUp() {}
         }
