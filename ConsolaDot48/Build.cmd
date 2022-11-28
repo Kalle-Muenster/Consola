@@ -9,8 +9,8 @@ set _root_=%CD%
 
 
 :: Set Version
-set ConsolaVersionNumber=00000107
-set ConsolaVersionString=0.0.1.7
+set ConsolaVersionNumber=00000108
+set ConsolaVersionString=0.0.1.8
 set DotNetVersionString=dot48
 set _tool_=v142
 
