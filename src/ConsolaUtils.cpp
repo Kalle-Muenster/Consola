@@ -103,7 +103,7 @@ _instanciateNewProcess( String^ cmd, Consola::Utility::Flags flg, StringDict^ en
     if( env ) {
         IEnumerator<KeyValuePair<String^,String^>>^ it = env->GetEnumerator();
         while( it->MoveNext() ) {
-#ifdef DotnetVersion >= 6
+#if DotnetVersion >= 6
             info->EnvironmentVariables->Add( it->Current.Key, it->Current.Value ); 
 #else
             info->Environment->Add(it->Current.Key, it->Current.Value);
