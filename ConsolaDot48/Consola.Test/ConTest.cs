@@ -52,6 +52,20 @@ namespace Consola
                 }
             }
 
+            public class CaseName
+                : Tuple<string,uint>
+            {
+                public string Name {
+                    get { return Item1; }
+                }
+                public uint Number {
+                    get { return Item2; }
+                }
+                public CaseName( string item1, uint item2 )
+                    : base( item1, item2 )
+                {}
+            }
+
             private uint step = 0;
             private int count = -1;
             private int failures = -1;
@@ -360,8 +374,8 @@ namespace Consola
                 set { repeats = value; }
             }
 
-            public (string Name, uint Number) CurrentCase {
-                get { return (current, step); }
+            public CaseName CurrentCase {
+                get { return new CaseName(current,step); }
             }
 
             public int CurrentStep {

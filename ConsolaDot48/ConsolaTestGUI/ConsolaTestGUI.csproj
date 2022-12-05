@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StdStreamsWFtest</RootNamespace>
     <AssemblyName>StdStreamsWFtest</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -79,7 +79,7 @@
     <ApplicationIcon>WARN.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Consola, Version=0.0.1.7, PublicKeyToken=3a8d8238dbb3e275">
+    <Reference Include="Consola">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
       <Private>False</Private>
