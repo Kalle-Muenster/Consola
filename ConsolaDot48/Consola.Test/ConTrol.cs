@@ -107,13 +107,12 @@ namespace Consola.Test
         public MOUSE_INPUT( ConTrol.Button f ) 
             : this()
         {
-            MFLAGS action = (MFLAGS)((uint)(f &~ (ConTrol.Button.UP|ConTrol.Button.DOWN))
-                                   * (uint)( 1 + (f & ConTrol.Button.UP ) ));
             type = InputType.Mouse;
+            data.dwFlags = (MFLAGS)( (uint)( f &~ (ConTrol.Button.UP|ConTrol.Button.DOWN) )
+                                   * (uint)( 1 + (f & ConTrol.Button.UP ) ) );
             data.dx = 0;
             data.dy = 0;
             data.dw = 0;
-            data.dwFlags = action;
             data.time = 0;
         }
     }
@@ -287,19 +286,19 @@ namespace Consola.Test
         {
             uint count = 2;
             MOUSE_INPUT[] click;
-            MOUSE_INPUT move = new MOUSE_INPUT( Move.Absolute, atX, atY );
             if( ( flags & ( Button.UP | Button.DOWN ) ) == 0 ) {
-                click = new MOUSE_INPUT[3] { move,
+                click = new MOUSE_INPUT[3] {
+                    new MOUSE_INPUT( Move.Absolute, atX, atY ),
                     new MOUSE_INPUT( flags|Button.DOWN ),
                     new MOUSE_INPUT( flags|Button.UP )
                 };
                 count = 3;
             } else {
-                click = new MOUSE_INPUT[2] { move,
+                click = new MOUSE_INPUT[2] { 
+                    new MOUSE_INPUT( Move.Absolute, atX, atY ),
                     new MOUSE_INPUT( flags )
                 };
-            }
-            unsafe {
+            } unsafe {
                 fixed( MOUSE_INPUT* ptr = &click[0] ) {
                     return SendInput( count, new IntPtr(ptr), SizeOf.MOUSE_DATA ) == count;
                 }
@@ -319,7 +318,7 @@ namespace Consola.Test
 
         public static bool Wheel( Wheels flags, int turn, int atX, int atY )
         {
-            MOUSE_INPUT[] evs = new MOUSE_INPUT[2]{
+            MOUSE_INPUT[] evs = new MOUSE_INPUT[2] {
                 new MOUSE_INPUT( ConTrol.Move.Absolute, atX, atY ),
                 new MOUSE_INPUT( flags, turn )
             };

@@ -77,7 +77,7 @@
     <AssemblyOriginatorKeyFile>Consola.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Consola, Version=0.0.1.7, PublicKeyToken=3a8d8238dbb3e275">
+    <Reference Include="Consola">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\dot48\$(PlatformTarget)\$(Configuration)\Consola.dll</HintPath>
       <Private>False</Private>
