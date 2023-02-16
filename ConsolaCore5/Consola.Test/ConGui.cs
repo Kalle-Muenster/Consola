@@ -131,6 +131,13 @@ namespace Consola.Test
             return new ConTrol.Point( ( Win.Point.X+Win.Size.X)-20, Win.Point.Y-10 );
         }
 
+        public Suite( T aut, TestResults flags )
+            : base( flags )
+        {
+            Aut = aut;
+            Win = GetWindowArea();
+        }
+
         public Suite( T aut, bool logall, bool logxml )
             : base( logall, logxml )
         {
