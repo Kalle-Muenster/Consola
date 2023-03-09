@@ -2,12 +2,35 @@
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Reflection;
 
 namespace Consola.Test
 {
     [StructLayout(LayoutKind.Explicit, Size = 8)]
     public struct Area
     {
+        internal static ConstructorInfo[] features;
+        internal static ConstructorInfo[] initTypes()
+        {
+            Assembly motors = Assembly.LoadFrom("TaskAssist.Dll");
+            if( motors != null ) {
+                Type[] args = new Type[]{typeof(int),typeof(int),typeof(int),typeof(int)};
+                return new ConstructorInfo[4] {
+                        motors.GetType("Stepflow.Gui.Geometry.CenterAndScale").GetConstructor(args),
+                        motors.GetType("Stepflow.Gui.Geometry.CornerAndSize").GetConstructor(args),
+                        motors.GetType("Stepflow.Gui.Geometry.AbsoluteEdges").GetConstructor(args),
+                        motors.GetType("Stepflow.Gui.Geometry.Point32").GetConstructor(new Type[2]{ typeof(int),typeof(int)})
+                    };
+            } else return Array.Empty<ConstructorInfo>();
+        }
+
+        static object newRectangle( int x, int y, int w, int h )
+        {
+            if( features.Length > 0 ) {
+                return features[1].Invoke(new object[] { x, y, w, h });
+            } else return new Area(x, y, w, h);
+        }
+
         public static readonly Area Zero = new Area( 0, 0, 0, 0 );
         public static readonly Area Empty = new Area( -1, -1, -1, -1 );
 
@@ -42,9 +65,16 @@ namespace Consola.Test
             Size.data = siz.data;
         }
 
+        public Area( ValueTuple<short, short, short, short> tuple ) : this()
+        {
+            Point.X = (ushort)tuple.Item1;
+            Point.Y = (ushort)tuple.Item2;
+            Size.X = (ushort)tuple.Item3;
+            Size.Y = (ushort)tuple.Item4;
+        }
         public Area At( ConTrol.Point position )
         {
-            return new Area( position, Size );
+            return new Area(position, Size);
         }
 
         public ConTrol.Point Center {
@@ -58,6 +88,11 @@ namespace Consola.Test
                 Point.X = (ushort)( value.X - Size.X / 2 );
                 Point.Y = (ushort)( value.Y - Size.Y / 2 );
             }
+        }
+
+        public static implicit operator ValueTuple<short, short, short, short>( Area cast )
+        {
+            return ((short)cast.Point.X, (short)cast.Point.Y, (short)cast.Size.X, (short)cast.Size.Y);
         }
     }
 
@@ -82,7 +117,8 @@ namespace Consola.Test
     public abstract class Suite<T> : Test where T : class
     {
         // class which provides access to the AUT's internal api
-        protected T Aut;
+        protected T aut;
+        public T Aut { get { return aut; } }
 
         // screen coordinates of the AUTs mainwindow rectangle
         protected Area Win;
@@ -103,7 +139,7 @@ namespace Consola.Test
         // (already pre-implemented) can be used inside implementation then for
         // doing translation of the requested control elements local coordinates
         // to needed global bounds then.
-        abstract protected Area GetScreenArea( object descriptor );
+        abstract protected Area GetElementArea( object descriptor );
 
 
         // must implement retreiving global coordinates of items on a menu strip
@@ -128,31 +164,33 @@ namespace Consola.Test
         virtual protected ConTrol.Point GetXButton()
         {
             Win = GetWindowArea();
-            return new ConTrol.Point( ( Win.Point.X+Win.Size.X)-20, Win.Point.Y-10 );
+            return new ConTrol.Point(( Win.Point.X + Win.Size.X ) - 20, Win.Point.Y - 10);
         }
 
-        public Suite( T aut, TestResults flags )
-            : base( flags )
+        public Suite( T theaut, TestResults flags )
+            : base(flags)
         {
-            Aut = aut;
+            aut = theaut;
             Win = GetWindowArea();
+            Area.features = Area.initTypes();
         }
 
-        public Suite( T aut, bool logall, bool logxml )
-            : base( logall, logxml )
+        public Suite( T theAut, bool logall, bool logxml )
+            : base(logall, logxml)
         {
-            Aut = aut;
+            aut = theAut;
             Win = GetWindowArea();
+            Area.features = Area.initTypes();
         }
 
         protected override void OnCleanUp()
         {
-            // auto close the AUT on test end by cllicking 'X'
-            ConTrol.Click( ConTrol.Button.L, GetXButton() );
+            // auto close the AUT when test ends test by cllicking 'X'
+            ConTrol.Click(ConTrol.Button.L, GetXButton());
         }
     }
 
-    public class Runner<A,T>
+    public class Runner<A, T>
     where T
         : Suite<A>
     where A
@@ -164,7 +202,7 @@ namespace Consola.Test
         private ParameterizedThreadStart los;
 
         public Runner( T suite )
-        : this( suite, ApartmentState.STA )
+        : this(suite, ApartmentState.STA)
         {
         }
 
@@ -172,15 +210,15 @@ namespace Consola.Test
         {
             prc = -1;
             tst = suite;
-            los = new ParameterizedThreadStart( testrun );
-            run = new Thread( los );
-            run.SetApartmentState( StateOfTheAut );
+            los = new ParameterizedThreadStart(testrun);
+            run = new Thread(los);
+            run.SetApartmentState(StateOfTheAut);
         }
 
-        public Runner<A,T> Start()
+        public Runner<A, T> Start()
         {
             if( Completed ) Reset();
-            run.Start( tst );
+            run.Start(tst);
             return this;
         }
 
@@ -200,7 +238,7 @@ namespace Consola.Test
         {
             if( run.ThreadState == ThreadState.Running ) {
                 run.Abort();
-                Thread.Sleep( 10 );
+                Thread.Sleep(10);
                 prc = -1;
             }
         }
@@ -212,14 +250,14 @@ namespace Consola.Test
 
         public void Reset()
         {
-            ApartmentState current = run.GetApartmentState();
+            ApartmentState stateoftheaut = run.GetApartmentState();
             if( run.ThreadState == ThreadState.Running ) {
                 run.Abort();
-                Thread.Sleep( 10 );
+                Thread.Sleep(10);
             }
             if( run.ThreadState == ThreadState.Stopped ) {
-                run = new Thread( los );
-                run.SetApartmentState( current );
+                run = new Thread(los);
+                run.SetApartmentState(stateoftheaut);
                 prc = -1;
             }
         }
@@ -227,11 +265,13 @@ namespace Consola.Test
         public bool Completed {
             get { return run.ThreadState == ThreadState.Stopped; }
         }
+
         public Suite<A> GetResult()
         {
             while( run.ThreadState == ThreadState.Running ) {
-                Thread.Sleep( 100 );
-            } return tst;
+                Thread.Sleep(100);
+            }
+            return tst;
         }
     }
 }

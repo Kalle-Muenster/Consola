@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Consola
 {
@@ -44,7 +45,7 @@ namespace Consola
                 {
                     if( test.NextCase( name ) ) {
                         call(); int failed =
-                            test.CloseCase( name );
+                            test.closeCase( name );
                         if( skip )
                             test.SkipNextTest =
                             failed > 0;
@@ -436,10 +437,10 @@ namespace Consola
 
 
             // Case handling:
-            // NextCase(name) - begins a new test case section named 'name'
-            // CloseCase(name) - close a test case section and generate case summary
+            // NextCase(name) - begins a new test case section named 'casename'
+            // CloseCase(name) - close a test case section and generate a summary
             // SkipCase(name) - doesn't execute but log a case was skiped instead 
-            protected bool NextCase( string casename )
+            public bool NextCase( string casename )
             {
                 if( SkipNextTest ) {
                     SkipNextTest = false;
@@ -459,7 +460,7 @@ namespace Consola
                 } return true;
             }
 
-            protected int CloseCase( bool successive )
+            private int closeCase( bool successive )
             {
                 bool xml = flags.HasFlag( TestResults.XmlOutput );
                 int total = count;
@@ -483,19 +484,24 @@ namespace Consola
                 } return returnval;
             }
 
-            protected int CloseCase( string casename )
+            private int closeCase( string casename )
             {
                 if (casename == current) {
                     bool successive = (failures - failsgone) == 0;
-                    return CloseCase( successive );
+                    return closeCase( successive );
                 } else {
                     string actual = current;
                     current = casename;
                     failsgone = 0;
-                    failsgone = CloseCase( hasPassed() );
+                    failsgone = closeCase( hasPassed() );
                     current = actual;
                     return failsgone;
                 }
+            }
+
+            public int CloseCase()
+            {
+                return closeCase( current );
             }
 
             protected int SkipCase( string casename )
@@ -503,7 +509,7 @@ namespace Consola
                 string previous = current;
                 NextCase( casename );
                 SkipStep( "depending on {0}", previous );
-                return CloseCase( false );
+                return closeCase( false );
             }
 
 

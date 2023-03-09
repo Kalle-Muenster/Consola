@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
+using System.Xml;
 
 namespace Consola.Test
 {
@@ -117,6 +118,7 @@ namespace Consola.Test
         }
     }
 
+    [StructLayout(LayoutKind.Sequential,Size=8)]
     internal struct ScreenScale
     {
         public float X;
@@ -134,7 +136,7 @@ namespace Consola.Test
         public UInt32     type;
         public KEYBDINPUT data;
 
-        public TYPED_INPUT( ConTrol.Typed flags, char key )
+        public TYPED_INPUT( ConTrol.Keys flags, char key )
             : this()
         {
             type = InputType.Typed;
@@ -191,6 +193,16 @@ namespace Consola.Test
                 This.Y -= That.Y;
                 return This;
             }
+
+            public static implicit operator ValueTuple<short,short>( Point cast )
+            {
+                return new ValueTuple<short,short>((short)cast.X, (short)cast.Y);
+            }
+
+            public static implicit operator Point( ValueTuple<short,short> cast )
+            {
+                return new Point( cast.Item1, cast.Item2 );
+            }
         }
 
         public struct SizeOf
@@ -226,10 +238,11 @@ namespace Consola.Test
             WheelH = MFLAGS.HWHEEL
         }
 
-        public enum Typed : uint 
+        public enum Keys : uint 
         {
-            KeyDown = 0,
-            KeyUp = KFLAGS.KEYUP
+            TYPE = 0,
+            DOWN = 1,
+            UP = KFLAGS.KEYUP
         }
 
         [DllImport( "User32.dll", EntryPoint = "GetSystemMetrics" )]
@@ -249,9 +262,9 @@ namespace Consola.Test
             return new ScreenScale( GetScreenSize() );
         }
 
-        public static bool Mouse( Move flags, ConTrol.Point point )
+        public static bool Mouse( Move flags, ValueTuple<short,short> point )
         {
-            return Mouse( flags, point.X, point.Y );
+            return Mouse( flags, point.Item1, point.Item2 );
         }
 
         public static bool Mouse( Move flags, int x, int y )
@@ -305,6 +318,11 @@ namespace Consola.Test
             }
         }
 
+        public static bool Click( Button flags, ValueTuple<short,short> ixyps )
+        {
+            return Click( flags, ixyps.Item1, ixyps.Item2 );
+        }
+
         public static bool Click( Button flags, ConTrol.Point point )
         {
             return Click( flags, point.X, point.Y );
@@ -332,14 +350,24 @@ namespace Consola.Test
             return Wheel( flags, turn, point.X, point.Y );
         }
 
-        public static bool Type( char key )
+
+        public static bool Key( Keys flags, char key )
         {
-            TYPED_INPUT[] evs = new TYPED_INPUT[2] {
-                new TYPED_INPUT( Typed.KeyDown, key ),
-                new TYPED_INPUT( Typed.KeyUp, key )
-            };
-            unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
-                return SendInput( 2, new IntPtr(ptr), SizeOf.TYPED_DATA ) == 2;
+            uint count;
+            TYPED_INPUT[] eingabe;
+            if( ( flags & ( Keys.UP | Keys.DOWN ) ) == 0 ) {
+                eingabe = new TYPED_INPUT[2] {
+                    new TYPED_INPUT( flags, key ),
+                    new TYPED_INPUT( flags|Keys.UP, key )
+                }; count = 2;
+            } else {
+                eingabe = new TYPED_INPUT[1] {
+                    new TYPED_INPUT( flags & ~Keys.DOWN, key )
+                }; count = 1;
+            }
+            unsafe { fixed( TYPED_INPUT* pt = &eingabe[0] ) {
+                return SendInput( count, new IntPtr(pt),
+                                  SizeOf.TYPED_DATA ) == count;
             } }
         }
 
@@ -349,14 +377,15 @@ namespace Consola.Test
             char[] text = sequence.ToCharArray();
             TYPED_INPUT[] evs = new TYPED_INPUT[count];
             count = (uint)text.Length;
-            for( int i = 0; i < count; ++i ) { int e = i*2;
+            for( int i = 0; i < count; ++i ) { int e = i+i;
                 char c = text[i];
-                evs[e] = new TYPED_INPUT( Typed.KeyDown, c );
-                evs[e+1] = new TYPED_INPUT( Typed.KeyUp, c );
-            } count *= 2;
+                evs[e] = new TYPED_INPUT( Keys.TYPE, c );
+                evs[e+1] = new TYPED_INPUT( Keys.UP, c );
+            } count += count;
             unsafe { fixed( TYPED_INPUT* ptr = &evs[0] ) {
                 uint size = (uint)sizeof(TYPED_INPUT);
-                return SendInput( count, new IntPtr(ptr), SizeOf.TYPED_DATA ) == count;
+                return SendInput( count, new IntPtr(ptr), 
+                                  SizeOf.TYPED_DATA ) == count;
             } }
         }
     }
